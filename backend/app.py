@@ -5,6 +5,7 @@ from flask_cors import CORS
 from flask_mail import Mail
 from dotenv import load_dotenv
 from urllib.parse import quote_plus
+from extensions import db, mail
 import os
 
 load_dotenv()
@@ -33,7 +34,7 @@ app.config['MAIL_PASSWORD'] = os.getenv('MAIL_PASSWORD')
 
 db.init_app(app)
 bcrypt = Bcrypt(app)
-mail = Mail(app)
+mail.init_app(app)
 
 @app.route('/')
 def home():

@@ -7,6 +7,7 @@ import os
 from werkzeug.utils import secure_filename
 from ai_module import analyze_images
 from pdf_module import generate_complaint_pdf
+from email_module import send_dmca_email
 UPLOAD_FOLDER = 'uploads'
 os.makedirs(UPLOAD_FOLDER, exist_ok=True)
 
@@ -238,3 +239,46 @@ def generate_pdf(report_id):
         'message': 'PDF generated successfully',
         'pdf_path': output_path
     }), 200
+
+# ─── 8. SEND DMCA EMAIL SIMULATION ───────────────────────────────────────────
+
+@api.route('/api/send-dmca/<int:report_id>', methods=['POST'])
+def send_dmca(report_id):
+    report = Report.query.get(report_id)
+    if not report:
+        return jsonify({'error': 'Report not found'}), 404
+
+    victim = Victim.query.get(report.victim_id)
+    evidence = Evidence.query.filter_by(report_id=report.id).first()
+    case = Case.query.filter_by(report_id=report.id).first()
+
+    report_data = {
+        'report_id': report.id,
+        'token': victim.token if victim else 'N/A',
+        'platform': report.platform,
+        'category': report.category,
+        'description': report.description,
+        'status': case.status if case else 'Pending',
+        'manipulation_score': evidence.manipulation_score if evidence else 'N/A',
+        'verdict': 'High likelihood of manipulation' if evidence else 'N/A'
+    }
+
+    # Create takedown record
+    takedown = Takedown(
+        report_id=report.id,
+        platform=report.platform,
+        status='Sent'
+    )
+    db.session.add(takedown)
+    db.session.commit()
+
+    result = send_dmca_email(report_data)
+
+    if result['success']:
+        return jsonify({
+            'message': 'DMCA simulation email sent successfully',
+            'sent_to': 'shieldnet.dummy@gmail.com',
+            'report_id': report_id
+        }), 200
+    else:
+        return jsonify({'error': result['error']}), 500
