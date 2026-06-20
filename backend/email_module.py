@@ -10,7 +10,7 @@ def send_dmca_email(report_data):
     """
 
     # Simulation target — dummy Gmail instead of real platform
-    DUMMY_EMAIL = "shieldnet.dummy@gmail.com"
+    DUMMY_EMAIL = "maria.amir.tech@gmail.com"
 
     platform = report_data.get('platform', 'Unknown Platform')
     report_id = report_data.get('report_id', 'N/A')
