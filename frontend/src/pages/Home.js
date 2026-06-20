@@ -1,10 +1,13 @@
 import React from 'react';
 import { Link } from 'react-router-dom';
+import { useTranslation } from 'react-i18next';
 import Navbar from '../components/Navbar';
 import Footer from '../components/Footer';
 import './Home.css';
 
 function Home() {
+  const { t } = useTranslation();
+
   return (
     <div className="page-container">
       <div className="home">
@@ -13,23 +16,19 @@ function Home() {
         <section className="hero">
           <div className="hero-left">
             <div className="shield-frame">
-              <span className="eyebrow">Anonymous &middot; Encrypted &middot; Free</span>
+              <span className="eyebrow">{t('home.eyebrow')}</span>
               <h1>
-                Report cyber harassment.<br />
-                Stay protected.<br />
-                <span className="accent">Stay anonymous.</span>
+                {t('home.title1')}<br />
+                {t('home.title2')}<br />
+                <span className="accent">{t('home.title3')}</span>
               </h1>
-              <p className="hero-sub">
-                ShieldNet helps victims of online harassment document evidence,
-                generate official complaints, and track their case — without
-                ever revealing who they are.
-              </p>
+              <p className="hero-sub">{t('home.subtitle')}</p>
               <div className="hero-actions">
                 <Link to="/report">
-                  <button className="btn-primary">Report an incident</button>
+                  <button className="btn-primary">{t('home.btnReport')}</button>
                 </Link>
                 <Link to="/track">
-                  <button className="btn-secondary">Track my case</button>
+                  <button className="btn-secondary">{t('home.btnTrack')}</button>
                 </Link>
               </div>
             </div>
@@ -39,19 +38,19 @@ function Home() {
             <div className="status-panel">
               <div className="status-row">
                 <span className="dot"></span>
-                <span>System status: Active</span>
+                <span>{t('home.statusActive')}</span>
               </div>
               <div className="stat">
                 <span className="stat-number mono">128</span>
-                <span className="stat-label">Cases reported this month</span>
+                <span className="stat-label">{t('home.stat1Label')}</span>
               </div>
               <div className="stat">
                 <span className="stat-number mono">94%</span>
-                <span className="stat-label">Evidence verified by AI</span>
+                <span className="stat-label">{t('home.stat2Label')}</span>
               </div>
               <div className="stat">
                 <span className="stat-number mono">100%</span>
-                <span className="stat-label">Anonymous by default</span>
+                <span className="stat-label">{t('home.stat3Label')}</span>
               </div>
             </div>
           </div>

@@ -1,0 +1,69 @@
+{
+  "nav": {
+    "home": "Accueil",
+    "track": "Suivre un dossier",
+    "stats": "Statistiques",
+    "report": "Signaler maintenant"
+  },
+  "home": {
+    "eyebrow": "Anonyme · Chiffré · Gratuit",
+    "title1": "Signalez le harcèlement en ligne.",
+    "title2": "Restez protégé.",
+    "title3": "Restez anonyme.",
+    "subtitle": "ShieldNet aide les victimes de harcèlement en ligne à documenter des preuves, générer des plaintes officielles et suivre leur dossier — sans jamais révéler leur identité.",
+    "btnReport": "Signaler un incident",
+    "btnTrack": "Suivre mon dossier",
+    "statusActive": "État du système : Actif",
+    "stat1Label": "Dossiers signalés ce mois-ci",
+    "stat2Label": "Preuves vérifiées par IA",
+    "stat3Label": "Anonyme par défaut"
+  },
+  "report": {
+    "title": "Signaler un incident",
+    "subtitle": "Aucun compte nécessaire. Votre identité n'est jamais enregistrée.",
+    "category": "Catégorie",
+    "categoryPlaceholder": "Sélectionnez une catégorie",
+    "platform": "Plateforme concernée",
+    "platformPlaceholder": "Sélectionnez une plateforme",
+    "description": "Décrivez ce qui s'est passé",
+    "descriptionPlaceholder": "Partagez autant de détails que vous le souhaitez...",
+    "evidence": "Téléverser une preuve (facultatif)",
+    "evidencePlaceholder": "Choisissez une capture d'écran ou une vidéo",
+    "submit": "Soumettre le rapport",
+    "validationError": "Veuillez remplir tous les champs avant de soumettre.",
+    "successEyebrow": "Rapport reçu",
+    "successTitle": "Votre dossier a été enregistré.",
+    "successSub": "Conservez ce jeton — vous en aurez besoin pour suivre votre dossier. Nous ne lions jamais ce jeton à votre identité.",
+    "successNote": "Les mises à jour apparaîtront sur la page de suivi."
+  },
+  "track": {
+    "title": "Suivez votre dossier",
+    "subtitle": "Entrez le jeton reçu lors de votre signalement.",
+    "placeholder": "ex. SHD-COJB1N",
+    "button": "Suivre",
+    "errorEmpty": "Veuillez entrer votre jeton de dossier.",
+    "category": "Catégorie",
+    "platform": "Plateforme",
+    "submitted": "Soumis"
+  },
+  "analytics": {
+    "eyebrow": "Tableau de sensibilisation publique",
+    "title": "Tendances du harcèlement en ligne",
+    "subtitle": "Statistiques anonymisées des signalements via ShieldNet. Aucune donnée personnelle n'est jamais affichée ici.",
+    "stat1": "Total des signalements ce mois-ci",
+    "stat2": "Preuves vérifiées par IA",
+    "stat3": "Taux de réussite des retraits",
+    "stat4": "Plateformes surveillées",
+    "chartPlatform": "Signalements par plateforme",
+    "chartCategory": "Signalements par catégorie",
+    "mapTitle": "Origines des signalements"
+  },
+  "footer": {
+    "tagline": "Protéger les victimes. Exposer les agresseurs. Connecter le monde.",
+    "platform": "Plateforme",
+    "emergency": "Ressources d'urgence",
+    "mentalHealth": "Soutien en santé mentale",
+    "copyright": "ShieldNet — Projet de fin d'études académique",
+    "university": "Université de Lahore, Département IET"
+  }
+}

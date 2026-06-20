@@ -10,6 +10,7 @@ import {
   Legend,
 } from 'chart.js';
 import { MapContainer, TileLayer, CircleMarker, Popup } from 'react-leaflet';
+import { useTranslation } from 'react-i18next';
 import Navbar from '../components/Navbar';
 import Footer from '../components/Footer';
 import './Analytics.css';
@@ -17,6 +18,8 @@ import './Analytics.css';
 ChartJS.register(CategoryScale, LinearScale, BarElement, ArcElement, Tooltip, Legend);
 
 function Analytics() {
+  const { t } = useTranslation();
+
   const platformData = {
     labels: ['Instagram', 'Facebook', 'TikTok', 'Twitter/X', 'Snapchat', 'YouTube'],
     datasets: [
@@ -82,46 +85,43 @@ function Analytics() {
       <Navbar />
       <div className="analytics-page">
         <div className="analytics-header">
-          <span className="eyebrow">Public Awareness Dashboard</span>
-          <h1>Cyber harassment trends</h1>
-          <p className="analytics-sub">
-            Anonymized statistics from reports submitted through ShieldNet.
-            No personal data is ever displayed here.
-          </p>
+          <span className="eyebrow">{t('analytics.eyebrow')}</span>
+          <h1>{t('analytics.title')}</h1>
+          <p className="analytics-sub">{t('analytics.subtitle')}</p>
         </div>
 
         <div className="stats-row">
           <div className="stat-card">
             <span className="stat-number mono">128</span>
-            <span className="stat-label">Total reports this month</span>
+            <span className="stat-label">{t('analytics.stat1')}</span>
           </div>
           <div className="stat-card">
             <span className="stat-number mono">94%</span>
-            <span className="stat-label">Evidence verified by AI</span>
+            <span className="stat-label">{t('analytics.stat2')}</span>
           </div>
           <div className="stat-card">
             <span className="stat-number mono">76%</span>
-            <span className="stat-label">Takedown success rate</span>
+            <span className="stat-label">{t('analytics.stat3')}</span>
           </div>
           <div className="stat-card">
             <span className="stat-number mono">6</span>
-            <span className="stat-label">Platforms monitored</span>
+            <span className="stat-label">{t('analytics.stat4')}</span>
           </div>
         </div>
 
         <div className="charts-row">
           <div className="chart-card">
-            <h3>Reports by platform</h3>
+            <h3>{t('analytics.chartPlatform')}</h3>
             <Bar data={platformData} options={chartOptions} />
           </div>
           <div className="chart-card">
-            <h3>Reports by category</h3>
+            <h3>{t('analytics.chartCategory')}</h3>
             <Doughnut data={categoryData} options={doughnutOptions} />
           </div>
         </div>
 
         <div className="map-card">
-          <h3>Report origins</h3>
+          <h3>{t('analytics.mapTitle')}</h3>
           <MapContainer
             center={[30.3753, 69.3451]}
             zoom={5}

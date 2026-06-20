@@ -1,9 +1,11 @@
 import React, { useState } from 'react';
+import { useTranslation } from 'react-i18next';
 import Navbar from '../components/Navbar';
 import Footer from '../components/Footer';
 import './TrackCase.css';
 
 function TrackCase() {
+  const { t } = useTranslation();
   const [token, setToken] = useState('');
   const [caseData, setCaseData] = useState(null);
   const [error, setError] = useState('');
@@ -32,7 +34,7 @@ function TrackCase() {
     const trimmedToken = token.trim().toUpperCase();
 
     if (!trimmedToken) {
-      setError('Please enter your case token.');
+      setError(t('track.errorEmpty'));
       return;
     }
 
@@ -61,20 +63,18 @@ function TrackCase() {
       <div className="track-page">
         <div className="track-card">
           <span className="eyebrow">Anonymous &middot; Encrypted &middot; Free</span>
-          <h1>Track your case</h1>
-          <p className="track-sub">
-            Enter the token you received when you submitted your report.
-          </p>
+          <h1>{t('track.title')}</h1>
+          <p className="track-sub">{t('track.subtitle')}</p>
 
           <form onSubmit={handleSearch} className="track-form">
             <input
               type="text"
-              placeholder="e.g. SHD-COJB1N"
+              placeholder={t('track.placeholder')}
               value={token}
               onChange={(e) => setToken(e.target.value)}
               className="mono"
             />
-            <button type="submit" className="btn-primary">Track</button>
+            <button type="submit" className="btn-primary">{t('track.button')}</button>
           </form>
 
           {error && <p className="track-error">{error}</p>}
@@ -83,15 +83,15 @@ function TrackCase() {
             <div className="case-result">
               <div className="case-meta">
                 <div>
-                  <span className="meta-label">Category</span>
+                  <span className="meta-label">{t('track.category')}</span>
                   <span className="meta-value">{caseData.category}</span>
                 </div>
                 <div>
-                  <span className="meta-label">Platform</span>
+                  <span className="meta-label">{t('track.platform')}</span>
                   <span className="meta-value">{caseData.platform}</span>
                 </div>
                 <div>
-                  <span className="meta-label">Submitted</span>
+                  <span className="meta-label">{t('track.submitted')}</span>
                   <span className="meta-value">{caseData.submittedOn}</span>
                 </div>
               </div>

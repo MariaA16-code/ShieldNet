@@ -54,6 +54,15 @@
   border-radius: 8px;
   font-weight: 500;
 }
+.lang-select {
+  background: #0B0E14;
+  color: #E8EBF0;
+  border: 1px solid rgba(255,255,255,0.15);
+  border-radius: 6px;
+  padding: 6px 8px;
+  font-size: 13px;
+  cursor: pointer;
+}
 
 @media (max-width: 600px) {
   .navbar {
