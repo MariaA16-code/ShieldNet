@@ -182,10 +182,14 @@ def get_flagged_harassers():
 
 # ─── 6. AI IMAGE ANALYSIS ─────────────────────────────────────────────────────
 
-@api.route('/api/analyze', methods=['POST'])
-def analyze():
+@api.route('/api/analyze/<int:report_id>', methods=['POST'])
+def analyze(report_id):
     if 'original' not in request.files or 'fake' not in request.files:
         return jsonify({'error': 'Both original and fake images are required'}), 400
+
+    report = Report.query.get(report_id)
+    if not report:
+        return jsonify({'error': 'Report not found'}), 404
 
     original = request.files['original']
     fake = request.files['fake']
@@ -200,6 +204,18 @@ def analyze():
     fake.save(fake_path)
 
     result = analyze_images(original_path, fake_path)
+
+    if 'error' not in result:
+        # Save to evidence table
+        evidence = Evidence(
+            report_id=report_id,
+            original_image=original_path,
+            fake_image=fake_path,
+            manipulation_score=result.get('manipulation_score'),
+            file_metadata=str(result.get('details'))
+        )
+        db.session.add(evidence)
+        db.session.commit()
 
     return jsonify(result), 200
 
