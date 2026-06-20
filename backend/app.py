@@ -10,6 +10,7 @@ import os
 load_dotenv()
 
 app = Flask(__name__)
+app.config['UPLOAD_FOLDER'] = 'uploads'
 CORS(app)
 
 # DB Config

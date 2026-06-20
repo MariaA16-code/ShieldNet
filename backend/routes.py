@@ -3,6 +3,11 @@ from extensions import db
 from models import Victim, Report, Evidence, Takedown, Harasser, Case
 from datetime import datetime
 import secrets
+import os
+from werkzeug.utils import secure_filename
+from ai_module import analyze_images
+UPLOAD_FOLDER = 'uploads'
+os.makedirs(UPLOAD_FOLDER, exist_ok=True)
 
 api = Blueprint('api', __name__)
 
@@ -172,3 +177,26 @@ def get_flagged_harassers():
         })
 
     return jsonify({'flagged_harassers': result}), 200
+
+# ─── 6. AI IMAGE ANALYSIS ─────────────────────────────────────────────────────
+
+@api.route('/api/analyze', methods=['POST'])
+def analyze():
+    if 'original' not in request.files or 'fake' not in request.files:
+        return jsonify({'error': 'Both original and fake images are required'}), 400
+
+    original = request.files['original']
+    fake = request.files['fake']
+
+    original_filename = secure_filename(original.filename)
+    fake_filename = secure_filename(fake.filename)
+
+    original_path = os.path.join(UPLOAD_FOLDER, 'original_' + original_filename)
+    fake_path = os.path.join(UPLOAD_FOLDER, 'fake_' + fake_filename)
+
+    original.save(original_path)
+    fake.save(fake_path)
+
+    result = analyze_images(original_path, fake_path)
+
+    return jsonify(result), 200
