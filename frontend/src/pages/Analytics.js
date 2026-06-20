@@ -9,6 +9,7 @@ import {
   Tooltip,
   Legend,
 } from 'chart.js';
+import { MapContainer, TileLayer, CircleMarker, Popup } from 'react-leaflet';
 import Navbar from '../components/Navbar';
 import './Analytics.css';
 
@@ -38,7 +39,13 @@ function Analytics() {
       },
     ],
   };
-
+  const reportLocations = [
+  { city: 'Lahore', lat: 31.5497, lng: 74.3436, count: 34 },
+  { city: 'Karachi', lat: 24.8607, lng: 67.0011, count: 28 },
+  { city: 'Islamabad', lat: 33.6844, lng: 73.0479, count: 19 },
+  { city: 'Faisalabad', lat: 31.4504, lng: 73.1350, count: 12 },
+  { city: 'Multan', lat: 30.1575, lng: 71.5249, count: 8 },
+];
   const chartOptions = {
     responsive: true,
     plugins: {
@@ -110,6 +117,33 @@ function Analytics() {
             <Doughnut data={categoryData} options={doughnutOptions} />
           </div>
         </div>
+        <div className="map-card">
+  <h3>Report origins</h3>
+  <MapContainer
+    center={[30.3753, 69.3451]}
+    zoom={5}
+    scrollWheelZoom={false}
+    style={{ height: '380px', width: '100%', borderRadius: '8px' }}
+  >
+    <TileLayer
+      url="https://{s}.basemaps.cartocdn.com/dark_all/{z}/{x}/{y}{r}.png"
+      attribution='&copy; OpenStreetMap contributors &copy; CARTO'
+    />
+    {reportLocations.map((loc, index) => (
+      <CircleMarker
+        key={index}
+        center={[loc.lat, loc.lng]}
+        radius={Math.sqrt(loc.count) * 3}
+        pathOptions={{ color: '#3DDC97', fillColor: '#3DDC97', fillOpacity: 0.4 }}
+      >
+        <Popup>
+          <strong>{loc.city}</strong><br />
+          {loc.count} reports
+        </Popup>
+      </CircleMarker>
+    ))}
+  </MapContainer>
+</div>
       </div>
     </div>
   );

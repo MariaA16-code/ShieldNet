@@ -80,3 +80,27 @@
   .stats-row { grid-template-columns: repeat(2, 1fr); }
   .charts-row { grid-template-columns: 1fr; }
 }
+.map-card {
+  background: #141925;
+  border: 1px solid rgba(255,255,255,0.06);
+  border-radius: 12px;
+  padding: 28px;
+  margin-top: 20px;
+}
+
+.map-card h3 {
+  font-size: 16px;
+  font-weight: 600;
+  margin-bottom: 20px;
+  color: #E8EBF0;
+}
+
+.leaflet-popup-content-wrapper {
+  background: #141925;
+  color: #E8EBF0;
+  border-radius: 8px;
+}
+
+.leaflet-popup-tip {
+  background: #141925;
+}
