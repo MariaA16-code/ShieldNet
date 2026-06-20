@@ -1,0 +1,131 @@
+.report-page {
+  min-height: 100vh;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 60px 24px;
+}
+
+.report-form {
+  background: #141925;
+  border: 1px solid rgba(255,255,255,0.06);
+  border-radius: 16px;
+  padding: 44px;
+  max-width: 520px;
+  width: 100%;
+}
+
+.eyebrow {
+  color: #3DDC97;
+  font-size: 13px;
+  font-weight: 500;
+  letter-spacing: 0.05em;
+  text-transform: uppercase;
+}
+
+.report-form h1 {
+  font-size: 28px;
+  font-weight: 600;
+  margin: 14px 0 8px;
+}
+
+.form-sub {
+  color: #7C8699;
+  font-size: 14px;
+  margin-bottom: 28px;
+}
+
+.report-form label {
+  display: block;
+  font-size: 13px;
+  color: #E8EBF0;
+  font-weight: 500;
+  margin-bottom: 8px;
+  margin-top: 20px;
+}
+
+.report-form select,
+.report-form textarea {
+  width: 100%;
+  background: #0B0E14;
+  border: 1px solid rgba(255,255,255,0.1);
+  border-radius: 8px;
+  padding: 12px 14px;
+  color: #E8EBF0;
+  font-family: 'Inter', sans-serif;
+  font-size: 14px;
+  resize: vertical;
+}
+
+.report-form select:focus,
+.report-form textarea:focus {
+  outline: none;
+  border-color: #3DDC97;
+}
+
+.file-upload input[type="file"] {
+  display: none;
+}
+
+.file-label {
+  display: block;
+  background: #0B0E14;
+  border: 1px dashed rgba(255,255,255,0.2);
+  border-radius: 8px;
+  padding: 14px;
+  text-align: center;
+  font-size: 14px;
+  color: #7C8699;
+  cursor: pointer;
+  margin-top: 0;
+}
+
+.file-label:hover {
+  border-color: #3DDC97;
+  color: #E8EBF0;
+}
+
+.submit-btn {
+  width: 100%;
+  margin-top: 32px;
+  padding: 14px;
+  font-size: 15px;
+}
+
+.success-card {
+  background: #141925;
+  border: 1px solid rgba(61, 220, 151, 0.25);
+  border-radius: 16px;
+  padding: 48px;
+  max-width: 480px;
+  text-align: center;
+}
+
+.success-card h1 {
+  font-size: 26px;
+  font-weight: 600;
+  margin: 14px 0 12px;
+}
+
+.success-sub {
+  color: #7C8699;
+  font-size: 14px;
+  line-height: 1.6;
+  margin-bottom: 28px;
+}
+
+.token-box {
+  background: #0B0E14;
+  border: 1px solid #3DDC97;
+  border-radius: 10px;
+  padding: 18px;
+  font-size: 22px;
+  letter-spacing: 0.05em;
+  color: #3DDC97;
+  margin-bottom: 24px;
+}
+
+.success-note {
+  color: #7C8699;
+  font-size: 13px;
+}
