@@ -1,5 +1,6 @@
 import React, { useState } from 'react';
 import Navbar from '../components/Navbar';
+import Footer from '../components/Footer';
 import './TrackCase.css';
 
 function TrackCase() {
@@ -7,7 +8,6 @@ function TrackCase() {
   const [caseData, setCaseData] = useState(null);
   const [error, setError] = useState('');
 
-  // Fake case database until Maria's API is ready
   const fakeCases = {
     'SHD-COJB1N': {
       category: 'Fake / edited photo',
@@ -110,6 +110,7 @@ function TrackCase() {
           )}
         </div>
       </div>
+      <Footer />
     </div>
   );
 }
