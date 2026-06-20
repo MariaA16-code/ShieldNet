@@ -293,7 +293,7 @@ def send_dmca(report_id):
     if result['success']:
         return jsonify({
             'message': 'DMCA simulation email sent successfully',
-            'sent_to': 'shieldnet.dummy@gmail.com',
+            'sent_to': 'maria.amir.tech@gmail.com',
             'report_id': report_id
         }), 200
     else:
