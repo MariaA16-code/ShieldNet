@@ -138,3 +138,21 @@
   color: #E8EBF0;
   font-weight: 500;
 }
+@media (max-width: 600px) {
+  .track-card {
+    padding: 28px 20px;
+  }
+
+  .track-form {
+    flex-direction: column;
+  }
+
+  .track-form button {
+    width: 100%;
+  }
+
+  .case-meta {
+    flex-direction: column;
+    gap: 12px;
+  }
+}
