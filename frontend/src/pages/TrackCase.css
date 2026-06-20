@@ -1,0 +1,134 @@
+.track-page {
+  min-height: 100vh;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 60px 24px;
+}
+
+.track-card {
+  background: #141925;
+  border: 1px solid rgba(255,255,255,0.06);
+  border-radius: 16px;
+  padding: 44px;
+  max-width: 520px;
+  width: 100%;
+}
+
+.eyebrow {
+  color: #3DDC97;
+  font-size: 13px;
+  font-weight: 500;
+  letter-spacing: 0.05em;
+  text-transform: uppercase;
+}
+
+.track-card h1 {
+  font-size: 28px;
+  font-weight: 600;
+  margin: 14px 0 8px;
+}
+
+.track-sub {
+  color: #7C8699;
+  font-size: 14px;
+  margin-bottom: 28px;
+}
+
+.track-form {
+  display: flex;
+  gap: 10px;
+}
+
+.track-form input {
+  flex: 1;
+  background: #0B0E14;
+  border: 1px solid rgba(255,255,255,0.1);
+  border-radius: 8px;
+  padding: 12px 14px;
+  color: #E8EBF0;
+  font-size: 14px;
+}
+
+.track-form input:focus {
+  outline: none;
+  border-color: #3DDC97;
+}
+
+.track-form button {
+  padding: 12px 24px;
+  border-radius: 8px;
+  font-weight: 500;
+}
+
+.track-error {
+  color: #FF6B6B;
+  font-size: 13px;
+  margin-top: 12px;
+}
+
+.case-result {
+  margin-top: 32px;
+  border-top: 1px solid rgba(255,255,255,0.06);
+  padding-top: 28px;
+}
+
+.case-meta {
+  display: flex;
+  justify-content: space-between;
+  margin-bottom: 28px;
+  flex-wrap: wrap;
+  gap: 16px;
+}
+
+.case-meta > div {
+  display: flex;
+  flex-direction: column;
+}
+
+.meta-label {
+  font-size: 12px;
+  color: #7C8699;
+  margin-bottom: 4px;
+}
+
+.meta-value {
+  font-size: 14px;
+  color: #E8EBF0;
+  font-weight: 500;
+}
+
+.timeline {
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+}
+
+.timeline-item {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}
+
+.timeline-dot {
+  width: 10px;
+  height: 10px;
+  border-radius: 50%;
+  background: rgba(255,255,255,0.15);
+  flex-shrink: 0;
+}
+
+.timeline-dot.done {
+  background: #3DDC97;
+  box-shadow: 0 0 8px #3DDC97;
+}
+
+.timeline-label {
+  font-size: 14px;
+  color: #7C8699;
+}
+
+.timeline-label.done {
+  color: #E8EBF0;
+  font-weight: 500;
+}
