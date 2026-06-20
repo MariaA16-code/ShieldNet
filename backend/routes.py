@@ -6,6 +6,7 @@ import secrets
 import os
 from werkzeug.utils import secure_filename
 from ai_module import analyze_images
+from pdf_module import generate_complaint_pdf
 UPLOAD_FOLDER = 'uploads'
 os.makedirs(UPLOAD_FOLDER, exist_ok=True)
 
@@ -200,3 +201,40 @@ def analyze():
     result = analyze_images(original_path, fake_path)
 
     return jsonify(result), 200
+
+# ─── 7. GENERATE PDF COMPLAINT ────────────────────────────────────────────────
+
+@api.route('/api/generate-pdf/<int:report_id>', methods=['GET'])
+def generate_pdf(report_id):
+    report = Report.query.get(report_id)
+    if not report:
+        return jsonify({'error': 'Report not found'}), 404
+
+    victim = Victim.query.get(report.victim_id)
+    case = Case.query.filter_by(report_id=report.id).first()
+    evidence = Evidence.query.filter_by(report_id=report.id).first()
+
+    report_data = {
+        'report_id': report.id,
+        'token': victim.token if victim else 'N/A',
+        'status': case.status if case else 'Pending',
+        'platform': report.platform,
+        'category': report.category,
+        'country': victim.country if victim else 'N/A',
+        'description': report.description,
+        'manipulation_score': evidence.manipulation_score if evidence else None,
+        'verdict': 'High likelihood of manipulation' if evidence else None,
+        'face_match': False if evidence else None,
+        'pixel_difference': None
+    }
+
+    pdf_folder = 'pdfs'
+    os.makedirs(pdf_folder, exist_ok=True)
+    output_path = os.path.join(pdf_folder, f'complaint_{report_id}.pdf')
+
+    generate_complaint_pdf(report_data, output_path)
+
+    return jsonify({
+        'message': 'PDF generated successfully',
+        'pdf_path': output_path
+    }), 200
