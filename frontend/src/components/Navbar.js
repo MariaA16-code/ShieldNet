@@ -12,7 +12,9 @@ function Navbar() {
       <div className="nav-links">
         <Link to="/">Home</Link>
         <Link to="/track">Track a case</Link>
+        <Link to="/analytics">Statistics</Link>
         <Link to="/report" className="nav-cta">Report now</Link>
+
       </div>
     </nav>
   );
