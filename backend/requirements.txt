@@ -21,3 +21,4 @@ flask-sqlalchemy>=2.5.1
 flask-bcrypt>=1.0.1
 flask-mail>=0.9.1
 PyMySQL>=1.0.2
+reportlab>=3.6.0
