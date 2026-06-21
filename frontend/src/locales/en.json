@@ -34,7 +34,9 @@
     "successEyebrow": "Report received",
     "successTitle": "Your case has been logged.",
     "successSub": "Save this token — you'll need it to track your case status. We never link this token to your identity.",
-    "successNote": "Status updates will appear on the Track Case page."
+    "successNote": "Status updates will appear on the Track Case page.",
+    "fileTypeError": "Please upload a valid image or video file.",
+"fileSizeError": "File must be under 25MB."
   },
   "track": {
     "title": "Track your case",
