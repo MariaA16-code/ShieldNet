@@ -1,3 +1,9 @@
+.page-container {
+  display: flex;
+  flex-direction: column;
+  min-height: 100vh;
+}
+
 .track-page {
   min-height: 100vh;
   display: flex;
@@ -131,4 +137,22 @@
 .timeline-label.done {
   color: #E8EBF0;
   font-weight: 500;
+}
+@media (max-width: 600px) {
+  .track-card {
+    padding: 28px 20px;
+  }
+
+  .track-form {
+    flex-direction: column;
+  }
+
+  .track-form button {
+    width: 100%;
+  }
+
+  .case-meta {
+    flex-direction: column;
+    gap: 12px;
+  }
 }

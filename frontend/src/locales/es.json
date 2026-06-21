@@ -1,0 +1,69 @@
+{
+  "nav": {
+    "home": "Inicio",
+    "track": "Rastrear un caso",
+    "stats": "Estadísticas",
+    "report": "Reportar ahora"
+  },
+  "home": {
+    "eyebrow": "Anónimo · Cifrado · Gratis",
+    "title1": "Reporta el acoso cibernético.",
+    "title2": "Mantente protegido.",
+    "title3": "Mantente anónimo.",
+    "subtitle": "ShieldNet ayuda a las víctimas de acoso en línea a documentar evidencia, generar quejas oficiales y rastrear su caso — sin revelar nunca su identidad.",
+    "btnReport": "Reportar un incidente",
+    "btnTrack": "Rastrear mi caso",
+    "statusActive": "Estado del sistema: Activo",
+    "stat1Label": "Casos reportados este mes",
+    "stat2Label": "Evidencia verificada por IA",
+    "stat3Label": "Anónimo por defecto"
+  },
+  "report": {
+    "title": "Reportar un incidente",
+    "subtitle": "No se necesita cuenta. Tu identidad nunca se registra.",
+    "category": "Categoría",
+    "categoryPlaceholder": "Selecciona una categoría",
+    "platform": "Plataforma donde ocurrió",
+    "platformPlaceholder": "Selecciona una plataforma",
+    "description": "Describe lo que pasó",
+    "descriptionPlaceholder": "Comparte tantos detalles como te sientas cómodo...",
+    "evidence": "Subir evidencia (opcional)",
+    "evidencePlaceholder": "Elige una captura de pantalla o video",
+    "submit": "Enviar reporte",
+    "validationError": "Por favor completa todos los campos antes de enviar.",
+    "successEyebrow": "Reporte recibido",
+    "successTitle": "Tu caso ha sido registrado.",
+    "successSub": "Guarda este token — lo necesitarás para rastrear tu caso. Nunca vinculamos este token con tu identidad.",
+    "successNote": "Las actualizaciones aparecerán en la página de seguimiento."
+  },
+  "track": {
+    "title": "Rastrea tu caso",
+    "subtitle": "Ingresa el token que recibiste al enviar tu reporte.",
+    "placeholder": "ej. SHD-COJB1N",
+    "button": "Rastrear",
+    "errorEmpty": "Por favor ingresa tu token de caso.",
+    "category": "Categoría",
+    "platform": "Plataforma",
+    "submitted": "Enviado"
+  },
+  "analytics": {
+    "eyebrow": "Panel de concientización pública",
+    "title": "Tendencias de acoso cibernético",
+    "subtitle": "Estadísticas anónimas de reportes enviados a través de ShieldNet. Nunca se muestran datos personales aquí.",
+    "stat1": "Total de reportes este mes",
+    "stat2": "Evidencia verificada por IA",
+    "stat3": "Tasa de éxito de remoción",
+    "stat4": "Plataformas monitoreadas",
+    "chartPlatform": "Reportes por plataforma",
+    "chartCategory": "Reportes por categoría",
+    "mapTitle": "Origen de los reportes"
+  },
+  "footer": {
+    "tagline": "Protegiendo víctimas. Exponiendo abusadores. Conectando el mundo.",
+    "platform": "Plataforma",
+    "emergency": "Recursos de emergencia",
+    "mentalHealth": "Apoyo de salud mental",
+    "copyright": "ShieldNet — Proyecto académico de fin de carrera",
+    "university": "Universidad de Lahore, Departamento IET"
+  }
+}

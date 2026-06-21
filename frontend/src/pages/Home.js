@@ -1,67 +1,62 @@
 import React from 'react';
 import { Link } from 'react-router-dom';
+import { useTranslation } from 'react-i18next';
+import Navbar from '../components/Navbar';
+import Footer from '../components/Footer';
 import './Home.css';
 
 function Home() {
+  const { t } = useTranslation();
+
   return (
-    <div className="home">
-      <nav className="navbar">
-        <div className="logo">
-          <span className="logo-mark"></span>
-          ShieldNet
-        </div>
-        <div className="nav-links">
-          <Link to="/track">Track a case</Link>
-          <Link to="/report" className="nav-cta">Report now</Link>
-        </div>
-      </nav>
+    <div className="page-container">
+      <div className="home">
+        <Navbar />
 
-      <section className="hero">
-        <div className="hero-left">
-          <div className="shield-frame">
-            <span className="eyebrow">Anonymous &middot; Encrypted &middot; Free</span>
-            <h1>
-              Report cyber harassment.<br />
-              Stay protected.<br />
-              <span className="accent">Stay anonymous.</span>
-            </h1>
-            <p className="hero-sub">
-              ShieldNet helps victims of online harassment document evidence,
-              generate official complaints, and track their case — without
-              ever revealing who they are.
-            </p>
-            <div className="hero-actions">
-              <Link to="/report">
-                <button className="btn-primary">Report an incident</button>
-              </Link>
-              <Link to="/track">
-                <button className="btn-secondary">Track my case</button>
-              </Link>
+        <section className="hero">
+          <div className="hero-left">
+            <div className="shield-frame">
+              <span className="eyebrow">{t('home.eyebrow')}</span>
+              <h1>
+                {t('home.title1')}<br />
+                {t('home.title2')}<br />
+                <span className="accent">{t('home.title3')}</span>
+              </h1>
+              <p className="hero-sub">{t('home.subtitle')}</p>
+              <div className="hero-actions">
+                <Link to="/report">
+                  <button className="btn-primary">{t('home.btnReport')}</button>
+                </Link>
+                <Link to="/track">
+                  <button className="btn-secondary">{t('home.btnTrack')}</button>
+                </Link>
+              </div>
             </div>
           </div>
-        </div>
 
-        <div className="hero-right">
-          <div className="status-panel">
-            <div className="status-row">
-              <span className="dot"></span>
-              <span>System status: Active</span>
-            </div>
-            <div className="stat">
-              <span className="stat-number mono">128</span>
-              <span className="stat-label">Cases reported this month</span>
-            </div>
-            <div className="stat">
-              <span className="stat-number mono">94%</span>
-              <span className="stat-label">Evidence verified by AI</span>
-            </div>
-            <div className="stat">
-              <span className="stat-number mono">100%</span>
-              <span className="stat-label">Anonymous by default</span>
+          <div className="hero-right">
+            <div className="status-panel">
+              <div className="status-row">
+                <span className="dot"></span>
+                <span>{t('home.statusActive')}</span>
+              </div>
+              <div className="stat">
+                <span className="stat-number mono">128</span>
+                <span className="stat-label">{t('home.stat1Label')}</span>
+              </div>
+              <div className="stat">
+                <span className="stat-number mono">94%</span>
+                <span className="stat-label">{t('home.stat2Label')}</span>
+              </div>
+              <div className="stat">
+                <span className="stat-number mono">100%</span>
+                <span className="stat-label">{t('home.stat3Label')}</span>
+              </div>
             </div>
           </div>
-        </div>
-      </section>
+        </section>
+      </div>
+      <Footer />
     </div>
   );
 }
