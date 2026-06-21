@@ -1,4 +1,4 @@
-from flask import Blueprint, request, jsonify
+from flask import Blueprint, request, jsonify,send_file
 from extensions import db
 from models import Victim, Report, Evidence, Takedown, Harasser, Case
 from datetime import datetime
@@ -265,6 +265,9 @@ def analyze(report_id):
 
 # ─── 7. GENERATE PDF COMPLAINT ────────────────────────────────────────────────
 
+from flask import send_file
+import tempfile
+
 @api.route('/api/generate-pdf/<int:report_id>', methods=['GET'])
 def generate_pdf(report_id):
     report = Report.query.get(report_id)
@@ -289,16 +292,19 @@ def generate_pdf(report_id):
         'pixel_difference': None
     }
 
-    pdf_folder = 'pdfs'
-    os.makedirs(pdf_folder, exist_ok=True)
-    output_path = os.path.join(pdf_folder, f'complaint_{report_id}.pdf')
+    # Use temp file instead of saving permanently
+    tmp = tempfile.NamedTemporaryFile(delete=False, suffix='.pdf')
+    tmp_path = tmp.name
+    tmp.close()
 
-    generate_complaint_pdf(report_data, output_path)
+    generate_complaint_pdf(report_data, tmp_path)
 
-    return jsonify({
-        'message': 'PDF generated successfully',
-        'pdf_path': output_path
-    }), 200
+    return send_file(
+        tmp_path,
+        as_attachment=True,
+        download_name=f'shieldnet_report_{report_id}.pdf',
+        mimetype='application/pdf'
+    )
 
 # ─── 8. SEND DMCA EMAIL SIMULATION ───────────────────────────────────────────
 
