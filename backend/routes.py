@@ -5,7 +5,7 @@ from datetime import datetime
 import secrets
 import os
 from werkzeug.utils import secure_filename
-from ai_module import analyze_images
+from ai_module import analyze_images, analyze_text_screenshot
 from pdf_module import generate_complaint_pdf
 from email_module import send_dmca_email
 UPLOAD_FOLDER = 'uploads'
@@ -180,44 +180,74 @@ def get_flagged_harassers():
 
     return jsonify({'flagged_harassers': result}), 200
 
-# ─── 6. AI IMAGE ANALYSIS ─────────────────────────────────────────────────────
+# ─── 6. AI ANALYSIS (Image or Text based on category) ────────────────────────
+
+IMAGE_CATEGORIES = ['fake / edited photo', 'deepfake video']
 
 @api.route('/api/analyze/<int:report_id>', methods=['POST'])
 def analyze(report_id):
-    if 'original' not in request.files or 'fake' not in request.files:
-        return jsonify({'error': 'Both original and fake images are required'}), 400
-
     report = Report.query.get(report_id)
     if not report:
         return jsonify({'error': 'Report not found'}), 404
 
-    original = request.files['original']
-    fake = request.files['fake']
+    category = report.category.lower() if report.category else ''
 
-    original_filename = secure_filename(original.filename)
-    fake_filename = secure_filename(fake.filename)
+    # ─── Image Analysis (Deepfake / Fake Photo) ───────────────────────────
+    if category in IMAGE_CATEGORIES:
+        if 'original' not in request.files or 'fake' not in request.files:
+            return jsonify({'error': 'Both original and fake images are required for image analysis'}), 400
 
-    original_path = os.path.join(UPLOAD_FOLDER, 'original_' + original_filename)
-    fake_path = os.path.join(UPLOAD_FOLDER, 'fake_' + fake_filename)
+        original = request.files['original']
+        fake = request.files['fake']
 
-    original.save(original_path)
-    fake.save(fake_path)
+        original_filename = secure_filename(original.filename)
+        fake_filename = secure_filename(fake.filename)
 
-    result = analyze_images(original_path, fake_path)
+        original_path = os.path.join(UPLOAD_FOLDER, 'original_' + original_filename)
+        fake_path = os.path.join(UPLOAD_FOLDER, 'fake_' + fake_filename)
 
-    if 'error' not in result:
-        # Save to evidence table
-        evidence = Evidence(
-            report_id=report_id,
-            original_image=original_path,
-            fake_image=fake_path,
-            manipulation_score=result.get('manipulation_score'),
-            file_metadata=str(result.get('details'))
-        )
-        db.session.add(evidence)
-        db.session.commit()
+        original.save(original_path)
+        fake.save(fake_path)
 
-    return jsonify(result), 200
+        result = analyze_images(original_path, fake_path)
+
+        if 'error' not in result:
+            evidence = Evidence(
+                report_id=report_id,
+                original_image=original_path,
+                fake_image=fake_path,
+                manipulation_score=result.get('manipulation_score'),
+                file_metadata=str(result.get('details'))
+            )
+            db.session.add(evidence)
+            db.session.commit()
+
+        return jsonify(result), 200
+
+    # ─── Text Analysis (Harassment / Threats / Stalking etc.) ─────────────
+    else:
+        if 'screenshot' not in request.files:
+            return jsonify({'error': 'A screenshot is required for text analysis'}), 400
+
+        screenshot = request.files['screenshot']
+        screenshot_filename = secure_filename(screenshot.filename)
+        screenshot_path = os.path.join(UPLOAD_FOLDER, 'screenshot_' + screenshot_filename)
+        screenshot.save(screenshot_path)
+
+        result = analyze_text_screenshot(screenshot_path)
+
+        if 'error' not in result:
+            evidence = Evidence(
+                report_id=report_id,
+                original_image=screenshot_path,
+                fake_image=None,
+                manipulation_score=result.get('threat_score'),
+                file_metadata=str(result.get('details'))
+            )
+            db.session.add(evidence)
+            db.session.commit()
+
+        return jsonify(result), 200
 
 # ─── 7. GENERATE PDF COMPLAINT ────────────────────────────────────────────────
 
