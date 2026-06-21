@@ -68,6 +68,6 @@ class Case(db.Model):
     id = db.Column(db.Integer, primary_key=True)
     report_id = db.Column(db.Integer, db.ForeignKey('reports.id'), nullable=False)
     admin_id = db.Column(db.Integer, nullable=True)
-    status = db.Column(db.String(50), default='Under Review')
+    status = db.Column(db.String(50), default='Submitted')
     notes = db.Column(db.Text)
     updated_at = db.Column(db.DateTime, default=datetime.utcnow, onupdate=datetime.utcnow)

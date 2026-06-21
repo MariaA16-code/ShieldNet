@@ -148,19 +148,33 @@ def update_case(case_id):
 
     data = request.get_json()
 
-    case.status = data.get('status', case.status)
+    # ─── Valid status values ───────────────────────────────────────────────
+    VALID_STATUSES = [
+        'Submitted',
+        'Evidence Verified',
+        'Under Review',
+        'Takedown Sent',
+        'Resolved'
+    ]
+
+    new_status = data.get('status', case.status)
+
+    if new_status not in VALID_STATUSES:
+        return jsonify({
+            'error': f'Invalid status. Must be one of: {VALID_STATUSES}'
+        }), 400
+
+    case.status = new_status
     case.notes = data.get('notes', case.notes)
     case.updated_at = datetime.utcnow()
 
-    # Also update report status to stay in sync
     report = Report.query.get(case.report_id)
     if report:
-        report.status = data.get('status', report.status)
+        report.status = new_status
 
     db.session.commit()
 
     return jsonify({'message': 'Case updated successfully', 'case_id': case_id}), 200
-
 
 # ─── 5. GET FLAGGED HARASSERS (Admin Side) ────────────────────────────────────
 
