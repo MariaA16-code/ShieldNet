@@ -2,66 +2,57 @@ import React, { useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import Navbar from '../components/Navbar';
 import Footer from '../components/Footer';
+import apiClient from '../api/client';
 import './TrackCase.css';
+
+const STATUS_STEPS = ['Submitted', 'Evidence Verified', 'Under Review', 'Takedown Sent', 'Resolved'];
+
+function buildTimeline(caseStatus) {
+  const currentIndex = STATUS_STEPS.indexOf(caseStatus);
+
+  return STATUS_STEPS.map((step, index) => ({
+    step,
+    done: currentIndex >= 0 && index <= currentIndex,
+  }));
+}
 
 function TrackCase() {
   const { t } = useTranslation();
   const [token, setToken] = useState('');
-  const [caseData, setCaseData] = useState(null);
+  const [reports, setReports] = useState(null);
   const [error, setError] = useState('');
   const [loading, setLoading] = useState(false);
 
-  const fakeCases = {
-    'SHD-COJB1N': {
-      category: 'Fake / edited photo',
-      platform: 'Instagram',
-      status: 'Under Review',
-      submittedOn: 'June 18, 2026',
-      timeline: [
-        { step: 'Submitted', done: true },
-        { step: 'Evidence Verified', done: true },
-        { step: 'Under Review', done: true },
-        { step: 'Takedown Requested', done: false },
-        { step: 'Resolved', done: false },
-      ],
-    },
-  };
+  const handleSearch = async (e) => {
+    e.preventDefault();
+    setError('');
+    setReports(null);
 
-const handleSearch = (e) => {
-  e.preventDefault();
-  setError('');
-  setCaseData(null);
+    const trimmedToken = token.trim();
 
-  const trimmedToken = token.trim().toUpperCase();
-
-  if (!trimmedToken) {
-    setError(t('track.errorEmpty'));
-    return;
-  }
-
-  setLoading(true);
-
-  setTimeout(() => {
-    if (fakeCases[trimmedToken]) {
-      setCaseData(fakeCases[trimmedToken]);
-    } else {
-      setCaseData({
-        category: 'Harassment',
-        platform: 'Facebook',
-        status: 'Submitted',
-        submittedOn: 'June 20, 2026',
-        timeline: [
-          { step: 'Submitted', done: true },
-          { step: 'Evidence Verified', done: false },
-          { step: 'Under Review', done: false },
-          { step: 'Takedown Requested', done: false },
-          { step: 'Resolved', done: false },
-        ],
-      });
+    if (!trimmedToken) {
+      setError(t('track.errorEmpty'));
+      return;
     }
-    setLoading(false);
-  }, 1000);
-};
+
+    setLoading(true);
+
+    try {
+      const response = await apiClient.get(`/api/track/${trimmedToken}`);
+      const data = response.data;
+
+      if (!data.reports || data.reports.length === 0) {
+        setError(t('track.errorNotFound'));
+      } else {
+        setReports(data.reports);
+      }
+    } catch (err) {
+      console.error('Track lookup failed:', err);
+      setError(t('track.errorNotFound'));
+    } finally {
+      setLoading(false);
+    }
+  };
 
   return (
     <div className="page-container">
@@ -81,31 +72,35 @@ const handleSearch = (e) => {
               className="mono"
             />
             <button type="submit" className="btn-primary" disabled={loading}>
-  {loading ? '...' : t('track.button')}
-</button>
+              {loading ? '...' : t('track.button')}
+            </button>
           </form>
 
           {error && <p className="track-error">{error}</p>}
 
-          {caseData && (
-            <div className="case-result">
+          {reports && reports.map((report) => (
+            <div className="case-result" key={report.report_id}>
               <div className="case-meta">
                 <div>
                   <span className="meta-label">{t('track.category')}</span>
-                  <span className="meta-value">{caseData.category}</span>
+                  <span className="meta-value">{report.category}</span>
                 </div>
                 <div>
                   <span className="meta-label">{t('track.platform')}</span>
-                  <span className="meta-value">{caseData.platform}</span>
+                  <span className="meta-value">{report.platform}</span>
                 </div>
                 <div>
                   <span className="meta-label">{t('track.submitted')}</span>
-                  <span className="meta-value">{caseData.submittedOn}</span>
+                  <span className="meta-value">{report.submitted_at}</span>
                 </div>
               </div>
 
+              {report.case_notes && (
+                <p className="case-notes">{report.case_notes}</p>
+              )}
+
               <div className="timeline">
-                {caseData.timeline.map((item, index) => (
+                {buildTimeline(report.case_status).map((item, index) => (
                   <div className="timeline-item" key={index}>
                     <span className={`timeline-dot ${item.done ? 'done' : ''}`}></span>
                     <span className={`timeline-label ${item.done ? 'done' : ''}`}>
@@ -114,8 +109,17 @@ const handleSearch = (e) => {
                   </div>
                 ))}
               </div>
+
+              <a
+                href={`https://shieldnet-backend.onrender.com/api/generate-pdf/${report.report_id}`}
+                className="btn-secondary download-btn"
+                target="_blank"
+                rel="noopener noreferrer"
+              >
+                {t('track.downloadPdf')}
+              </a>
             </div>
-          )}
+          ))}
         </div>
       </div>
       <Footer />

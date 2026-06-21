@@ -36,7 +36,12 @@
     "successSub": "Guarda este token — lo necesitarás para rastrear tu caso. Nunca vinculamos este token con tu identidad.",
     "successNote": "Las actualizaciones aparecerán en la página de seguimiento.",
     "fileTypeError": "Por favor sube una imagen o video válido.",
-"fileSizeError": "El archivo debe ser menor a 25MB."
+"fileSizeError": "El archivo debe ser menor a 25MB.",
+"harasserInfo": "Nom d'utilisateur du harceleur (si connu)",
+"harasserInfoPlaceholder": "ex. son @nomdutilisateur",
+"contact": "Coordonnées (facultatif, chiffré)",
+"contactPlaceholder": "Email ou téléphone — uniquement si vous voulez des mises à jour",
+"submitError": "Une erreur s'est produite lors de l'envoi de votre signalement. Veuillez réessayer."
   },
   "track": {
     "title": "Rastrea tu caso",
@@ -44,6 +49,7 @@
     "placeholder": "ej. SHD-COJB1N",
     "button": "Rastrear",
     "errorEmpty": "Por favor ingresa tu token de caso.",
+    "errorNotFound": "No se encontró ningún caso para este token. Por favor verifica e intenta de nuevo.",
     "category": "Categoría",
     "platform": "Plataforma",
     "submitted": "Enviado"

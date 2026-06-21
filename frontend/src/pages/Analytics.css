@@ -75,17 +75,18 @@
   color: #E8EBF0;
 }
 
-@media (max-width: 900px) {
-  .analytics-page { padding: 20px 24px 40px; }
-  .stats-row { grid-template-columns: repeat(2, 1fr); }
-  .charts-row { grid-template-columns: 1fr; }
-}
 .map-card {
   background: #141925;
   border: 1px solid rgba(255,255,255,0.06);
   border-radius: 12px;
   padding: 28px;
   margin-top: 20px;
+}
+
+.analytics-map {
+  height: 380px;
+  width: 100%;
+  border-radius: 8px;
 }
 
 .map-card h3 {
@@ -103,4 +104,41 @@
 
 .leaflet-popup-tip {
   background: #141925;
+}
+
+@media (max-width: 900px) {
+  .analytics-page { padding: 20px 24px 40px; }
+  .stats-row { grid-template-columns: repeat(2, 1fr); }
+  .charts-row { grid-template-columns: 1fr; }
+}
+
+@media (max-width: 480px) {
+  .analytics-page { padding: 16px 16px 32px; }
+
+  .analytics-header h1 { font-size: 24px; }
+  .analytics-sub { font-size: 14px; }
+
+  .stats-row {
+    grid-template-columns: repeat(2, 1fr);
+    gap: 10px;
+    margin-bottom: 28px;
+  }
+
+  .stat-card { padding: 16px; }
+  .stat-number { font-size: 22px; }
+  .stat-label { font-size: 12px; }
+
+  .chart-card { padding: 14px; }
+  .chart-card h3 { font-size: 14px; margin-bottom: 14px; }
+
+  .map-card { padding: 14px; }
+  .map-card h3 { font-size: 14px; margin-bottom: 14px; }
+
+  .analytics-map {
+    height: 260px;
+  }
+
+  .leaflet-popup-content-wrapper {
+    font-size: 13px;
+  }
 }

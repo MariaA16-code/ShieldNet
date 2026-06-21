@@ -36,7 +36,12 @@
     "successSub": "Conservez ce jeton — vous en aurez besoin pour suivre votre dossier. Nous ne lions jamais ce jeton à votre identité.",
     "successNote": "Les mises à jour apparaîtront sur la page de suivi.",
     "fileTypeError": "Veuillez télécharger une image ou une vidéo valide.",
-"fileSizeError": "Le fichier doit être inférieur à 25 Mo."
+"fileSizeError": "Le fichier doit être inférieur à 25 Mo.",
+"harasserInfo": "Nom d'utilisateur du harceleur (si connu)",
+"harasserInfoPlaceholder": "ex. son @nomdutilisateur",
+"contact": "Coordonnées (facultatif, chiffré)",
+"contactPlaceholder": "Email ou téléphone — uniquement si vous voulez des mises à jour",
+"submitError": "Une erreur s'est produite lors de l'envoi de votre signalement. Veuillez réessayer."
   },
   "track": {
     "title": "Suivez votre dossier",
@@ -44,6 +49,7 @@
     "placeholder": "ex. SHD-COJB1N",
     "button": "Suivre",
     "errorEmpty": "Veuillez entrer votre jeton de dossier.",
+    "errorNotFound": "Aucun dossier trouvé pour ce jeton. Veuillez vérifier et réessayer.",
     "category": "Catégorie",
     "platform": "Plateforme",
     "submitted": "Soumis"

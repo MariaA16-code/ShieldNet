@@ -2,35 +2,41 @@ import React, { useState, useEffect } from 'react';
 import { useTranslation } from 'react-i18next';
 import Navbar from '../components/Navbar';
 import Footer from '../components/Footer';
+import apiClient from '../api/client';
 import './ReportIncident.css';
 
 function ReportIncident() {
   const { t } = useTranslation();
   const [formData, setFormData] = useState({
+    country: 'Pakistan',
+    contact: '',
     category: '',
     platform: '',
     description: '',
+    harasser_username: '',
   });
   const [evidenceFile, setEvidenceFile] = useState(null);
   const [fileError, setFileError] = useState('');
   const [filePreview, setFilePreview] = useState(null);
+  const [submitted, setSubmitted] = useState(false);
+  const [loading, setLoading] = useState(false);
+  const [generatedToken, setGeneratedToken] = useState('');
+  const [submitError, setSubmitError] = useState('');
 
   const MAX_FILE_SIZE = 25 * 1024 * 1024; // 25MB
   const ALLOWED_TYPES = ['image/jpeg', 'image/png', 'image/webp', 'image/gif', 'video/mp4', 'video/quicktime', 'video/webm'];
+
   useEffect(() => {
     return () => {
       if (filePreview) URL.revokeObjectURL(filePreview);
     };
   }, [filePreview]);
-  const [submitted, setSubmitted] = useState(false);
-  const [loading, setLoading] = useState(false);
-  const [generatedToken, setGeneratedToken] = useState('');
 
   const handleChange = (e) => {
     setFormData({ ...formData, [e.target.name]: e.target.value });
   };
 
- const handleFileChange = (e) => {
+  const handleFileChange = (e) => {
     const file = e.target.files[0];
     if (!file) return;
 
@@ -67,29 +73,59 @@ function ReportIncident() {
     document.getElementById('evidence').value = '';
   };
 
-  const handleSubmit = (e) => {
-  e.preventDefault();
+const handleSubmit = async (e) => {
+    e.preventDefault();
 
-  if (!formData.category || !formData.platform || !formData.description) {
-    alert(t('report.validationError'));
-    return;
-  }
+    if (!formData.category || !formData.platform || !formData.description) {
+      alert(t('report.validationError'));
+      return;
+    }
 
-  setLoading(true);
+    setLoading(true);
+    setSubmitError('');
 
-  setTimeout(() => {
-    const fakeToken = 'SHD-' + Math.random().toString(36).substring(2, 8).toUpperCase();
-    setGeneratedToken(fakeToken);
-    setSubmitted(true);
-    setLoading(false);
+    try {
+      const payload = {
+        country: formData.country,
+        contact: formData.contact || 'optional - encrypted contact info',
+        category: formData.category,
+        platform: formData.platform,
+        description: formData.description,
+        harasser_username: formData.harasser_username,
+      };
 
-    console.log('Report data (will be sent to API later):', {
-      ...formData,
-      evidenceFile,
-    });
-  }, 1400);
-};
+      const response = await apiClient.post('/api/report', payload);
+      const { token, report_id } = response.data;
 
+      if (evidenceFile) {
+        try {
+          const PHOTO_CATEGORIES = ['fake_photo', 'deepfake'];
+          const evidencePayload = new FormData();
+
+          if (PHOTO_CATEGORIES.includes(formData.category)) {
+            evidencePayload.append('original', evidenceFile);
+            evidencePayload.append('fake', evidenceFile);
+          } else {
+            evidencePayload.append('screenshot', evidenceFile);
+          }
+
+          await apiClient.post(`/api/analyze/${report_id}`, evidencePayload, {
+            headers: { 'Content-Type': 'multipart/form-data' },
+          });
+        } catch (evidenceError) {
+          console.error('Evidence upload failed:', evidenceError);
+        }
+      }
+
+      setGeneratedToken(token);
+      setSubmitted(true);
+    } catch (error) {
+      console.error('Submit failed:', error);
+      setSubmitError(t('report.submitError'));
+    } finally {
+      setLoading(false);
+    }
+  };
   if (submitted) {
     return (
       <div className="page-container">
@@ -150,7 +186,25 @@ function ReportIncident() {
             onChange={handleChange}
           />
 
-        <label>{t('report.evidence')}</label>
+          <label>{t('report.harasserInfo')}</label>
+          <input
+            type="text"
+            name="harasser_username"
+            placeholder={t('report.harasserInfoPlaceholder')}
+            value={formData.harasser_username}
+            onChange={handleChange}
+          />
+
+          <label>{t('report.contact')}</label>
+          <input
+            type="text"
+            name="contact"
+            placeholder={t('report.contactPlaceholder')}
+            value={formData.contact}
+            onChange={handleChange}
+          />
+
+          <label>{t('report.evidence')}</label>
           <div className="file-upload">
             <input
               type="file"
@@ -184,9 +238,11 @@ function ReportIncident() {
             {fileError && <p className="file-error">{fileError}</p>}
           </div>
 
+          {submitError && <p className="file-error">{submitError}</p>}
+
           <button type="submit" className="btn-primary submit-btn" disabled={loading}>
-  {loading ? 'Submitting...' : t('report.submit')}
-</button>
+            {loading ? 'Submitting...' : t('report.submit')}
+          </button>
         </form>
       </div>
       <Footer />

@@ -45,7 +45,8 @@
 }
 
 .report-form select,
-.report-form textarea {
+.report-form textarea,
+.report-form input {
   width: 100%;
   background: #0B0E14;
   border: 1px solid rgba(255,255,255,0.1);
@@ -55,8 +56,10 @@
   font-family: 'Inter', sans-serif;
   font-size: 14px;
   resize: vertical;
+  box-sizing: border-box;
 }
 
+.report-form input:focus,
 .report-form select:focus,
 .report-form textarea:focus {
   outline: none;
@@ -119,16 +122,25 @@
   border: 1px solid #3DDC97;
   border-radius: 10px;
   padding: 18px;
-  font-size: 22px;
-  letter-spacing: 0.05em;
+  font-size: 20px;
+  letter-spacing: 0.02em;
   color: #3DDC97;
   margin-bottom: 24px;
+  word-break: break-all;
+  line-height: 1.5;
+}
+
+@media (max-width: 480px) {
+  .token-box {
+    font-size: 15px;
+  }
 }
 
 .success-note {
   color: #7C8699;
   font-size: 13px;
 }
+
 .file-preview {
   display: flex;
   align-items: center;

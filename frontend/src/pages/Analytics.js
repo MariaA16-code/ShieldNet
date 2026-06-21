@@ -122,12 +122,12 @@ function Analytics() {
 
         <div className="map-card">
           <h3>{t('analytics.mapTitle')}</h3>
-          <MapContainer
-            center={[30.3753, 69.3451]}
-            zoom={5}
-            scrollWheelZoom={false}
-            style={{ height: '380px', width: '100%', borderRadius: '8px' }}
-          >
+        <MapContainer
+  center={[30.3753, 69.3451]}
+  zoom={5}
+  scrollWheelZoom={false}
+  className="analytics-map"
+>
             <TileLayer
               url="https://{s}.basemaps.cartocdn.com/dark_all/{z}/{x}/{y}{r}.png"
               attribution='&copy; OpenStreetMap contributors &copy; CARTO'

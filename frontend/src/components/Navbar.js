@@ -20,7 +20,7 @@ function Navbar() {
         <Link to="/">{t('nav.home')}</Link>
         <Link to="/track">{t('nav.track')}</Link>
         <Link to="/analytics">{t('nav.stats')}</Link>
-        <select className="lang-select" onChange={handleLanguageChange} defaultValue="en">
+        <select className="lang-select" onChange={handleLanguageChange} value={i18n.language}>
   <option value="en">English</option>
   <option value="ur">اردو</option>
   <option value="ar">العربية</option>

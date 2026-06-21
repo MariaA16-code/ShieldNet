@@ -36,7 +36,12 @@
     "successSub": "Save this token — you'll need it to track your case status. We never link this token to your identity.",
     "successNote": "Status updates will appear on the Track Case page.",
     "fileTypeError": "Please upload a valid image or video file.",
-"fileSizeError": "File must be under 25MB."
+"fileSizeError": "File must be under 25MB.",
+"harasserInfo": "Harasser Username (if known)",
+"harasserInfoPlaceholder": "e.g. their @username",
+"contact": "Contact Info (optional, encrypted)",
+"contactPlaceholder": "Email or phone — only if you want updates",
+"submitError": "Something went wrong submitting your report. Please try again."
   },
   "track": {
     "title": "Track your case",
@@ -44,6 +49,8 @@
     "placeholder": "e.g. SHD-COJB1N",
     "button": "Track",
     "errorEmpty": "Please enter your case token.",
+    "errorNotFound": "No case found for this token. Please check and try again.",
+    "downloadPdf": "Download Report PDF",
     "category": "Category",
     "platform": "Platform",
     "submitted": "Submitted"

@@ -138,6 +138,32 @@
   color: #E8EBF0;
   font-weight: 500;
 }
+
+.case-notes {
+  color: #7C8699;
+  font-size: 13px;
+  margin: 12px 0 24px;
+  font-style: italic;
+}
+
+.download-btn {
+  display: inline-block;
+  margin-top: 28px;
+  padding: 12px 24px;
+  border-radius: 8px;
+  background: #5B8DEF;
+  color: #0B0E14;
+  border: none;
+  font-size: 14px;
+  font-weight: 600;
+  text-decoration: none;
+  transition: background 0.2s;
+}
+
+.download-btn:hover {
+  background: #4a7ad9;
+}
+
 @media (max-width: 600px) {
   .track-card {
     padding: 28px 20px;
