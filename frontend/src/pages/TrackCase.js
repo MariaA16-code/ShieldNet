@@ -9,6 +9,7 @@ function TrackCase() {
   const [token, setToken] = useState('');
   const [caseData, setCaseData] = useState(null);
   const [error, setError] = useState('');
+  const [loading, setLoading] = useState(false);
 
   const fakeCases = {
     'SHD-COJB1N': {
@@ -26,18 +27,21 @@ function TrackCase() {
     },
   };
 
-  const handleSearch = (e) => {
-    e.preventDefault();
-    setError('');
-    setCaseData(null);
+const handleSearch = (e) => {
+  e.preventDefault();
+  setError('');
+  setCaseData(null);
 
-    const trimmedToken = token.trim().toUpperCase();
+  const trimmedToken = token.trim().toUpperCase();
 
-    if (!trimmedToken) {
-      setError(t('track.errorEmpty'));
-      return;
-    }
+  if (!trimmedToken) {
+    setError(t('track.errorEmpty'));
+    return;
+  }
 
+  setLoading(true);
+
+  setTimeout(() => {
     if (fakeCases[trimmedToken]) {
       setCaseData(fakeCases[trimmedToken]);
     } else {
@@ -55,7 +59,9 @@ function TrackCase() {
         ],
       });
     }
-  };
+    setLoading(false);
+  }, 1000);
+};
 
   return (
     <div className="page-container">
@@ -74,7 +80,9 @@ function TrackCase() {
               onChange={(e) => setToken(e.target.value)}
               className="mono"
             />
-            <button type="submit" className="btn-primary">{t('track.button')}</button>
+            <button type="submit" className="btn-primary" disabled={loading}>
+  {loading ? '...' : t('track.button')}
+</button>
           </form>
 
           {error && <p className="track-error">{error}</p>}

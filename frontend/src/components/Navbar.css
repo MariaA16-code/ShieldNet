@@ -80,6 +80,6 @@
   }
 
   .nav-cta {
-    margin-left: auto;
+    margin-inline-start: auto;
   }
 }

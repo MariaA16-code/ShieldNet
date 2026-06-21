@@ -34,7 +34,9 @@
     "successEyebrow": "Rapport reçu",
     "successTitle": "Votre dossier a été enregistré.",
     "successSub": "Conservez ce jeton — vous en aurez besoin pour suivre votre dossier. Nous ne lions jamais ce jeton à votre identité.",
-    "successNote": "Les mises à jour apparaîtront sur la page de suivi."
+    "successNote": "Les mises à jour apparaîtront sur la page de suivi.",
+    "fileTypeError": "Veuillez télécharger une image ou une vidéo valide.",
+"fileSizeError": "Le fichier doit être inférieur à 25 Mo."
   },
   "track": {
     "title": "Suivez votre dossier",

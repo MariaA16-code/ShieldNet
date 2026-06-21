@@ -21,12 +21,12 @@ function Navbar() {
         <Link to="/track">{t('nav.track')}</Link>
         <Link to="/analytics">{t('nav.stats')}</Link>
         <select className="lang-select" onChange={handleLanguageChange} defaultValue="en">
-          <option value="en">EN</option>
-          <option value="ur">اردو</option>
-          <option value="ar">عربي</option>
-          <option value="fr">FR</option>
-          <option value="es">ES</option>
-        </select>
+  <option value="en">English</option>
+  <option value="ur">اردو</option>
+  <option value="ar">العربية</option>
+  <option value="fr">Français</option>
+  <option value="es">Español</option>
+</select>
         <Link to="/report" className="nav-cta">{t('nav.report')}</Link>
       </div>
     </nav>

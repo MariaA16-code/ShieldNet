@@ -34,7 +34,9 @@
     "successEyebrow": "Reporte recibido",
     "successTitle": "Tu caso ha sido registrado.",
     "successSub": "Guarda este token — lo necesitarás para rastrear tu caso. Nunca vinculamos este token con tu identidad.",
-    "successNote": "Las actualizaciones aparecerán en la página de seguimiento."
+    "successNote": "Las actualizaciones aparecerán en la página de seguimiento.",
+    "fileTypeError": "Por favor sube una imagen o video válido.",
+"fileSizeError": "El archivo debe ser menor a 25MB."
   },
   "track": {
     "title": "Rastrea tu caso",
