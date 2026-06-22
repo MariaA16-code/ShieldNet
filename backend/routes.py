@@ -63,7 +63,7 @@ def submit_report():
     # Create case linked to report
     case = Case(
         report_id=report.id,
-        status='Under Review',
+        status='Submitted',
         notes='Case opened automatically on report submission.'
     )
     db.session.add(case)

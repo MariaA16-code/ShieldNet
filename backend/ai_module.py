@@ -1,6 +1,5 @@
 import cv2
 import numpy as np
-from deepface import DeepFace
 import base64
 import os
 from PIL import Image
@@ -14,6 +13,7 @@ def analyze_images(original_path, fake_path):
     Compares original and suspected fake image.
     Returns a manipulation score and analysis details.
     """
+    from deepface import DeepFace
     result = {
         'manipulation_score': 0.0,
         'verdict': '',
