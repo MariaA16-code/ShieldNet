@@ -1,9 +1,10 @@
 from flask import Blueprint, request, jsonify,send_file
 from extensions import db
 from models import Victim, Report, Evidence, Takedown, Harasser, Case
-from datetime import datetime
+from datetime import datetime, timedelta 
 import secrets
 import os
+import tempfile
 from werkzeug.utils import secure_filename
 from ai_module import analyze_images, analyze_text_content 
 from pdf_module import generate_complaint_pdf
@@ -13,6 +14,25 @@ os.makedirs(UPLOAD_FOLDER, exist_ok=True)
 
 api = Blueprint('api', __name__)
 
+# ─── ADMIN AUTH ───────────────────────────────────────────────────────────
+
+ADMIN_PASSWORD = "shieldnet_admin_2025"
+ADMIN_TOKEN = "shieldnet_admin_token_2025"
+
+def verify_admin(request):
+    token = request.headers.get('Authorization')
+    return token == f'Bearer {ADMIN_TOKEN}'
+
+# ─── 0. ADMIN LOGIN ───────────────────────────────────────────────────────────
+@api.route('/api/admin/login', methods=['POST'])
+def admin_login():
+    data = request.get_json()
+    if not data or data.get('password') != ADMIN_PASSWORD:
+        return jsonify({'error': 'Invalid password'}), 401
+    return jsonify({
+        'message': 'Login successful',
+        'token': ADMIN_TOKEN
+    }), 200
 
 # ─── 1. SUBMIT REPORT (Victim Side) ───────────────────────────────────────────
 
@@ -102,7 +122,7 @@ def track_case(token):
             'report_status': report.status,
             'case_status': case.status if case else 'N/A',
             'case_notes': case.notes if case else '',
-            'submitted_at': report.created_at.strftime('%Y-%m-%d %H:%M')
+            'submitted_at': (report.created_at + timedelta(hours=5)).strftime('%Y-%m-%d %H:%M') + ' PKT'
         })
 
     return jsonify({
@@ -116,6 +136,9 @@ def track_case(token):
 
 @api.route('/api/admin/reports', methods=['GET'])
 def get_all_reports():
+    if not verify_admin(request):
+        return jsonify({'error': 'Unauthorized'}), 401
+    
     reports = Report.query.order_by(Report.created_at.desc()).all()
 
     result = []
@@ -131,7 +154,7 @@ def get_all_reports():
             'description': report.description,
             'report_status': report.status,
             'case_status': case.status if case else 'N/A',
-            'submitted_at': report.created_at.strftime('%Y-%m-%d %H:%M')
+            'submitted_at': (report.created_at + timedelta(hours=5)).strftime('%Y-%m-%d %H:%M') + ' PKT'
         })
 
     return jsonify({'total': len(result), 'reports': result}), 200
@@ -141,6 +164,9 @@ def get_all_reports():
 
 @api.route('/api/admin/case/<int:case_id>', methods=['PUT'])
 def update_case(case_id):
+    if not verify_admin(request):
+        return jsonify({'error': 'Unauthorized'}), 401
+    
     case = Case.query.get(case_id)
 
     if not case:
@@ -180,6 +206,9 @@ def update_case(case_id):
 
 @api.route('/api/admin/harassers', methods=['GET'])
 def get_flagged_harassers():
+    if not verify_admin(request):
+        return jsonify({'error': 'Unauthorized'}), 401
+    
     harassers = Harasser.query.filter_by(flagged=True).all()
 
     result = []
@@ -261,9 +290,6 @@ def analyze(report_id):
 
 # ─── 7. GENERATE PDF COMPLAINT ────────────────────────────────────────────────
 
-from flask import send_file
-import tempfile
-
 @api.route('/api/generate-pdf/<int:report_id>', methods=['GET'])
 def generate_pdf(report_id):
     report = Report.query.get(report_id)
@@ -273,6 +299,8 @@ def generate_pdf(report_id):
     victim = Victim.query.get(report.victim_id)
     case = Case.query.filter_by(report_id=report.id).first()
     evidence = Evidence.query.filter_by(report_id=report.id).first()
+
+    PKT = timedelta(hours=5)
 
     report_data = {
         'report_id': report.id,
@@ -285,7 +313,8 @@ def generate_pdf(report_id):
         'manipulation_score': evidence.manipulation_score if evidence else None,
         'verdict': 'High likelihood of manipulation' if evidence else None,
         'face_match': False if evidence else None,
-        'pixel_difference': None
+        'pixel_difference': None,
+        'submitted_at': (report.created_at + PKT).strftime('%Y-%m-%d %H:%M') + ' PKT'
     }
 
     # Use temp file instead of saving permanently
@@ -306,6 +335,10 @@ def generate_pdf(report_id):
 
 @api.route('/api/send-dmca/<int:report_id>', methods=['POST'])
 def send_dmca(report_id):
+
+    if not verify_admin(request):
+        return jsonify({'error': 'Unauthorized'}), 401
+    
     report = Report.query.get(report_id)
     if not report:
         return jsonify({'error': 'Report not found'}), 404
