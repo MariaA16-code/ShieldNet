@@ -6,9 +6,9 @@ import os
 from PIL import Image
 import pytesseract
 from better_profanity import profanity
-from textblob import TextBlob
-
+pytesseract.pytesseract.tesseract_cmd = '/usr/bin/tesseract'
 profanity.load_censor_words()
+from textblob import TextBlob
 
 # ─── IMAGE ANALYSIS (Fake Photo / Deepfake) ───────────────────────────────────
 
