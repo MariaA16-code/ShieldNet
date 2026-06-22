@@ -36,12 +36,16 @@
     "successSub": "Save this token — you'll need it to track your case status. We never link this token to your identity.",
     "successNote": "Status updates will appear on the Track Case page.",
     "fileTypeError": "Please upload a valid image or video file.",
-"fileSizeError": "File must be under 25MB.",
-"harasserInfo": "Harasser Username (if known)",
-"harasserInfoPlaceholder": "e.g. their @username",
-"contact": "Contact Info (optional, encrypted)",
-"contactPlaceholder": "Email or phone — only if you want updates",
-"submitError": "Something went wrong submitting your report. Please try again."
+    "fileSizeError": "File must be under 25MB.",
+    "harasserInfo": "Harasser Username (if known)",
+    "harasserInfoPlaceholder": "e.g. their @username",
+    "contact": "Contact Info (optional, encrypted)",
+    "contactPlaceholder": "Email or phone — only if you want updates",
+    "submitError": "Something went wrong submitting your report. Please try again.",
+    "originalPhoto": "Original photo",
+    "originalPhotoPlaceholder": "Upload the real, unedited photo",
+    "fakePhoto": "Manipulated / fake photo",
+    "fakePhotoPlaceholder": "Upload the edited/fake version"
   },
   "track": {
     "title": "Track your case",

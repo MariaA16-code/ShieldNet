@@ -5,6 +5,8 @@ import Footer from '../components/Footer';
 import apiClient from '../api/client';
 import './ReportIncident.css';
 
+const PHOTO_CATEGORIES = ['Fake / edited photo', 'Deepfake video'];
+
 function ReportIncident() {
   const { t } = useTranslation();
   const [formData, setFormData] = useState({
@@ -15,9 +17,18 @@ function ReportIncident() {
     description: '',
     harasser_username: '',
   });
+
+  // Single-file state (used for all non-photo categories)
   const [evidenceFile, setEvidenceFile] = useState(null);
-  const [fileError, setFileError] = useState('');
   const [filePreview, setFilePreview] = useState(null);
+
+  // Dual-file state (used only for Fake/edited photo + Deepfake video)
+  const [originalFile, setOriginalFile] = useState(null);
+  const [originalPreview, setOriginalPreview] = useState(null);
+  const [fakeFile, setFakeFile] = useState(null);
+  const [fakePreview, setFakePreview] = useState(null);
+
+  const [fileError, setFileError] = useState('');
   const [submitted, setSubmitted] = useState(false);
   const [loading, setLoading] = useState(false);
   const [generatedToken, setGeneratedToken] = useState('');
@@ -26,30 +37,62 @@ function ReportIncident() {
   const MAX_FILE_SIZE = 25 * 1024 * 1024; // 25MB
   const ALLOWED_TYPES = ['image/jpeg', 'image/png', 'image/webp', 'image/gif', 'video/mp4', 'video/quicktime', 'video/webm'];
 
+  const isPhotoCategory = PHOTO_CATEGORIES.includes(formData.category);
+
+  // Clean up object URLs on unmount or when they change
   useEffect(() => {
     return () => {
       if (filePreview) URL.revokeObjectURL(filePreview);
     };
   }, [filePreview]);
 
+  useEffect(() => {
+    return () => {
+      if (originalPreview) URL.revokeObjectURL(originalPreview);
+    };
+  }, [originalPreview]);
+
+  useEffect(() => {
+    return () => {
+      if (fakePreview) URL.revokeObjectURL(fakePreview);
+    };
+  }, [fakePreview]);
+
   const handleChange = (e) => {
-    setFormData({ ...formData, [e.target.name]: e.target.value });
+    const { name, value } = e.target;
+    setFormData((prev) => ({ ...prev, [name]: value }));
+
+    // If switching category away from/into photo categories, clear stale file state
+    // so leftover files from the previous mode never get submitted by mistake.
+    if (name === 'category') {
+      setEvidenceFile(null);
+      setFilePreview(null);
+      setOriginalFile(null);
+      setOriginalPreview(null);
+      setFakeFile(null);
+      setFakePreview(null);
+      setFileError('');
+    }
   };
 
+  const validateFile = (file) => {
+    if (!ALLOWED_TYPES.includes(file.type)) {
+      setFileError(t('report.fileTypeError'));
+      return false;
+    }
+    if (file.size > MAX_FILE_SIZE) {
+      setFileError(t('report.fileSizeError'));
+      return false;
+    }
+    return true;
+  };
+
+  // Single-file handler (non-photo categories)
   const handleFileChange = (e) => {
     const file = e.target.files[0];
     if (!file) return;
 
-    if (!ALLOWED_TYPES.includes(file.type)) {
-      setFileError(t('report.fileTypeError'));
-      setEvidenceFile(null);
-      setFilePreview(null);
-      e.target.value = '';
-      return;
-    }
-
-    if (file.size > MAX_FILE_SIZE) {
-      setFileError(t('report.fileSizeError'));
+    if (!validateFile(file)) {
       setEvidenceFile(null);
       setFilePreview(null);
       e.target.value = '';
@@ -58,22 +101,67 @@ function ReportIncident() {
 
     setFileError('');
     setEvidenceFile(file);
-
-    if (file.type.startsWith('image/')) {
-      setFilePreview(URL.createObjectURL(file));
-    } else {
-      setFilePreview(null);
-    }
+    setFilePreview(file.type.startsWith('image/') ? URL.createObjectURL(file) : null);
   };
 
   const handleRemoveFile = () => {
     setEvidenceFile(null);
     setFilePreview(null);
     setFileError('');
-    document.getElementById('evidence').value = '';
+    const input = document.getElementById('evidence');
+    if (input) input.value = '';
   };
 
-const handleSubmit = async (e) => {
+  // Dual-file handlers (Fake/edited photo + Deepfake video)
+  const handleOriginalFileChange = (e) => {
+    const file = e.target.files[0];
+    if (!file) return;
+
+    if (!validateFile(file)) {
+      setOriginalFile(null);
+      setOriginalPreview(null);
+      e.target.value = '';
+      return;
+    }
+
+    setFileError('');
+    setOriginalFile(file);
+    setOriginalPreview(file.type.startsWith('image/') ? URL.createObjectURL(file) : null);
+  };
+
+  const handleFakeFileChange = (e) => {
+    const file = e.target.files[0];
+    if (!file) return;
+
+    if (!validateFile(file)) {
+      setFakeFile(null);
+      setFakePreview(null);
+      e.target.value = '';
+      return;
+    }
+
+    setFileError('');
+    setFakeFile(file);
+    setFakePreview(file.type.startsWith('image/') ? URL.createObjectURL(file) : null);
+  };
+
+  const handleRemoveOriginal = () => {
+    setOriginalFile(null);
+    setOriginalPreview(null);
+    setFileError('');
+    const input = document.getElementById('evidence-original');
+    if (input) input.value = '';
+  };
+
+  const handleRemoveFake = () => {
+    setFakeFile(null);
+    setFakePreview(null);
+    setFileError('');
+    const input = document.getElementById('evidence-fake');
+    if (input) input.value = '';
+  };
+
+  const handleSubmit = async (e) => {
     e.preventDefault();
 
     if (!formData.category || !formData.platform || !formData.description) {
@@ -87,7 +175,7 @@ const handleSubmit = async (e) => {
     try {
       const payload = {
         country: formData.country,
-        contact: formData.contact || 'optional - encrypted contact info',
+        contact: formData.contact || '',
         category: formData.category,
         platform: formData.platform,
         description: formData.description,
@@ -97,24 +185,24 @@ const handleSubmit = async (e) => {
       const response = await apiClient.post('/api/report', payload);
       const { token, report_id } = response.data;
 
-      if (evidenceFile) {
-        try {
-          const PHOTO_CATEGORIES = ['fake_photo', 'deepfake'];
+      // Evidence upload is independent of token delivery — failures here
+      // must never block the user from receiving their token.
+      try {
+        if (isPhotoCategory && originalFile && fakeFile) {
           const evidencePayload = new FormData();
-
-          if (PHOTO_CATEGORIES.includes(formData.category)) {
-            evidencePayload.append('original', evidenceFile);
-            evidencePayload.append('fake', evidenceFile);
-          } else {
-            evidencePayload.append('screenshot', evidenceFile);
-          }
+          evidencePayload.append('original', originalFile);
+          evidencePayload.append('fake', fakeFile);
 
           await apiClient.post(`/api/analyze/${report_id}`, evidencePayload, {
             headers: { 'Content-Type': 'multipart/form-data' },
           });
-        } catch (evidenceError) {
-          console.error('Evidence upload failed:', evidenceError);
+        } else if (!isPhotoCategory) {
+          await apiClient.post(`/api/analyze/${report_id}`);
         }
+        // If isPhotoCategory but one or both files are missing, we skip the
+        // analyze call entirely rather than send an incomplete multipart body.
+      } catch (evidenceError) {
+        console.error('AI analysis request failed:', evidenceError);
       }
 
       setGeneratedToken(token);
@@ -126,6 +214,7 @@ const handleSubmit = async (e) => {
       setLoading(false);
     }
   };
+
   if (submitted) {
     return (
       <div className="page-container">
@@ -156,13 +245,13 @@ const handleSubmit = async (e) => {
           <label>{t('report.category')}</label>
           <select name="category" value={formData.category} onChange={handleChange}>
             <option value="">{t('report.categoryPlaceholder')}</option>
-            <option value="fake_photo">Fake / edited photo</option>
-            <option value="deepfake">Deepfake video</option>
-            <option value="impersonation">Impersonation</option>
-            <option value="harassment">Sexual harassment</option>
-            <option value="stalking">Stalking</option>
-            <option value="threats">Threats</option>
-            <option value="identity_theft">Identity theft</option>
+            <option value="Fake / edited photo">Fake / edited photo</option>
+            <option value="Deepfake video">Deepfake video</option>
+            <option value="Impersonation">Impersonation</option>
+            <option value="Sexual harassment">Sexual harassment</option>
+            <option value="Stalking">Stalking</option>
+            <option value="Threats">Threats</option>
+            <option value="Identity theft">Identity theft</option>
           </select>
 
           <label>{t('report.platform')}</label>
@@ -204,39 +293,113 @@ const handleSubmit = async (e) => {
             onChange={handleChange}
           />
 
-          <label>{t('report.evidence')}</label>
-          <div className="file-upload">
-            <input
-              type="file"
-              id="evidence"
-              onChange={handleFileChange}
-              accept="image/jpeg,image/png,image/webp,image/gif,video/mp4,video/quicktime,video/webm"
-            />
-            {!evidenceFile && (
-              <label htmlFor="evidence" className="file-label">
-                {t('report.evidencePlaceholder')}
-              </label>
-            )}
-
-            {evidenceFile && (
-              <div className="file-preview">
-                {filePreview && (
-                  <img src={filePreview} alt="Evidence preview" className="file-preview-img" />
+          {isPhotoCategory ? (
+            <>
+              {/* Original photo upload */}
+              <label>{t('report.originalPhoto')}</label>
+              <div className="file-upload">
+                <input
+                  type="file"
+                  id="evidence-original"
+                  onChange={handleOriginalFileChange}
+                  accept="image/jpeg,image/png,image/webp,image/gif,video/mp4,video/quicktime,video/webm"
+                />
+                {!originalFile && (
+                  <label htmlFor="evidence-original" className="file-label">
+                    {t('report.originalPhotoPlaceholder')}
+                  </label>
                 )}
-                <div className="file-preview-info">
-                  <span className="file-preview-name">{evidenceFile.name}</span>
-                  <span className="file-preview-size">
-                    {(evidenceFile.size / (1024 * 1024)).toFixed(1)} MB
-                  </span>
-                </div>
-                <button type="button" className="file-remove-btn" onClick={handleRemoveFile}>
-                  &times;
-                </button>
-              </div>
-            )}
 
-            {fileError && <p className="file-error">{fileError}</p>}
-          </div>
+                {originalFile && (
+                  <div className="file-preview">
+                    {originalPreview && (
+                      <img src={originalPreview} alt="Original evidence preview" className="file-preview-img" />
+                    )}
+                    <div className="file-preview-info">
+                      <span className="file-preview-name">{originalFile.name}</span>
+                      <span className="file-preview-size">
+                        {(originalFile.size / (1024 * 1024)).toFixed(1)} MB
+                      </span>
+                    </div>
+                    <button type="button" className="file-remove-btn" onClick={handleRemoveOriginal}>
+                      &times;
+                    </button>
+                  </div>
+                )}
+              </div>
+
+              {/* Fake/manipulated photo upload */}
+              <label>{t('report.fakePhoto')}</label>
+              <div className="file-upload">
+                <input
+                  type="file"
+                  id="evidence-fake"
+                  onChange={handleFakeFileChange}
+                  accept="image/jpeg,image/png,image/webp,image/gif,video/mp4,video/quicktime,video/webm"
+                />
+                {!fakeFile && (
+                  <label htmlFor="evidence-fake" className="file-label">
+                    {t('report.fakePhotoPlaceholder')}
+                  </label>
+                )}
+
+                {fakeFile && (
+                  <div className="file-preview">
+                    {fakePreview && (
+                      <img src={fakePreview} alt="Fake evidence preview" className="file-preview-img" />
+                    )}
+                    <div className="file-preview-info">
+                      <span className="file-preview-name">{fakeFile.name}</span>
+                      <span className="file-preview-size">
+                        {(fakeFile.size / (1024 * 1024)).toFixed(1)} MB
+                      </span>
+                    </div>
+                    <button type="button" className="file-remove-btn" onClick={handleRemoveFake}>
+                      &times;
+                    </button>
+                  </div>
+                )}
+              </div>
+
+              {fileError && <p className="file-error">{fileError}</p>}
+            </>
+          ) : (
+            <>
+              <label>{t('report.evidence')}</label>
+              <div className="file-upload">
+                <input
+                  type="file"
+                  id="evidence"
+                  onChange={handleFileChange}
+                  accept="image/jpeg,image/png,image/webp,image/gif,video/mp4,video/quicktime,video/webm"
+                />
+                {!evidenceFile && (
+                  <label htmlFor="evidence" className="file-label">
+                    {t('report.evidencePlaceholder')}
+                  </label>
+                )}
+
+                {evidenceFile && (
+                  <div className="file-preview">
+                    {filePreview && (
+                      <img src={filePreview} alt="Evidence preview" className="file-preview-img" />
+                    )}
+                    <div className="file-preview-info">
+                      <span className="file-preview-name">{evidenceFile.name}</span>
+                      <span className="file-preview-size">
+                        {(evidenceFile.size / (1024 * 1024)).toFixed(1)} MB
+                      </span>
+                    </div>
+                    <button type="button" className="file-remove-btn" onClick={handleRemoveFile}>
+                      &times;
+                    </button>
+                  </div>
+                )}
+
+                {fileError && <p className="file-error">{fileError}</p>}
+              </div>
+            </>
+          )}
 
           {submitError && <p className="file-error">{submitError}</p>}
 
