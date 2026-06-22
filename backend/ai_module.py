@@ -4,12 +4,10 @@ from deepface import DeepFace
 import base64
 import os
 from PIL import Image
-import pytesseract
+import easyocr
 from better_profanity import profanity
-pytesseract.pytesseract.tesseract_cmd = '/usr/bin/tesseract'
-profanity.load_censor_words()
 from textblob import TextBlob
-
+profanity.load_censor_words()
 # ─── IMAGE ANALYSIS (Fake Photo / Deepfake) ───────────────────────────────────
 
 def analyze_images(original_path, fake_path):
@@ -82,17 +80,14 @@ def analyze_images(original_path, fake_path):
 # ─── TEXT ANALYSIS (Harassment / Threats / Stalking etc.) ────────────────────
 
 def analyze_text_screenshot(image_path):
-    """
-    Extracts text from a screenshot using OCR,
-    then analyzes it for toxicity and sentiment.
-    """
     try:
         if not os.path.exists(image_path):
             return {'error': 'Screenshot not found'}
 
-        # ─── Step 1: OCR — Extract text from screenshot ───────────────────
-        img = Image.open(image_path)
-        extracted_text = pytesseract.image_to_string(img).strip()
+        # ─── Step 1: OCR using EasyOCR (no system deps needed) ───────────
+        reader = easyocr.Reader(['en'], gpu=False)
+        results = reader.readtext(image_path)
+        extracted_text = ' '.join([text for _, text, _ in results]).strip()
 
         if not extracted_text:
             return {'error': 'No text could be extracted from the screenshot'}
