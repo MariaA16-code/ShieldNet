@@ -1,8 +1,4 @@
-import cv2
-import numpy as np
-import base64
 import os
-from PIL import Image
 from better_profanity import profanity
 from textblob import TextBlob
 profanity.load_censor_words()
@@ -13,6 +9,8 @@ def analyze_images(original_path, fake_path):
     Compares original and suspected fake image.
     Returns a manipulation score and analysis details.
     """
+    import cv2
+    import numpy as np
     from deepface import DeepFace
     result = {
         'manipulation_score': 0.0,
