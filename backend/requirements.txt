@@ -22,6 +22,5 @@ flask-bcrypt>=1.0.1
 flask-mail>=0.9.1
 PyMySQL>=1.0.2
 reportlab>=3.6.0
-easyocr>=1.7.0
 better-profanity>=0.7.0
 textblob>=0.17.1

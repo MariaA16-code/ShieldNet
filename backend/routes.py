@@ -5,7 +5,7 @@ from datetime import datetime
 import secrets
 import os
 from werkzeug.utils import secure_filename
-from ai_module import analyze_images, analyze_text_screenshot
+from ai_module import analyze_images, analyze_text_content 
 from pdf_module import generate_complaint_pdf
 from email_module import send_dmca_email
 UPLOAD_FOLDER = 'uploads'
@@ -238,22 +238,18 @@ def analyze(report_id):
 
         return jsonify(result), 200
 
-    # ─── Text Analysis (Harassment / Threats / Stalking etc.) ─────────────
+   # ─── Text Analysis (Harassment / Threats / Stalking etc.) ─────────────
     else:
-        if 'screenshot' not in request.files:
-            return jsonify({'error': 'A screenshot is required for text analysis'}), 400
+        text = report.description
+        if not text:
+            return jsonify({'error': 'No description found for this report'}), 400
 
-        screenshot = request.files['screenshot']
-        screenshot_filename = secure_filename(screenshot.filename)
-        screenshot_path = os.path.join(UPLOAD_FOLDER, 'screenshot_' + screenshot_filename)
-        screenshot.save(screenshot_path)
-
-        result = analyze_text_screenshot(screenshot_path)
+        result = analyze_text_content(text)
 
         if 'error' not in result:
             evidence = Evidence(
                 report_id=report_id,
-                original_image=screenshot_path,
+                original_image=None,
                 fake_image=None,
                 manipulation_score=result.get('threat_score'),
                 file_metadata=str(result.get('details'))

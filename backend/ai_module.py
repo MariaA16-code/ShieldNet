@@ -4,7 +4,6 @@ from deepface import DeepFace
 import base64
 import os
 from PIL import Image
-import easyocr
 from better_profanity import profanity
 from textblob import TextBlob
 profanity.load_censor_words()
@@ -76,32 +75,27 @@ def analyze_images(original_path, fake_path):
 
     return result
 
-
 # ─── TEXT ANALYSIS (Harassment / Threats / Stalking etc.) ────────────────────
 
-def analyze_text_screenshot(image_path):
+def analyze_text_content(text):
+    """
+    Analyzes text content for toxicity and harassment.
+    Used for text-based harassment categories.
+    """
     try:
-        if not os.path.exists(image_path):
-            return {'error': 'Screenshot not found'}
+        if not text or text.strip() == '':
+            return {'error': 'No text provided for analysis'}
 
-        # ─── Step 1: OCR using EasyOCR (no system deps needed) ───────────
-        reader = easyocr.Reader(['en'], gpu=False)
-        results = reader.readtext(image_path)
-        extracted_text = ' '.join([text for _, text, _ in results]).strip()
+        # ─── Step 1: Toxicity check ───────────────────────────────────────
+        is_toxic = profanity.contains_profanity(text)
+        censored = profanity.censor(text)
 
-        if not extracted_text:
-            return {'error': 'No text could be extracted from the screenshot'}
+        # ─── Step 2: Sentiment Analysis ───────────────────────────────────
+        blob = TextBlob(text)
+        polarity = round(blob.sentiment.polarity, 4)
+        subjectivity = round(blob.sentiment.subjectivity, 4)
 
-        # ─── Step 2: Toxicity check ───────────────────────────────────────
-        is_toxic = profanity.contains_profanity(extracted_text)
-        censored = profanity.censor(extracted_text)
-
-        # ─── Step 3: Sentiment Analysis ───────────────────────────────────
-        blob = TextBlob(extracted_text)
-        polarity = round(blob.sentiment.polarity, 4)      # -1 (negative) to +1 (positive)
-        subjectivity = round(blob.sentiment.subjectivity, 4)  # 0 (objective) to 1 (subjective)
-
-        # ─── Step 4: Threat Score (0-100) ─────────────────────────────────
+        # ─── Step 3: Threat Score ─────────────────────────────────────────
         threat_score = 0.0
         if is_toxic:
             threat_score += 50
@@ -111,7 +105,7 @@ def analyze_text_screenshot(image_path):
             threat_score += 20
         threat_score = min(round(threat_score, 2), 100.0)
 
-        # ─── Step 5: Verdict ──────────────────────────────────────────────
+        # ─── Step 4: Verdict ──────────────────────────────────────────────
         if threat_score >= 70:
             verdict = 'High likelihood of harassment'
         elif threat_score >= 40:
@@ -123,7 +117,7 @@ def analyze_text_screenshot(image_path):
             'threat_score': threat_score,
             'verdict': verdict,
             'details': {
-                'extracted_text': extracted_text,
+                'analyzed_text': text,
                 'censored_text': censored,
                 'is_toxic': is_toxic,
                 'sentiment_polarity': polarity,
