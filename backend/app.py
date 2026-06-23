@@ -2,7 +2,6 @@ from flask import Flask
 from extensions import db
 from flask_bcrypt import Bcrypt
 from flask_cors import CORS
-from flask_mail import Mail
 from dotenv import load_dotenv
 from urllib.parse import quote_plus
 from extensions import db, mail
