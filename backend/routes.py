@@ -288,8 +288,6 @@ def analyze(report_id):
 
         return jsonify(result), 200
 
-# ─── 7. GENERATE PDF COMPLAINT ────────────────────────────────────────────────
-
 @api.route('/api/generate-pdf/<int:report_id>', methods=['GET'])
 def generate_pdf(report_id):
     report = Report.query.get(report_id)
@@ -301,6 +299,7 @@ def generate_pdf(report_id):
     evidence = Evidence.query.filter_by(report_id=report.id).first()
 
     PKT = timedelta(hours=5)
+    is_image_category = report.category.lower() in ['fake / edited photo', 'deepfake video']
 
     report_data = {
         'report_id': report.id,
@@ -310,14 +309,26 @@ def generate_pdf(report_id):
         'category': report.category,
         'country': victim.country if victim else 'N/A',
         'description': report.description,
-        'manipulation_score': evidence.manipulation_score if evidence else None,
-        'verdict': 'High likelihood of manipulation' if evidence else None,
-        'face_match': False if evidence else None,
-        'pixel_difference': None,
         'submitted_at': (report.created_at + PKT).strftime('%Y-%m-%d %H:%M') + ' PKT'
     }
 
-    # Use temp file instead of saving permanently
+    if is_image_category:
+        report_data.update({
+            'analysis_type': 'image',
+            'manipulation_score': evidence.manipulation_score if evidence else None,
+            'verdict': str(evidence.file_metadata) if evidence else 'No analysis available',
+            'pixel_difference': None,
+            'face_match': 'N/A'
+        })
+    else:
+        report_data.update({
+            'analysis_type': 'text',
+            'threat_score': evidence.manipulation_score if evidence else None,
+            'verdict': 'Analysis completed' if evidence else 'No analysis available',
+            'is_toxic': None,
+            'sentiment_polarity': None
+        })
+
     tmp = tempfile.NamedTemporaryFile(delete=False, suffix='.pdf')
     tmp_path = tmp.name
     tmp.close()

@@ -7,11 +7,6 @@ from datetime import datetime
 import os
 
 def generate_complaint_pdf(report_data, output_path):
-    """
-    Generates a DMCA complaint PDF for a ShieldNet report.
-    report_data: dict with report details
-    output_path: where to save the PDF
-    """
 
     os.makedirs(os.path.dirname(output_path), exist_ok=True)
 
@@ -26,7 +21,6 @@ def generate_complaint_pdf(report_data, output_path):
 
     styles = getSampleStyleSheet()
 
-    # Custom styles
     title_style = ParagraphStyle(
         'TitleStyle',
         parent=styles['Title'],
@@ -105,14 +99,37 @@ def generate_complaint_pdf(report_data, output_path):
     elements.append(Spacer(1, 0.2 * inch))
 
     # ─── AI Analysis Results ──────────────────────────────────────────────────
-    if report_data.get('manipulation_score') is not None:
+    analysis_type = report_data.get('analysis_type')
+
+    if analysis_type == 'image':
         elements.append(Paragraph("AI Analysis Results", heading_style))
 
         ai_data = [
+            ['Analysis Type', 'Image Manipulation Detection'],
             ['Manipulation Score', f"{report_data.get('manipulation_score', 0)}%"],
             ['Verdict', str(report_data.get('verdict', 'N/A'))],
-            ['Face Match', str(report_data.get('face_match', 'N/A'))],
             ['Pixel Difference', str(report_data.get('pixel_difference', 'N/A'))],
+        ]
+
+        ai_table = Table(ai_data, colWidths=[2 * inch, 4 * inch])
+        ai_table.setStyle(TableStyle([
+            ('BACKGROUND', (0, 0), (0, -1), colors.HexColor('#f0f0f0')),
+            ('FONTNAME', (0, 0), (0, -1), 'Helvetica-Bold'),
+            ('FONTSIZE', (0, 0), (-1, -1), 10),
+            ('GRID', (0, 0), (-1, -1), 0.5, colors.HexColor('#dddddd')),
+            ('PADDING', (0, 0), (-1, -1), 6),
+        ]))
+
+        elements.append(ai_table)
+        elements.append(Spacer(1, 0.2 * inch))
+
+    elif analysis_type == 'text':
+        elements.append(Paragraph("AI Analysis Results", heading_style))
+
+        ai_data = [
+            ['Analysis Type', 'Text Harassment Detection'],
+            ['Threat Score', f"{report_data.get('threat_score', 0)}%"],
+            ['Verdict', str(report_data.get('verdict', 'N/A'))],
         ]
 
         ai_table = Table(ai_data, colWidths=[2 * inch, 4 * inch])

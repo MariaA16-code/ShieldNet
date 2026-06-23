@@ -11,7 +11,6 @@ def analyze_images(original_path, fake_path):
     """
     import cv2
     import numpy as np
-    from deepface import DeepFace
     result = {
         'manipulation_score': 0.0,
         'verdict': '',
@@ -23,19 +22,7 @@ def analyze_images(original_path, fake_path):
             return {'error': 'Original image not found'}
         if not os.path.exists(fake_path):
             return {'error': 'Suspected fake image not found'}
-
-        try:
-            verification = DeepFace.verify(
-                img1_path=original_path,
-                img2_path=fake_path,
-                enforce_detection=False
-            )
-            face_match = verification.get('verified', False)
-            face_distance = verification.get('distance', 1.0)
-        except Exception:
-            face_match = False
-            face_distance = 1.0
-
+        
         img1 = cv2.imread(original_path)
         img2 = cv2.imread(fake_path)
 
@@ -47,23 +34,18 @@ def analyze_images(original_path, fake_path):
         diff_score = np.mean(diff)
         pixel_manipulation = min(round((diff_score / 255) * 100 * 3, 2), 100.0)
 
-        face_score = round(face_distance * 100, 2)
-        final_score = round((face_score * 0.6) + (pixel_manipulation * 0.4), 2)
-        final_score = min(final_score, 100.0)
-
-        if final_score >= 70:
+        if pixel_manipulation >= 70:
             verdict = 'High likelihood of manipulation'
-        elif final_score >= 40:
+        elif pixel_manipulation >= 40:
             verdict = 'Moderate likelihood of manipulation'
         else:
             verdict = 'Low likelihood of manipulation'
 
         result = {
-            'manipulation_score': final_score,
+            'manipulation_score': pixel_manipulation,
             'verdict': verdict,
             'details': {
-                'face_match': face_match,
-                'face_distance': round(face_distance, 4),
+                'face_match': 'N/A',
                 'pixel_difference': pixel_manipulation
             }
         }
