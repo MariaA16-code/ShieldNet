@@ -260,6 +260,8 @@ def analyze(report_id):
                 original_image=original_path,
                 fake_image=fake_path,
                 manipulation_score=result.get('manipulation_score'),
+                verdict=result.get('verdict'),
+                pixel_difference=result.get('details', {}).get('pixel_difference'),
                 file_metadata=str(result.get('details'))
             )
             db.session.add(evidence)
@@ -267,7 +269,7 @@ def analyze(report_id):
 
         return jsonify(result), 200
 
-   # ─── Text Analysis (Harassment / Threats / Stalking etc.) ─────────────
+    # ─── Text Analysis (Harassment / Threats / Stalking etc.) ─────────────
     else:
         text = report.description
         if not text:
@@ -281,12 +283,14 @@ def analyze(report_id):
                 original_image=None,
                 fake_image=None,
                 manipulation_score=result.get('threat_score'),
+                verdict=result.get('verdict'),
                 file_metadata=str(result.get('details'))
             )
             db.session.add(evidence)
             db.session.commit()
 
         return jsonify(result), 200
+
 
 @api.route('/api/generate-pdf/<int:report_id>', methods=['GET'])
 def generate_pdf(report_id):
@@ -299,7 +303,7 @@ def generate_pdf(report_id):
     evidence = Evidence.query.filter_by(report_id=report.id).first()
 
     PKT = timedelta(hours=5)
-    is_image_category = report.category.lower() in ['fake / edited photo', 'deepfake video']
+    is_image_category = (report.category or '').lower() in ['fake / edited photo', 'deepfake video']
 
     report_data = {
         'report_id': report.id,
@@ -316,15 +320,15 @@ def generate_pdf(report_id):
         report_data.update({
             'analysis_type': 'image',
             'manipulation_score': evidence.manipulation_score if evidence else None,
-            'verdict': str(evidence.file_metadata) if evidence else 'No analysis available',
-            'pixel_difference': None,
+            'verdict': evidence.verdict if evidence else 'No analysis available',
+            'pixel_difference': evidence.pixel_difference if evidence else None,
             'face_match': 'N/A'
         })
     else:
         report_data.update({
             'analysis_type': 'text',
             'threat_score': evidence.manipulation_score if evidence else None,
-            'verdict': 'Analysis completed' if evidence else 'No analysis available',
+            'verdict': evidence.verdict if evidence else 'No analysis available',
             'is_toxic': None,
             'sentiment_polarity': None
         })
@@ -341,50 +345,3 @@ def generate_pdf(report_id):
         download_name=f'shieldnet_report_{report_id}.pdf',
         mimetype='application/pdf'
     )
-
-# ─── 8. SEND DMCA EMAIL SIMULATION ───────────────────────────────────────────
-
-@api.route('/api/send-dmca/<int:report_id>', methods=['POST'])
-def send_dmca(report_id):
-
-    if not verify_admin(request):
-        return jsonify({'error': 'Unauthorized'}), 401
-    
-    report = Report.query.get(report_id)
-    if not report:
-        return jsonify({'error': 'Report not found'}), 404
-
-    victim = Victim.query.get(report.victim_id)
-    evidence = Evidence.query.filter_by(report_id=report.id).first()
-    case = Case.query.filter_by(report_id=report.id).first()
-
-    report_data = {
-        'report_id': report.id,
-        'token': victim.token if victim else 'N/A',
-        'platform': report.platform,
-        'category': report.category,
-        'description': report.description,
-        'status': case.status if case else 'Pending',
-        'manipulation_score': evidence.manipulation_score if evidence else 'N/A',
-        'verdict': 'High likelihood of manipulation' if evidence else 'N/A'
-    }
-
-    # Create takedown record
-    takedown = Takedown(
-        report_id=report.id,
-        platform=report.platform,
-        status='Sent'
-    )
-    db.session.add(takedown)
-    db.session.commit()
-
-    result = send_dmca_email(report_data)
-
-    if result['success']:
-        return jsonify({
-            'message': 'DMCA simulation email sent successfully',
-            'sent_to': 'maria.amir.tech@gmail.com',
-            'report_id': report_id
-        }), 200
-    else:
-        return jsonify({'error': result['error']}), 500

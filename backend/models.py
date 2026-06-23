@@ -38,6 +38,8 @@ class Evidence(db.Model):
     original_image = db.Column(db.String(255))
     fake_image = db.Column(db.String(255))
     manipulation_score = db.Column(db.Float)
+    verdict = db.Column(db.String(100))
+    pixel_difference = db.Column(db.Float)
     file_metadata = db.Column(db.Text)
 
 
