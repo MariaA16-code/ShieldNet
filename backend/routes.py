@@ -134,31 +134,124 @@ def track_case(token):
 
 # ─── 3. GET ALL REPORTS (Admin Side) ──────────────────────────────────────────
 
-@api.route('/api/admin/reports', methods=['GET'])
-def get_all_reports():
-    if not verify_admin(request):
-        return jsonify({'error': 'Unauthorized'}), 401
-    
-    reports = Report.query.order_by(Report.created_at.desc()).all()
+@api.route('/api/analyze/<int:report_id>', methods=['POST'])
+def analyze(report_id):
+    report = Report.query.get(report_id)
+    if not report:
+        return jsonify({'error': 'Report not found'}), 404
 
-    result = []
-    for report in reports:
-        victim = Victim.query.get(report.victim_id)
-        case = Case.query.filter_by(report_id=report.id).first()
-        result.append({
-            'report_id': report.id,
-            'victim_token': victim.token if victim else 'N/A',
-            'country': victim.country if victim else 'N/A',
-            'category': report.category,
-            'platform': report.platform,
-            'description': report.description,
-            'report_status': report.status,
-            'case_status': case.status if case else 'N/A',
-            'submitted_at': (report.created_at + timedelta(hours=5)).strftime('%Y-%m-%d %H:%M') + ' PKT'
+    category = report.category.lower() if report.category else ''
+
+    # ─── Image Analysis (Deepfake / Fake Photo) ───────────────────────────
+    if category in IMAGE_CATEGORIES:
+        if 'original' not in request.files or 'fake' not in request.files:
+            return jsonify({'error': 'Both original and fake images are required for image analysis'}), 400
+
+        original = request.files['original']
+        fake = request.files['fake']
+
+        original_filename = secure_filename(original.filename)
+        fake_filename = secure_filename(fake.filename)
+
+        original_path = os.path.join(UPLOAD_FOLDER, 'original_' + original_filename)
+        fake_path = os.path.join(UPLOAD_FOLDER, 'fake_' + fake_filename)
+
+        original.save(original_path)
+        fake.save(fake_path)
+
+        result = analyze_images(original_path, fake_path)
+
+        if 'error' not in result:
+            evidence = Evidence(
+                report_id=report_id,
+                original_image=original_path,
+                fake_image=fake_path,
+                manipulation_score=result.get('manipulation_score'),
+                verdict=result.get('verdict'),
+                pixel_difference=result.get('details', {}).get('pixel_difference'),
+                file_metadata=str(result.get('details'))
+            )
+            db.session.add(evidence)
+            db.session.commit()
+
+        return jsonify(result), 200
+
+    # ─── Text Analysis (Harassment / Threats / Stalking etc.) ─────────────
+    else:
+        text = report.description
+        if not text:
+            return jsonify({'error': 'No description found for this report'}), 400
+
+        result = analyze_text_content(text)
+
+        if 'error' not in result:
+            evidence = Evidence(
+                report_id=report_id,
+                original_image=None,
+                fake_image=None,
+                manipulation_score=result.get('threat_score'),
+                verdict=result.get('verdict'),
+                file_metadata=str(result.get('details'))
+            )
+            db.session.add(evidence)
+            db.session.commit()
+
+        return jsonify(result), 200
+
+
+@api.route('/api/generate-pdf/<int:report_id>', methods=['GET'])
+def generate_pdf(report_id):
+    report = Report.query.get(report_id)
+    if not report:
+        return jsonify({'error': 'Report not found'}), 404
+
+    victim = Victim.query.get(report.victim_id)
+    case = Case.query.filter_by(report_id=report.id).first()
+    evidence = Evidence.query.filter_by(report_id=report.id).first()
+
+    PKT = timedelta(hours=5)
+    is_image_category = (report.category or '').lower() in ['fake / edited photo', 'deepfake video']
+
+    report_data = {
+        'report_id': report.id,
+        'token': victim.token if victim else 'N/A',
+        'status': case.status if case else 'Pending',
+        'platform': report.platform,
+        'category': report.category,
+        'country': victim.country if victim else 'N/A',
+        'description': report.description,
+        'submitted_at': (report.created_at + PKT).strftime('%Y-%m-%d %H:%M') + ' PKT'
+    }
+
+    if is_image_category:
+        report_data.update({
+            'analysis_type': 'image',
+            'manipulation_score': evidence.manipulation_score if evidence else None,
+            'verdict': evidence.verdict if evidence else 'No analysis available',
+            'pixel_difference': evidence.pixel_difference if evidence else None,
+            'face_match': 'N/A'
+        })
+    else:
+        report_data.update({
+            'analysis_type': 'text',
+            'threat_score': evidence.manipulation_score if evidence else None,
+            'verdict': evidence.verdict if evidence else 'No analysis available',
+            'is_toxic': None,
+            'sentiment_polarity': None
         })
 
-    return jsonify({'total': len(result), 'reports': result}), 200
+    tmp = tempfile.NamedTemporaryFile(delete=False, suffix='.pdf')
+    tmp_path = tmp.name
+    tmp.close()
 
+    generate_complaint_pdf(report_data, tmp_path)
+
+    return send_file(
+        tmp_path,
+        as_attachment=True,
+        download_name=f'shieldnet_report_{report_id}.pdf',
+        mimetype='application/pdf'
+    )
 
 # ─── 4. UPDATE CASE STATUS (Admin Side) ───────────────────────────────────────
 
