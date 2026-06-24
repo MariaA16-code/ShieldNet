@@ -220,6 +220,10 @@ function ReportIncident() {
       <div className="page-container">
         <Navbar />
         <div className="report-page">
+          <div className="report-bg" aria-hidden="true">
+            <span className="report-blob r1"></span>
+            <span className="report-blob r2"></span>
+          </div>
           <div className="success-card">
             <span className="eyebrow">{t('report.successEyebrow')}</span>
             <h1>{t('report.successTitle')}</h1>
@@ -237,6 +241,10 @@ function ReportIncident() {
     <div className="page-container">
       <Navbar />
       <div className="report-page">
+        <div className="report-bg" aria-hidden="true">
+          <span className="report-blob r1"></span>
+          <span className="report-blob r2"></span>
+        </div>
         <form className="report-form" onSubmit={handleSubmit}>
           <span className="eyebrow">Anonymous &middot; Encrypted &middot; Free</span>
           <h1>{t('report.title')}</h1>

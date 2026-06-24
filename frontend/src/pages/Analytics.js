@@ -26,18 +26,25 @@ function Analytics() {
       {
         label: 'Reports',
         data: [42, 31, 24, 18, 9, 4],
-        backgroundColor: '#3DDC97',
+        backgroundColor: '#9B8CF5',
         borderRadius: 6,
       },
     ],
   };
 
   const categoryData = {
-    labels: ['Fake Photo', 'Harassment', 'Impersonation', 'Stalking', 'Threats', 'Deepfake'],
+    labels: [
+      t('report.categories.fakePhoto'),
+      t('analytics.categoryHarassment'),
+      t('report.categories.impersonation'),
+      t('report.categories.stalking'),
+      t('report.categories.threats'),
+      t('report.categories.deepfakeVideo'),
+    ],
     datasets: [
       {
         data: [35, 28, 20, 12, 8, 5],
-        backgroundColor: ['#3DDC97', '#5B8DEF', '#7C8699', '#FF6B6B', '#34c585', '#2C3548'],
+        backgroundColor: ['#9B8CF5', '#4A7DFF', '#6B7390', '#FF6B6B', '#6C5CE7', '#2C3548'],
         borderWidth: 0,
       },
     ],
@@ -55,17 +62,17 @@ function Analytics() {
     responsive: true,
     plugins: {
       legend: {
-        labels: { color: '#E8EBF0', font: { family: 'Inter' } },
+        labels: { color: '#EDEFF7', font: { family: 'Inter' } },
       },
     },
     scales: {
       x: {
-        ticks: { color: '#7C8699' },
-        grid: { color: 'rgba(255,255,255,0.05)' },
+        ticks: { color: '#8A91AC' },
+        grid: { color: 'rgba(237, 239, 247, 0.05)' },
       },
       y: {
-        ticks: { color: '#7C8699' },
-        grid: { color: 'rgba(255,255,255,0.05)' },
+        ticks: { color: '#8A91AC' },
+        grid: { color: 'rgba(237, 239, 247, 0.05)' },
       },
     },
   };
@@ -75,7 +82,7 @@ function Analytics() {
     plugins: {
       legend: {
         position: 'bottom',
-        labels: { color: '#E8EBF0', font: { family: 'Inter' }, padding: 16 },
+        labels: { color: '#EDEFF7', font: { family: 'Inter' }, padding: 16 },
       },
     },
   };
@@ -84,6 +91,11 @@ function Analytics() {
     <div className="page-container">
       <Navbar />
       <div className="analytics-page">
+        <div className="analytics-bg" aria-hidden="true">
+          <span className="analytics-blob a1"></span>
+          <span className="analytics-blob a2"></span>
+        </div>
+
         <div className="analytics-header">
           <span className="eyebrow">{t('analytics.eyebrow')}</span>
           <h1>{t('analytics.title')}</h1>
@@ -122,12 +134,12 @@ function Analytics() {
 
         <div className="map-card">
           <h3>{t('analytics.mapTitle')}</h3>
-        <MapContainer
-  center={[30.3753, 69.3451]}
-  zoom={5}
-  scrollWheelZoom={false}
-  className="analytics-map"
->
+          <MapContainer
+            center={[30.3753, 69.3451]}
+            zoom={5}
+            scrollWheelZoom={false}
+            className="analytics-map"
+          >
             <TileLayer
               url="https://{s}.basemaps.cartocdn.com/dark_all/{z}/{x}/{y}{r}.png"
               attribution='&copy; OpenStreetMap contributors &copy; CARTO'
@@ -137,7 +149,7 @@ function Analytics() {
                 key={index}
                 center={[loc.lat, loc.lng]}
                 radius={Math.sqrt(loc.count) * 3}
-                pathOptions={{ color: '#3DDC97', fillColor: '#3DDC97', fillOpacity: 0.4 }}
+                pathOptions={{ color: '#9B8CF5', fillColor: '#9B8CF5', fillOpacity: 0.4 }}
               >
                 <Popup>
                   <strong>{loc.city}</strong><br />

@@ -1,14 +1,55 @@
+@import url('https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@500;600;700&family=JetBrains+Mono:wght@500&display=swap');
+
 .report-page {
+  position: relative;
   min-height: 100vh;
   display: flex;
   align-items: center;
   justify-content: center;
   padding: 60px 24px;
+  background: #0A0E16;
+  color: #EDEFF7;
+  overflow: hidden;
+}
+
+/* ---------- Background blobs (static, matches Home/TrackCase/Analytics) ---------- */
+
+.report-bg {
+  position: absolute;
+  inset: 0;
+  z-index: 0;
+  pointer-events: none;
+}
+
+.report-blob {
+  position: absolute;
+  border-radius: 50%;
+  mix-blend-mode: lighten;
+  opacity: 0.4;
+  filter: blur(85px);
+}
+
+.report-blob.r1 {
+  width: 400px;
+  height: 400px;
+  background: #6C5CE7;
+  top: -130px;
+  left: -110px;
+}
+
+.report-blob.r2 {
+  width: 340px;
+  height: 340px;
+  background: #4A7DFF;
+  bottom: -110px;
+  right: -90px;
 }
 
 .report-form {
-  background: #141925;
-  border: 1px solid rgba(255,255,255,0.06);
+  position: relative;
+  z-index: 1;
+  background: #141B2E;
+  border: 1px solid rgba(237, 239, 247, 0.08);
   border-radius: 16px;
   padding: 44px;
   max-width: 520px;
@@ -16,7 +57,7 @@
 }
 
 .eyebrow {
-  color: #3DDC97;
+  color: #9B8CF5;
   font-size: 13px;
   font-weight: 500;
   letter-spacing: 0.05em;
@@ -24,13 +65,16 @@
 }
 
 .report-form h1 {
+  font-family: 'Space Grotesk', sans-serif;
   font-size: 28px;
   font-weight: 600;
+  letter-spacing: -0.01em;
   margin: 14px 0 8px;
+  color: #EDEFF7;
 }
 
 .form-sub {
-  color: #7C8699;
+  color: #8A91AC;
   font-size: 14px;
   margin-bottom: 28px;
 }
@@ -38,7 +82,7 @@
 .report-form label {
   display: block;
   font-size: 13px;
-  color: #E8EBF0;
+  color: #EDEFF7;
   font-weight: 500;
   margin-bottom: 8px;
   margin-top: 20px;
@@ -48,11 +92,11 @@
 .report-form textarea,
 .report-form input {
   width: 100%;
-  background: #0B0E14;
-  border: 1px solid rgba(255,255,255,0.1);
+  background: #0A0E16;
+  border: 1px solid rgba(237, 239, 247, 0.1);
   border-radius: 8px;
   padding: 12px 14px;
-  color: #E8EBF0;
+  color: #EDEFF7;
   font-family: 'Inter', sans-serif;
   font-size: 14px;
   resize: vertical;
@@ -63,7 +107,7 @@
 .report-form select:focus,
 .report-form textarea:focus {
   outline: none;
-  border-color: #3DDC97;
+  border-color: #9B8CF5;
 }
 
 .file-upload input[type="file"] {
@@ -72,20 +116,31 @@
 
 .file-label {
   display: block;
-  background: #0B0E14;
-  border: 1px dashed rgba(255,255,255,0.2);
+  background: #0A0E16;
+  border: 1px dashed rgba(237, 239, 247, 0.2);
   border-radius: 8px;
   padding: 14px;
   text-align: center;
   font-size: 14px;
-  color: #7C8699;
+  color: #8A91AC;
   cursor: pointer;
   margin-top: 0;
 }
 
 .file-label:hover {
-  border-color: #3DDC97;
-  color: #E8EBF0;
+  border-color: #9B8CF5;
+  color: #EDEFF7;
+}
+
+.btn-primary {
+  background: #4A7DFF;
+  color: #0A0E16;
+  border: none;
+  font-weight: 600;
+}
+
+.btn-primary:hover {
+  background: #6996ff;
 }
 
 .submit-btn {
@@ -93,11 +148,14 @@
   margin-top: 32px;
   padding: 14px;
   font-size: 15px;
+  border-radius: 8px;
 }
 
 .success-card {
-  background: #141925;
-  border: 1px solid rgba(61, 220, 151, 0.25);
+  position: relative;
+  z-index: 1;
+  background: #141B2E;
+  border: 1px solid rgba(155, 140, 245, 0.3);
   border-radius: 16px;
   padding: 48px;
   max-width: 480px;
@@ -105,26 +163,29 @@
 }
 
 .success-card h1 {
+  font-family: 'Space Grotesk', sans-serif;
   font-size: 26px;
   font-weight: 600;
   margin: 14px 0 12px;
+  color: #EDEFF7;
 }
 
 .success-sub {
-  color: #7C8699;
+  color: #8A91AC;
   font-size: 14px;
   line-height: 1.6;
   margin-bottom: 28px;
 }
 
 .token-box {
-  background: #0B0E14;
-  border: 1px solid #3DDC97;
+  background: #0A0E16;
+  border: 1px solid #9B8CF5;
   border-radius: 10px;
   padding: 18px;
+  font-family: 'JetBrains Mono', monospace;
   font-size: 20px;
   letter-spacing: 0.02em;
-  color: #3DDC97;
+  color: #9B8CF5;
   margin-bottom: 24px;
   word-break: break-all;
   line-height: 1.5;
@@ -137,7 +198,7 @@
 }
 
 .success-note {
-  color: #7C8699;
+  color: #8A91AC;
   font-size: 13px;
 }
 
@@ -145,8 +206,8 @@
   display: flex;
   align-items: center;
   gap: 12px;
-  background: #0B0E14;
-  border: 1px solid rgba(61, 220, 151, 0.3);
+  background: #0A0E16;
+  border: 1px solid rgba(155, 140, 245, 0.3);
   border-radius: 8px;
   padding: 10px 14px;
 }
@@ -168,7 +229,7 @@
 
 .file-preview-name {
   font-size: 13px;
-  color: #E8EBF0;
+  color: #EDEFF7;
   white-space: nowrap;
   overflow: hidden;
   text-overflow: ellipsis;
@@ -176,13 +237,13 @@
 
 .file-preview-size {
   font-size: 12px;
-  color: #7C8699;
+  color: #8A91AC;
 }
 
 .file-remove-btn {
   background: none;
   border: none;
-  color: #7C8699;
+  color: #8A91AC;
   font-size: 20px;
   cursor: pointer;
   flex-shrink: 0;

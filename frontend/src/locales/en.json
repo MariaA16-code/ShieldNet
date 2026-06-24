@@ -78,7 +78,8 @@
     "stat4": "Platforms monitored",
     "chartPlatform": "Reports by platform",
     "chartCategory": "Reports by category",
-    "mapTitle": "Report origins"
+    "mapTitle": "Report origins",
+    "categoryHarassment": "Harassment"
   },
   "footer": {
     "tagline": "Protecting victims. Exposing abusers. Connecting the world.",

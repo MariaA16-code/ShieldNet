@@ -78,7 +78,8 @@
     "stat4": "Plataformas monitoreadas",
     "chartPlatform": "Reportes por plataforma",
     "chartCategory": "Reportes por categoría",
-    "mapTitle": "Origen de los reportes"
+    "mapTitle": "Origen de los reportes",
+    "categoryHarassment": "Acoso"
   },
   "footer": {
     "tagline": "Protegiendo a las víctimas. Exponiendo a los abusadores. Conectando al mundo.",

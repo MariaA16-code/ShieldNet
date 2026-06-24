@@ -1,3 +1,5 @@
+@import url('https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@500;600;700&family=JetBrains+Mono:wght@500&display=swap');
+
 .page-container {
   display: flex;
   flex-direction: column;
@@ -5,16 +7,55 @@
 }
 
 .track-page {
+  position: relative;
   min-height: 100vh;
   display: flex;
   align-items: center;
   justify-content: center;
   padding: 60px 24px;
+  background: #0A0E16;
+  color: #EDEFF7;
+  overflow: hidden;
+}
+
+/* ---------- Background blobs (static, matches Home) ---------- */
+
+.track-bg {
+  position: absolute;
+  inset: 0;
+  z-index: 0;
+  pointer-events: none;
+}
+
+.track-blob {
+  position: absolute;
+  border-radius: 50%;
+  mix-blend-mode: lighten;
+  opacity: 0.45;
+  filter: blur(80px);
+}
+
+.track-blob.t1 {
+  width: 380px;
+  height: 380px;
+  background: #6C5CE7;
+  top: -120px;
+  left: -100px;
+}
+
+.track-blob.t2 {
+  width: 340px;
+  height: 340px;
+  background: #4A7DFF;
+  bottom: -120px;
+  right: -100px;
 }
 
 .track-card {
-  background: #141925;
-  border: 1px solid rgba(255,255,255,0.06);
+  position: relative;
+  z-index: 1;
+  background: #141B2E;
+  border: 1px solid rgba(237, 239, 247, 0.08);
   border-radius: 16px;
   padding: 44px;
   max-width: 520px;
@@ -22,7 +63,7 @@
 }
 
 .eyebrow {
-  color: #3DDC97;
+  color: #9B8CF5;
   font-size: 13px;
   font-weight: 500;
   letter-spacing: 0.05em;
@@ -30,13 +71,16 @@
 }
 
 .track-card h1 {
+  font-family: 'Space Grotesk', sans-serif;
   font-size: 28px;
   font-weight: 600;
+  letter-spacing: -0.01em;
   margin: 14px 0 8px;
+  color: #EDEFF7;
 }
 
 .track-sub {
-  color: #7C8699;
+  color: #8A91AC;
   font-size: 14px;
   margin-bottom: 28px;
 }
@@ -48,23 +92,48 @@
 
 .track-form input {
   flex: 1;
-  background: #0B0E14;
-  border: 1px solid rgba(255,255,255,0.1);
+  background: #0A0E16;
+  border: 1px solid rgba(237, 239, 247, 0.1);
   border-radius: 8px;
   padding: 12px 14px;
-  color: #E8EBF0;
+  color: #EDEFF7;
   font-size: 14px;
+  font-family: 'JetBrains Mono', monospace;
 }
 
 .track-form input:focus {
   outline: none;
-  border-color: #3DDC97;
+  border-color: #9B8CF5;
 }
 
 .track-form button {
   padding: 12px 24px;
   border-radius: 8px;
   font-weight: 500;
+}
+
+.btn-primary {
+  background: #4A7DFF;
+  color: #0A0E16;
+  font-weight: 600;
+  font-size: 15px;
+  border: none;
+}
+
+.btn-primary:hover {
+  background: #6996ff;
+}
+
+.btn-secondary {
+  background: transparent;
+  border: 1px solid rgba(237, 239, 247, 0.18) !important;
+  color: #EDEFF7;
+  font-weight: 500;
+  font-size: 15px;
+}
+
+.btn-secondary:hover {
+  border-color: rgba(237, 239, 247, 0.4) !important;
 }
 
 .track-error {
@@ -75,7 +144,7 @@
 
 .case-result {
   margin-top: 32px;
-  border-top: 1px solid rgba(255,255,255,0.06);
+  border-top: 1px solid rgba(237, 239, 247, 0.08);
   padding-top: 28px;
 }
 
@@ -94,14 +163,17 @@
 
 .meta-label {
   font-size: 12px;
-  color: #7C8699;
+  color: #6B7390;
   margin-bottom: 4px;
+  text-transform: uppercase;
+  letter-spacing: 0.04em;
 }
 
 .meta-value {
   font-size: 14px;
-  color: #E8EBF0;
+  color: #EDEFF7;
   font-weight: 500;
+  font-family: 'JetBrains Mono', monospace;
 }
 
 .timeline {
@@ -120,27 +192,27 @@
   width: 10px;
   height: 10px;
   border-radius: 50%;
-  background: rgba(255,255,255,0.15);
+  background: rgba(237, 239, 247, 0.15);
   flex-shrink: 0;
 }
 
 .timeline-dot.done {
-  background: #3DDC97;
-  box-shadow: 0 0 8px #3DDC97;
+  background: #9B8CF5;
+  box-shadow: 0 0 8px #9B8CF5;
 }
 
 .timeline-label {
   font-size: 14px;
-  color: #7C8699;
+  color: #6B7390;
 }
 
 .timeline-label.done {
-  color: #E8EBF0;
+  color: #EDEFF7;
   font-weight: 500;
 }
 
 .case-notes {
-  color: #7C8699;
+  color: #8A91AC;
   font-size: 13px;
   margin: 12px 0 24px;
   font-style: italic;
@@ -151,8 +223,8 @@
   margin-top: 28px;
   padding: 12px 24px;
   border-radius: 8px;
-  background: #5B8DEF;
-  color: #0B0E14;
+  background: #4A7DFF;
+  color: #0A0E16;
   border: none;
   font-size: 14px;
   font-weight: 600;
@@ -161,7 +233,7 @@
 }
 
 .download-btn:hover {
-  background: #4a7ad9;
+  background: #6996ff;
 }
 
 @media (max-width: 600px) {

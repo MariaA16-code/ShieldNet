@@ -78,7 +78,8 @@
     "stat4": "Plateformes surveillées",
     "chartPlatform": "Signalements par plateforme",
     "chartCategory": "Signalements par catégorie",
-    "mapTitle": "Origines des signalements"
+    "mapTitle": "Origines des signalements",
+    "categoryHarassment": "Harcèlement"
   },
   "footer": {
     "tagline": "Protéger les victimes. Exposer les agresseurs. Connecter le monde.",

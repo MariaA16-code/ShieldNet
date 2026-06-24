@@ -1,398 +1,168 @@
-import React, { useState, useEffect, useCallback } from 'react';
-import axios from 'axios';
-import './AdminDashboard.css';
+import React from 'react';
+import { Bar, Doughnut } from 'react-chartjs-2';
+import {
+  Chart as ChartJS,
+  CategoryScale,
+  LinearScale,
+  BarElement,
+  ArcElement,
+  Tooltip,
+  Legend,
+} from 'chart.js';
+import { MapContainer, TileLayer, CircleMarker, Popup } from 'react-leaflet';
+import { useTranslation } from 'react-i18next';
+import Navbar from '../components/Navbar';
+import Footer from '../components/Footer';
+import './Analytics.css';
 
-const API_BASE = 'https://shieldnet-backend.onrender.com';
+ChartJS.register(CategoryScale, LinearScale, BarElement, ArcElement, Tooltip, Legend);
 
-const STATUS_OPTIONS = [
-  'Submitted',
-  'Evidence Verified',
-  'Under Review',
-  'Takedown Sent',
-  'Resolved',
-];
+function Analytics() {
+  const { t } = useTranslation();
 
-const STATUS_CLASS = {
-  Submitted: 'status-submitted',
-  'Evidence Verified': 'status-evidence-verified',
-  'Under Review': 'status-under-review',
-  'Takedown Sent': 'status-takedown-sent',
-  Resolved: 'status-resolved',
-};
-
-function AdminDashboard() {
-  const [token, setToken] = useState(null);
-
-  const [passwordInput, setPasswordInput] = useState('');
-  const [loginError, setLoginError] = useState('');
-  const [loggingIn, setLoggingIn] = useState(false);
-
-  const [reports, setReports] = useState([]);
-  const [harassers, setHarassers] = useState([]);
-  const [loadingReports, setLoadingReports] = useState(false);
-  const [loadingHarassers, setLoadingHarassers] = useState(false);
-  const [dataError, setDataError] = useState('');
-
-  const [rowBusy, setRowBusy] = useState({});
-  const [rowMessage, setRowMessage] = useState({});
-
-  const authHeaders = useCallback(
-    () => ({ Authorization: `Bearer ${token}` }),
-    [token]
-  );
-
-  const fetchReports = useCallback(async () => {
-    setLoadingReports(true);
-    setDataError('');
-    try {
-      const res = await axios.get(`${API_BASE}/api/admin/reports`, {
-        headers: authHeaders(),
-        timeout: 60000,
-      });
-      setReports(res.data.reports || []);
-    } catch (err) {
-      setDataError(
-        err.response?.status === 401
-          ? 'Session expired. Log in again.'
-          : 'Could not load reports. The server may be waking up — try again in a moment.'
-      );
-      if (err.response?.status === 401) setToken(null);
-    } finally {
-      setLoadingReports(false);
-    }
-  }, [authHeaders]);
-
-  const fetchHarassers = useCallback(async () => {
-    setLoadingHarassers(true);
-    try {
-      const res = await axios.get(`${API_BASE}/api/admin/harassers`, {
-        headers: authHeaders(),
-        timeout: 60000,
-      });
-      setHarassers(res.data.flagged_harassers || []);
-    } catch (err) {
-      setHarassers([]);
-    } finally {
-      setLoadingHarassers(false);
-    }
-  }, [authHeaders]);
-
-  useEffect(() => {
-    if (token) {
-      fetchReports();
-      fetchHarassers();
-    }
-  }, [token, fetchReports, fetchHarassers]);
-
-  const handleLogin = async (e) => {
-    e.preventDefault();
-    setLoginError('');
-    setLoggingIn(true);
-    try {
-      const res = await axios.post(
-        `${API_BASE}/api/admin/login`,
-        { password: passwordInput },
-        { timeout: 60000 }
-      );
-      setToken(res.data.token);
-      setPasswordInput('');
-    } catch (err) {
-      setLoginError(
-        err.response?.status === 401
-          ? 'Incorrect password.'
-          : 'Could not reach the server. Try again.'
-      );
-    } finally {
-      setLoggingIn(false);
-    }
+  const platformData = {
+    labels: ['Instagram', 'Facebook', 'TikTok', 'Twitter/X', 'Snapchat', 'YouTube'],
+    datasets: [
+      {
+        label: 'Reports',
+        data: [42, 31, 24, 18, 9, 4],
+        backgroundColor: '#9B8CF5',
+        borderRadius: 6,
+      },
+    ],
   };
 
-  const setRowMsg = (reportId, msg) => {
-    setRowMessage((prev) => ({ ...prev, [reportId]: msg }));
-    if (msg) {
-      setTimeout(() => {
-        setRowMessage((prev) => {
-          const next = { ...prev };
-          delete next[reportId];
-          return next;
-        });
-      }, 4000);
-    }
+  const categoryData = {
+    labels: [
+      t('report.categories.fakePhoto'),
+      t('analytics.categoryHarassment'),
+      t('report.categories.impersonation'),
+      t('report.categories.stalking'),
+      t('report.categories.threats'),
+      t('report.categories.deepfakeVideo'),
+    ],
+    datasets: [
+      {
+        data: [35, 28, 20, 12, 8, 5],
+        backgroundColor: ['#9B8CF5', '#4A7DFF', '#6B7390', '#FF6B6B', '#6C5CE7', '#2C3548'],
+        borderWidth: 0,
+      },
+    ],
   };
 
-  const handleStatusChange = async (report, newStatus) => {
-    const caseId = report.case_id || report.report_id;
-    if (newStatus === report.case_status) return;
-    if (rowBusy[report.report_id]) return;
+  const reportLocations = [
+    { city: 'Lahore', lat: 31.5497, lng: 74.3436, count: 34 },
+    { city: 'Karachi', lat: 24.8607, lng: 67.0011, count: 28 },
+    { city: 'Islamabad', lat: 33.6844, lng: 73.0479, count: 19 },
+    { city: 'Faisalabad', lat: 31.4504, lng: 73.1350, count: 12 },
+    { city: 'Multan', lat: 30.1575, lng: 71.5249, count: 8 },
+  ];
 
-    setRowBusy((prev) => ({ ...prev, [report.report_id]: 'status' }));
-    try {
-      await axios.put(
-        `${API_BASE}/api/admin/case/${caseId}`,
-        { status: newStatus },
-        { headers: { ...authHeaders(), 'Content-Type': 'application/json' }, timeout: 90000 }
-      );
-      setReports((prev) =>
-        prev.map((r) =>
-          r.report_id === report.report_id
-            ? { ...r, case_status: newStatus, report_status: newStatus }
-            : r
-        )
-      );
-      setRowMsg(report.report_id, { type: 'success', text: 'Status updated.' });
-    } catch (err) {
-      setRowMsg(report.report_id, {
-        type: 'error',
-        text: 'Update failed. Try again.',
-      });
-    } finally {
-      setRowBusy((prev) => {
-        const next = { ...prev };
-        delete next[report.report_id];
-        return next;
-      });
-    }
+  const chartOptions = {
+    responsive: true,
+    plugins: {
+      legend: {
+        labels: { color: '#EDEFF7', font: { family: 'Inter' } },
+      },
+    },
+    scales: {
+      x: {
+        ticks: { color: '#8A91AC' },
+        grid: { color: 'rgba(237, 239, 247, 0.05)' },
+      },
+      y: {
+        ticks: { color: '#8A91AC' },
+        grid: { color: 'rgba(237, 239, 247, 0.05)' },
+      },
+    },
   };
 
-  const handleSendDmca = async (report) => {
-    if (rowBusy[report.report_id]) return;
-    setRowBusy((prev) => ({ ...prev, [report.report_id]: 'dmca' }));
-    try {
-      await axios.post(
-        `${API_BASE}/api/send-dmca/${report.report_id}`,
-        {},
-        { headers: authHeaders(), timeout: 90000 }
-      );
-      setReports((prev) =>
-        prev.map((r) =>
-          r.report_id === report.report_id
-            ? { ...r, case_status: 'Takedown Sent', report_status: 'Takedown Sent' }
-            : r
-        )
-      );
-      setRowMsg(report.report_id, { type: 'success', text: 'Takedown notice sent.' });
-    } catch (err) {
-      setRowMsg(report.report_id, {
-        type: 'error',
-        text: 'Send failed. Status unchanged — try again.',
-      });
-    } finally {
-      setRowBusy((prev) => {
-        const next = { ...prev };
-        delete next[report.report_id];
-        return next;
-      });
-    }
+  const doughnutOptions = {
+    responsive: true,
+    plugins: {
+      legend: {
+        position: 'bottom',
+        labels: { color: '#EDEFF7', font: { family: 'Inter' }, padding: 16 },
+      },
+    },
   };
-
-  const handleViewPdf = (reportId) => {
-    window.open(`${API_BASE}/api/generate-pdf/${reportId}`, '_blank', 'noopener,noreferrer');
-  };
-
-  if (!token) {
-    return (
-      <div className="admin-shell admin-shell--centered">
-        <form className="admin-login-card" onSubmit={handleLogin}>
-          <span className="admin-login-eyebrow">ShieldNet</span>
-          <h1 className="admin-login-title">Admin access</h1>
-          <p className="admin-login-sub">Enter the admin password to view reports.</p>
-
-          <label className="admin-field-label" htmlFor="admin-password">
-            Password
-          </label>
-          <input
-            id="admin-password"
-            type="password"
-            className="admin-input"
-            value={passwordInput}
-            onChange={(e) => setPasswordInput(e.target.value)}
-            autoComplete="current-password"
-            disabled={loggingIn}
-            autoFocus
-          />
-
-          {loginError && <p className="admin-error-text">{loginError}</p>}
-
-          <button type="submit" className="admin-btn admin-btn--primary" disabled={loggingIn}>
-            {loggingIn ? 'Checking…' : 'Log in'}
-          </button>
-        </form>
-      </div>
-    );
-  }
 
   return (
-    <div className="admin-shell">
-      <header className="admin-header">
-        <div>
-          <span className="admin-header-eyebrow">ShieldNet</span>
-          <h1 className="admin-header-title">Admin dashboard</h1>
+    <div className="page-container">
+      <Navbar />
+      <div className="analytics-page">
+        <div className="analytics-bg" aria-hidden="true">
+          <span className="analytics-blob a1"></span>
+          <span className="analytics-blob a2"></span>
         </div>
-        <button className="admin-btn admin-btn--ghost" onClick={() => setToken(null)}>
-          Log out
-        </button>
-      </header>
 
-      {dataError && <div className="admin-banner admin-banner--error">{dataError}</div>}
+        <div className="analytics-header">
+          <span className="eyebrow">{t('analytics.eyebrow')}</span>
+          <h1>{t('analytics.title')}</h1>
+          <p className="analytics-sub">{t('analytics.subtitle')}</p>
+        </div>
 
-      <section className="admin-section">
-        <div className="admin-section-head">
-          <h2 className="admin-section-title">Reports</h2>
-          <button
-            className="admin-btn admin-btn--ghost admin-btn--small"
-            onClick={fetchReports}
-            disabled={loadingReports}
+        <div className="stats-row">
+          <div className="stat-card">
+            <span className="stat-number mono">128</span>
+            <span className="stat-label">{t('analytics.stat1')}</span>
+          </div>
+          <div className="stat-card">
+            <span className="stat-number mono">94%</span>
+            <span className="stat-label">{t('analytics.stat2')}</span>
+          </div>
+          <div className="stat-card">
+            <span className="stat-number mono">76%</span>
+            <span className="stat-label">{t('analytics.stat3')}</span>
+          </div>
+          <div className="stat-card">
+            <span className="stat-number mono">6</span>
+            <span className="stat-label">{t('analytics.stat4')}</span>
+          </div>
+        </div>
+
+        <div className="charts-row">
+          <div className="chart-card">
+            <h3>{t('analytics.chartPlatform')}</h3>
+            <Bar data={platformData} options={chartOptions} />
+          </div>
+          <div className="chart-card">
+            <h3>{t('analytics.chartCategory')}</h3>
+            <Doughnut data={categoryData} options={doughnutOptions} />
+          </div>
+        </div>
+
+        <div className="map-card">
+          <h3>{t('analytics.mapTitle')}</h3>
+          <MapContainer
+            center={[30.3753, 69.3451]}
+            zoom={5}
+            scrollWheelZoom={false}
+            className="analytics-map"
           >
-            {loadingReports ? 'Refreshing…' : 'Refresh'}
-          </button>
+            <TileLayer
+              url="https://{s}.basemaps.cartocdn.com/dark_all/{z}/{x}/{y}{r}.png"
+              attribution='&copy; OpenStreetMap contributors &copy; CARTO'
+            />
+            {reportLocations.map((loc, index) => (
+              <CircleMarker
+                key={index}
+                center={[loc.lat, loc.lng]}
+                radius={Math.sqrt(loc.count) * 3}
+                pathOptions={{ color: '#9B8CF5', fillColor: '#9B8CF5', fillOpacity: 0.4 }}
+              >
+                <Popup>
+                  <strong>{loc.city}</strong><br />
+                  {loc.count} reports
+                </Popup>
+              </CircleMarker>
+            ))}
+          </MapContainer>
         </div>
-
-        <div className="admin-table-wrap">
-          <table className="admin-table">
-            <thead>
-              <tr>
-                <th>Report</th>
-                <th>Category</th>
-                <th>Platform</th>
-                <th>Country</th>
-                <th>Description</th>
-                <th>Submitted</th>
-                <th>Status</th>
-                <th>Actions</th>
-              </tr>
-            </thead>
-            <tbody>
-              {loadingReports && reports.length === 0 && (
-                <tr>
-                  <td colSpan={8} className="admin-table-empty">Loading reports…</td>
-                </tr>
-              )}
-
-              {!loadingReports && reports.length === 0 && (
-                <tr>
-                  <td colSpan={8} className="admin-table-empty">No reports yet.</td>
-                </tr>
-              )}
-
-              {reports.map((report) => {
-                const busy = rowBusy[report.report_id];
-                const msg = rowMessage[report.report_id];
-                const statusClass = STATUS_CLASS[report.case_status] || '';
-
-                return (
-                  <tr key={report.report_id}>
-                    <td className="admin-cell-mono">
-                      #{report.report_id}
-                      <span className="admin-cell-sub">case {report.case_id ?? report.report_id}</span>
-                    </td>
-                    <td>{report.category}</td>
-                    <td>{report.platform}</td>
-                    <td>{report.country}</td>
-                    <td className="admin-cell-desc" title={report.description}>
-                      {report.description}
-                    </td>
-                    <td className="admin-cell-mono admin-cell-sub">{report.submitted_at}</td>
-                    <td>
-                      <select
-                        className={`admin-status-select ${statusClass}`}
-                        value={report.case_status}
-                        disabled={busy === 'status'}
-                        onChange={(e) => handleStatusChange(report, e.target.value)}
-                      >
-                        {STATUS_OPTIONS.map((s) => (
-                          <option key={s} value={s}>{s}</option>
-                        ))}
-                      </select>
-                      {msg && (
-                        <div
-                          className={
-                            msg.type === 'success'
-                              ? 'admin-row-msg admin-row-msg--success'
-                              : 'admin-row-msg admin-row-msg--error'
-                          }
-                        >
-                          {msg.text}
-                        </div>
-                      )}
-                    </td>
-                    <td className="admin-cell-actions">
-                      <button
-                        className="admin-btn admin-btn--small admin-btn--ghost"
-                        onClick={() => handleViewPdf(report.report_id)}
-                      >
-                        View PDF
-                      </button>
-                      <button
-                        className="admin-btn admin-btn--small admin-btn--danger"
-                        onClick={() => handleSendDmca(report)}
-                        disabled={busy === 'dmca' || report.case_status === 'Takedown Sent'}
-                      >
-                        {busy === 'dmca' ? 'Sending…' : report.case_status === 'Takedown Sent' ? 'Sent' : 'Send DMCA'}
-                      </button>
-                    </td>
-                  </tr>
-                );
-              })}
-            </tbody>
-          </table>
-        </div>
-      </section>
-
-      <section className="admin-section">
-        <div className="admin-section-head">
-          <h2 className="admin-section-title">Flagged harassers</h2>
-          <button
-            className="admin-btn admin-btn--ghost admin-btn--small"
-            onClick={fetchHarassers}
-            disabled={loadingHarassers}
-          >
-            {loadingHarassers ? 'Refreshing…' : 'Refresh'}
-          </button>
-        </div>
-
-        <div className="admin-table-wrap">
-          <table className="admin-table">
-            <thead>
-              <tr>
-                <th>Username</th>
-                <th>Platform</th>
-                <th>Reports filed</th>
-                <th>Flagged</th>
-              </tr>
-            </thead>
-            <tbody>
-              {loadingHarassers && harassers.length === 0 && (
-                <tr>
-                  <td colSpan={4} className="admin-table-empty">Loading…</td>
-                </tr>
-              )}
-
-              {!loadingHarassers && harassers.length === 0 && (
-                <tr>
-                  <td colSpan={4} className="admin-table-empty">No flagged harassers yet.</td>
-                </tr>
-              )}
-
-              {harassers.map((h) => (
-                <tr key={h.id}>
-                  <td>{h.username}</td>
-                  <td>{h.platform}</td>
-                  <td className="admin-cell-mono">{h.report_count}</td>
-                  <td>
-                    {h.flagged ? (
-                      <span className="admin-pill admin-pill--flagged">Flagged</span>
-                    ) : (
-                      <span className="admin-pill admin-pill--clear">Clear</span>
-                    )}
-                  </td>
-                </tr>
-              ))}
-            </tbody>
-          </table>
-        </div>
-      </section>
+      </div>
+      <Footer />
     </div>
   );
 }
 
-export default AdminDashboard;
+export default Analytics;

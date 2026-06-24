@@ -1,14 +1,55 @@
+@import url('https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@500;600;700&family=JetBrains+Mono:wght@500&display=swap');
+
 .analytics-page {
+  position: relative;
   padding: 20px 60px 60px;
+  background: #0A0E16;
+  color: #EDEFF7;
+  overflow: hidden;
+}
+
+/* ---------- Background blobs (static, matches Home/TrackCase) ---------- */
+
+.analytics-bg {
+  position: absolute;
+  inset: 0;
+  z-index: 0;
+  pointer-events: none;
+}
+
+.analytics-blob {
+  position: absolute;
+  border-radius: 50%;
+  mix-blend-mode: lighten;
+  opacity: 0.4;
+  filter: blur(90px);
+}
+
+.analytics-blob.a1 {
+  width: 420px;
+  height: 420px;
+  background: #6C5CE7;
+  top: -140px;
+  right: -100px;
+}
+
+.analytics-blob.a2 {
+  width: 360px;
+  height: 360px;
+  background: #9B5CF6;
+  bottom: 10%;
+  left: -120px;
 }
 
 .analytics-header {
+  position: relative;
+  z-index: 1;
   max-width: 640px;
   margin-bottom: 40px;
 }
 
 .eyebrow {
-  color: #3DDC97;
+  color: #9B8CF5;
   font-size: 13px;
   font-weight: 500;
   letter-spacing: 0.05em;
@@ -16,18 +57,23 @@
 }
 
 .analytics-header h1 {
+  font-family: 'Space Grotesk', sans-serif;
   font-size: 32px;
   font-weight: 600;
+  letter-spacing: -0.01em;
   margin: 14px 0 10px;
+  color: #EDEFF7;
 }
 
 .analytics-sub {
-  color: #7C8699;
+  color: #8A91AC;
   font-size: 15px;
   line-height: 1.6;
 }
 
 .stats-row {
+  position: relative;
+  z-index: 1;
   display: grid;
   grid-template-columns: repeat(4, 1fr);
   gap: 16px;
@@ -35,8 +81,8 @@
 }
 
 .stat-card {
-  background: #141925;
-  border: 1px solid rgba(255,255,255,0.06);
+  background: #141B2E;
+  border: 1px solid rgba(237, 239, 247, 0.08);
   border-radius: 12px;
   padding: 24px;
   display: flex;
@@ -44,40 +90,48 @@
 }
 
 .stat-number {
+  font-family: 'JetBrains Mono', monospace;
   font-size: 28px;
   font-weight: 500;
-  color: #3DDC97;
+  color: #9B8CF5;
 }
 
 .stat-label {
   font-size: 13px;
-  color: #7C8699;
+  color: #6B7390;
   margin-top: 6px;
+  text-transform: uppercase;
+  letter-spacing: 0.04em;
 }
 
 .charts-row {
+  position: relative;
+  z-index: 1;
   display: grid;
   grid-template-columns: 1.4fr 1fr;
   gap: 20px;
 }
 
 .chart-card {
-  background: #141925;
-  border: 1px solid rgba(255,255,255,0.06);
+  background: #141B2E;
+  border: 1px solid rgba(237, 239, 247, 0.08);
   border-radius: 12px;
   padding: 28px;
 }
 
 .chart-card h3 {
+  font-family: 'Space Grotesk', sans-serif;
   font-size: 16px;
   font-weight: 600;
   margin-bottom: 20px;
-  color: #E8EBF0;
+  color: #EDEFF7;
 }
 
 .map-card {
-  background: #141925;
-  border: 1px solid rgba(255,255,255,0.06);
+  position: relative;
+  z-index: 1;
+  background: #141B2E;
+  border: 1px solid rgba(237, 239, 247, 0.08);
   border-radius: 12px;
   padding: 28px;
   margin-top: 20px;
@@ -90,20 +144,21 @@
 }
 
 .map-card h3 {
+  font-family: 'Space Grotesk', sans-serif;
   font-size: 16px;
   font-weight: 600;
   margin-bottom: 20px;
-  color: #E8EBF0;
+  color: #EDEFF7;
 }
 
 .leaflet-popup-content-wrapper {
-  background: #141925;
-  color: #E8EBF0;
+  background: #141B2E;
+  color: #EDEFF7;
   border-radius: 8px;
 }
 
 .leaflet-popup-tip {
-  background: #141925;
+  background: #141B2E;
 }
 
 @media (max-width: 900px) {

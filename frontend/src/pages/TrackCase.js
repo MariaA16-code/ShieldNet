@@ -58,6 +58,11 @@ function TrackCase() {
     <div className="page-container">
       <Navbar />
       <div className="track-page">
+        <div className="track-bg" aria-hidden="true">
+          <span className="track-blob t1"></span>
+          <span className="track-blob t2"></span>
+        </div>
+
         <div className="track-card">
           <span className="eyebrow">Anonymous &middot; Encrypted &middot; Free</span>
           <h1>{t('track.title')}</h1>
