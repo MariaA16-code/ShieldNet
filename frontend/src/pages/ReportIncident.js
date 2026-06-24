@@ -245,13 +245,13 @@ function ReportIncident() {
           <label>{t('report.category')}</label>
           <select name="category" value={formData.category} onChange={handleChange}>
             <option value="">{t('report.categoryPlaceholder')}</option>
-            <option value="Fake / edited photo">Fake / edited photo</option>
-            <option value="Deepfake video">Deepfake video</option>
-            <option value="Impersonation">Impersonation</option>
-            <option value="Sexual harassment">Sexual harassment</option>
-            <option value="Stalking">Stalking</option>
-            <option value="Threats">Threats</option>
-            <option value="Identity theft">Identity theft</option>
+            <option value="Fake / edited photo">{t('report.categories.fakePhoto')}</option>
+            <option value="Deepfake video">{t('report.categories.deepfakeVideo')}</option>
+            <option value="Impersonation">{t('report.categories.impersonation')}</option>
+            <option value="Sexual harassment">{t('report.categories.sexualHarassment')}</option>
+            <option value="Stalking">{t('report.categories.stalking')}</option>
+            <option value="Threats">{t('report.categories.threats')}</option>
+            <option value="Identity theft">{t('report.categories.identityTheft')}</option>
           </select>
 
           <label>{t('report.platform')}</label>

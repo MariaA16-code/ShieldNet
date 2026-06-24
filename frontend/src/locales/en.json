@@ -23,6 +23,15 @@
     "subtitle": "No account needed. Your identity is never recorded.",
     "category": "Category",
     "categoryPlaceholder": "Select a category",
+    "categories": {
+      "fakePhoto": "Fake / edited photo",
+      "deepfakeVideo": "Deepfake video",
+      "impersonation": "Impersonation",
+      "sexualHarassment": "Sexual harassment",
+      "stalking": "Stalking",
+      "threats": "Threats",
+      "identityTheft": "Identity theft"
+    },
     "platform": "Platform where this happened",
     "platformPlaceholder": "Select a platform",
     "description": "Describe what happened",
