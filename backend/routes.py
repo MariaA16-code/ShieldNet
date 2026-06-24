@@ -1,14 +1,15 @@
-from flask import Blueprint, request, jsonify,send_file
+from flask import Blueprint, request, jsonify, send_file
 from extensions import db
 from models import Victim, Report, Evidence, Takedown, Harasser, Case
-from datetime import datetime, timedelta 
+from datetime import datetime, timedelta
 import secrets
 import os
 import tempfile
 from werkzeug.utils import secure_filename
-from ai_module import analyze_images, analyze_text_content 
+from ai_module import analyze_images, analyze_text_content
 from pdf_module import generate_complaint_pdf
 from email_module import send_dmca_email
+
 UPLOAD_FOLDER = 'uploads'
 os.makedirs(UPLOAD_FOLDER, exist_ok=True)
 
@@ -40,16 +41,14 @@ def admin_login():
 def submit_report():
     data = request.get_json()
 
-    # Create victim with unique token
     victim = Victim(
         country=data.get('country'),
         contact_encrypted=data.get('contact'),
         token=secrets.token_hex(16)
     )
     db.session.add(victim)
-    db.session.flush()  # get victim.id before commit
+    db.session.flush()
 
-    # Create report linked to victim
     report = Report(
         victim_id=victim.id,
         category=data.get('category'),
@@ -58,9 +57,8 @@ def submit_report():
         status='Pending'
     )
     db.session.add(report)
-    db.session.flush()  # get report.id before commit
+    db.session.flush()
 
-    # Create case linked to report
     case = Case(
         report_id=report.id,
         status='Submitted',
@@ -68,7 +66,6 @@ def submit_report():
     )
     db.session.add(case)
 
-    # Check if harasser already reported
     harasser_username = data.get('harasser_username')
     harasser_platform = data.get('platform')
 
@@ -134,124 +131,32 @@ def track_case(token):
 
 # ─── 3. GET ALL REPORTS (Admin Side) ──────────────────────────────────────────
 
-@api.route('/api/analyze/<int:report_id>', methods=['POST'])
-def analyze(report_id):
-    report = Report.query.get(report_id)
-    if not report:
-        return jsonify({'error': 'Report not found'}), 404
+@api.route('/api/admin/reports', methods=['GET'])
+def get_all_reports():
+    if not verify_admin(request):
+        return jsonify({'error': 'Unauthorized'}), 401
 
-    category = report.category.lower() if report.category else ''
+    reports = Report.query.order_by(Report.created_at.desc()).all()
 
-    # ─── Image Analysis (Deepfake / Fake Photo) ───────────────────────────
-    if category in IMAGE_CATEGORIES:
-        if 'original' not in request.files or 'fake' not in request.files:
-            return jsonify({'error': 'Both original and fake images are required for image analysis'}), 400
-
-        original = request.files['original']
-        fake = request.files['fake']
-
-        original_filename = secure_filename(original.filename)
-        fake_filename = secure_filename(fake.filename)
-
-        original_path = os.path.join(UPLOAD_FOLDER, 'original_' + original_filename)
-        fake_path = os.path.join(UPLOAD_FOLDER, 'fake_' + fake_filename)
-
-        original.save(original_path)
-        fake.save(fake_path)
-
-        result = analyze_images(original_path, fake_path)
-
-        if 'error' not in result:
-            evidence = Evidence(
-                report_id=report_id,
-                original_image=original_path,
-                fake_image=fake_path,
-                manipulation_score=result.get('manipulation_score'),
-                verdict=result.get('verdict'),
-                pixel_difference=result.get('details', {}).get('pixel_difference'),
-                file_metadata=str(result.get('details'))
-            )
-            db.session.add(evidence)
-            db.session.commit()
-
-        return jsonify(result), 200
-
-    # ─── Text Analysis (Harassment / Threats / Stalking etc.) ─────────────
-    else:
-        text = report.description
-        if not text:
-            return jsonify({'error': 'No description found for this report'}), 400
-
-        result = analyze_text_content(text)
-
-        if 'error' not in result:
-            evidence = Evidence(
-                report_id=report_id,
-                original_image=None,
-                fake_image=None,
-                manipulation_score=result.get('threat_score'),
-                verdict=result.get('verdict'),
-                file_metadata=str(result.get('details'))
-            )
-            db.session.add(evidence)
-            db.session.commit()
-
-        return jsonify(result), 200
-
-
-@api.route('/api/generate-pdf/<int:report_id>', methods=['GET'])
-def generate_pdf(report_id):
-    report = Report.query.get(report_id)
-    if not report:
-        return jsonify({'error': 'Report not found'}), 404
-
-    victim = Victim.query.get(report.victim_id)
-    case = Case.query.filter_by(report_id=report.id).first()
-    evidence = Evidence.query.filter_by(report_id=report.id).first()
-
-    PKT = timedelta(hours=5)
-    is_image_category = (report.category or '').lower() in ['fake / edited photo', 'deepfake video']
-
-    report_data = {
-        'report_id': report.id,
-        'token': victim.token if victim else 'N/A',
-        'status': case.status if case else 'Pending',
-        'platform': report.platform,
-        'category': report.category,
-        'country': victim.country if victim else 'N/A',
-        'description': report.description,
-        'submitted_at': (report.created_at + PKT).strftime('%Y-%m-%d %H:%M') + ' PKT'
-    }
-
-    if is_image_category:
-        report_data.update({
-            'analysis_type': 'image',
-            'manipulation_score': evidence.manipulation_score if evidence else None,
-            'verdict': evidence.verdict if evidence else 'No analysis available',
-            'pixel_difference': evidence.pixel_difference if evidence else None,
-            'face_match': 'N/A'
-        })
-    else:
-        report_data.update({
-            'analysis_type': 'text',
-            'threat_score': evidence.manipulation_score if evidence else None,
-            'verdict': evidence.verdict if evidence else 'No analysis available',
-            'is_toxic': None,
-            'sentiment_polarity': None
+    result = []
+    for report in reports:
+        victim = Victim.query.get(report.victim_id)
+        case = Case.query.filter_by(report_id=report.id).first()
+        result.append({
+            'report_id': report.id,
+            'case_id': case.id if case else None,
+            'victim_token': victim.token if victim else 'N/A',
+            'country': victim.country if victim else 'N/A',
+            'category': report.category,
+            'platform': report.platform,
+            'description': report.description,
+            'report_status': report.status,
+            'case_status': case.status if case else 'N/A',
+            'submitted_at': (report.created_at + timedelta(hours=5)).strftime('%Y-%m-%d %H:%M') + ' PKT'
         })
 
-    tmp = tempfile.NamedTemporaryFile(delete=False, suffix='.pdf')
-    tmp_path = tmp.name
-    tmp.close()
+    return jsonify({'total': len(result), 'reports': result}), 200
 
-    generate_complaint_pdf(report_data, tmp_path)
-
-    return send_file(
-        tmp_path,
-        as_attachment=True,
-        download_name=f'shieldnet_report_{report_id}.pdf',
-        mimetype='application/pdf'
-    )
 
 # ─── 4. UPDATE CASE STATUS (Admin Side) ───────────────────────────────────────
 
@@ -259,15 +164,13 @@ def generate_pdf(report_id):
 def update_case(case_id):
     if not verify_admin(request):
         return jsonify({'error': 'Unauthorized'}), 401
-    
-    case = Case.query.get(case_id)
 
+    case = Case.query.get(case_id)
     if not case:
         return jsonify({'error': 'Case not found'}), 404
 
     data = request.get_json()
 
-    # ─── Valid status values ───────────────────────────────────────────────
     VALID_STATUSES = [
         'Submitted',
         'Evidence Verified',
@@ -295,13 +198,14 @@ def update_case(case_id):
 
     return jsonify({'message': 'Case updated successfully', 'case_id': case_id}), 200
 
+
 # ─── 5. GET FLAGGED HARASSERS (Admin Side) ────────────────────────────────────
 
 @api.route('/api/admin/harassers', methods=['GET'])
 def get_flagged_harassers():
     if not verify_admin(request):
         return jsonify({'error': 'Unauthorized'}), 401
-    
+
     harassers = Harasser.query.filter_by(flagged=True).all()
 
     result = []
@@ -316,6 +220,7 @@ def get_flagged_harassers():
 
     return jsonify({'flagged_harassers': result}), 200
 
+
 # ─── 6. AI ANALYSIS (Image or Text based on category) ────────────────────────
 
 IMAGE_CATEGORIES = ['fake / edited photo', 'deepfake video']
@@ -328,7 +233,6 @@ def analyze(report_id):
 
     category = report.category.lower() if report.category else ''
 
-    # ─── Image Analysis (Deepfake / Fake Photo) ───────────────────────────
     if category in IMAGE_CATEGORIES:
         if 'original' not in request.files or 'fake' not in request.files:
             return jsonify({'error': 'Both original and fake images are required for image analysis'}), 400
@@ -362,7 +266,6 @@ def analyze(report_id):
 
         return jsonify(result), 200
 
-    # ─── Text Analysis (Harassment / Threats / Stalking etc.) ─────────────
     else:
         text = report.description
         if not text:
@@ -384,6 +287,8 @@ def analyze(report_id):
 
         return jsonify(result), 200
 
+
+# ─── 7. GENERATE PDF COMPLAINT ────────────────────────────────────────────────
 
 @api.route('/api/generate-pdf/<int:report_id>', methods=['GET'])
 def generate_pdf(report_id):
@@ -438,3 +343,55 @@ def generate_pdf(report_id):
         download_name=f'shieldnet_report_{report_id}.pdf',
         mimetype='application/pdf'
     )
+
+
+# ─── 8. SEND DMCA EMAIL SIMULATION ───────────────────────────────────────────
+
+@api.route('/api/send-dmca/<int:report_id>', methods=['POST'])
+def send_dmca(report_id):
+    if not verify_admin(request):
+        return jsonify({'error': 'Unauthorized'}), 401
+
+    report = Report.query.get(report_id)
+    if not report:
+        return jsonify({'error': 'Report not found'}), 404
+
+    victim = Victim.query.get(report.victim_id)
+    evidence = Evidence.query.filter_by(report_id=report.id).first()
+    case = Case.query.filter_by(report_id=report.id).first()
+
+    report_data = {
+        'report_id': report.id,
+        'token': victim.token if victim else 'N/A',
+        'platform': report.platform,
+        'category': report.category,
+        'description': report.description,
+        'status': case.status if case else 'Pending',
+        'manipulation_score': evidence.manipulation_score if evidence else 'N/A',
+        'verdict': evidence.verdict if evidence else 'N/A'
+    }
+
+    takedown = Takedown(
+        report_id=report.id,
+        platform=report.platform,
+        status='Sent'
+    )
+    db.session.add(takedown)
+
+    result = send_dmca_email(report_data)
+
+    if result['success']:
+        if case:
+            case.status = 'Takedown Sent'
+            case.updated_at = datetime.utcnow()
+        report.status = 'Takedown Sent'
+        db.session.commit()
+
+        return jsonify({
+            'message': 'DMCA simulation email sent successfully',
+            'sent_to': 'maria.amir.tech@gmail.com',
+            'report_id': report_id
+        }), 200
+    else:
+        db.session.commit()
+        return jsonify({'error': result['error']}), 500
