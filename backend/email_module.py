@@ -1,3 +1,5 @@
+import socket
+socket.setdefaulttimeout(10)
 from flask_mail import Message
 from extensions import mail
 from datetime import datetime
