@@ -1,5 +1,4 @@
 @import url('https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@500;600;700&family=JetBrains+Mono:wght@500&display=swap');
-
 .analytics-page {
   position: relative;
   padding: 20px 60px 60px;
@@ -7,16 +6,13 @@
   color: #EDEFF7;
   overflow: hidden;
 }
-
 /* ---------- Background blobs (static, matches Home/TrackCase) ---------- */
-
 .analytics-bg {
   position: absolute;
   inset: 0;
   z-index: 0;
   pointer-events: none;
 }
-
 .analytics-blob {
   position: absolute;
   border-radius: 50%;
@@ -24,7 +20,6 @@
   opacity: 0.4;
   filter: blur(90px);
 }
-
 .analytics-blob.a1 {
   width: 420px;
   height: 420px;
@@ -32,7 +27,6 @@
   top: -140px;
   right: -100px;
 }
-
 .analytics-blob.a2 {
   width: 360px;
   height: 360px;
@@ -40,14 +34,12 @@
   bottom: 10%;
   left: -120px;
 }
-
 .analytics-header {
   position: relative;
   z-index: 1;
   max-width: 640px;
   margin-bottom: 40px;
 }
-
 .eyebrow {
   color: #9B8CF5;
   font-size: 13px;
@@ -55,22 +47,19 @@
   letter-spacing: 0.05em;
   text-transform: uppercase;
 }
-
 .analytics-header h1 {
   font-family: 'Space Grotesk', sans-serif;
-  font-size: 32px;
+  font-size: clamp(22px, 5vw, 32px);
   font-weight: 600;
   letter-spacing: -0.01em;
   margin: 14px 0 10px;
   color: #EDEFF7;
 }
-
 .analytics-sub {
   color: #8A91AC;
-  font-size: 15px;
+  font-size: clamp(13px, 2.2vw, 15px);
   line-height: 1.6;
 }
-
 .stats-row {
   position: relative;
   z-index: 1;
@@ -79,31 +68,27 @@
   gap: 16px;
   margin-bottom: 40px;
 }
-
 .stat-card {
   background: #141B2E;
   border: 1px solid rgba(237, 239, 247, 0.08);
   border-radius: 12px;
-  padding: 24px;
+  padding: clamp(14px, 2.5vw, 24px);
   display: flex;
   flex-direction: column;
 }
-
 .stat-number {
   font-family: 'JetBrains Mono', monospace;
-  font-size: 28px;
+  font-size: clamp(20px, 4vw, 28px);
   font-weight: 500;
   color: #9B8CF5;
 }
-
 .stat-label {
-  font-size: 13px;
+  font-size: clamp(11px, 2vw, 13px);
   color: #6B7390;
   margin-top: 6px;
   text-transform: uppercase;
   letter-spacing: 0.04em;
 }
-
 .charts-row {
   position: relative;
   z-index: 1;
@@ -111,20 +96,29 @@
   grid-template-columns: 1.4fr 1fr;
   gap: 20px;
 }
-
 .chart-card {
   background: #141B2E;
   border: 1px solid rgba(237, 239, 247, 0.08);
   border-radius: 12px;
-  padding: 28px;
+  padding: clamp(14px, 2.5vw, 28px);
+  /* prevents the card from forcing a min-width wider than its grid track,
+     which is what pushed bar labels into rotation/overflow before */
+  min-width: 0;
 }
-
 .chart-card h3 {
   font-family: 'Space Grotesk', sans-serif;
-  font-size: 16px;
+  font-size: clamp(14px, 2.5vw, 16px);
   font-weight: 600;
   margin-bottom: 20px;
   color: #EDEFF7;
+}
+
+/* Fluid chart sizing — scales continuously with viewport height instead of
+   snapping between fixed desktop/mobile values. Applies at every screen size. */
+.chart-canvas-wrap {
+  position: relative;
+  width: 100%;
+  height: clamp(200px, 38vh, 320px);
 }
 
 .map-card {
@@ -133,67 +127,36 @@
   background: #141B2E;
   border: 1px solid rgba(237, 239, 247, 0.08);
   border-radius: 12px;
-  padding: 28px;
+  padding: clamp(14px, 2.5vw, 28px);
   margin-top: 20px;
 }
-
 .analytics-map {
-  height: 380px;
+  height: clamp(220px, 40vh, 380px);
   width: 100%;
   border-radius: 8px;
 }
-
 .map-card h3 {
   font-family: 'Space Grotesk', sans-serif;
-  font-size: 16px;
+  font-size: clamp(14px, 2.5vw, 16px);
   font-weight: 600;
   margin-bottom: 20px;
   color: #EDEFF7;
 }
-
 .leaflet-popup-content-wrapper {
   background: #141B2E;
   color: #EDEFF7;
   border-radius: 8px;
 }
-
 .leaflet-popup-tip {
   background: #141B2E;
 }
-
 @media (max-width: 900px) {
   .analytics-page { padding: 20px 24px 40px; }
   .stats-row { grid-template-columns: repeat(2, 1fr); }
   .charts-row { grid-template-columns: 1fr; }
 }
-
 @media (max-width: 480px) {
   .analytics-page { padding: 16px 16px 32px; }
-
-  .analytics-header h1 { font-size: 24px; }
-  .analytics-sub { font-size: 14px; }
-
-  .stats-row {
-    grid-template-columns: repeat(2, 1fr);
-    gap: 10px;
-    margin-bottom: 28px;
-  }
-
-  .stat-card { padding: 16px; }
-  .stat-number { font-size: 22px; }
-  .stat-label { font-size: 12px; }
-
-  .chart-card { padding: 14px; }
-  .chart-card h3 { font-size: 14px; margin-bottom: 14px; }
-
-  .map-card { padding: 14px; }
-  .map-card h3 { font-size: 14px; margin-bottom: 14px; }
-
-  .analytics-map {
-    height: 260px;
-  }
-
-  .leaflet-popup-content-wrapper {
-    font-size: 13px;
-  }
+  .stats-row { gap: 10px; margin-bottom: 28px; }
+  .leaflet-popup-content-wrapper { font-size: 13px; }
 }

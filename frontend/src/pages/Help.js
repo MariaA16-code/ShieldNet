@@ -52,7 +52,7 @@ function Help() {
         <div className="help-contact-card">
           <h3>{t('help.stillStuck')}</h3>
           <p>{t('help.contactText')}</p>
-          <a href="mailto:zainabb2483@gmail.com" className="btn-primary help-contact-btn">
+          <a href="mailto:shieldnet.support@gmail.com" className="btn-primary help-contact-btn">
             {t('help.emailUs')}
           </a>
         </div>

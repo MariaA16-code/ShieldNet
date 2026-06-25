@@ -58,8 +58,12 @@ function Analytics() {
     { city: 'Multan', lat: 30.1575, lng: 71.5249, count: 8 },
   ];
 
+  // Fluid, container-width-based sizing — no window-resize dependency.
+  // ctx.chart.width is the canvas's actual rendered width, which Chart.js
+  // recalculates whenever the container resizes (ResizeObserver-driven).
   const chartOptions = {
     responsive: true,
+    maintainAspectRatio: false,
     plugins: {
       legend: {
         labels: { color: '#EDEFF7', font: { family: 'Inter' } },
@@ -67,7 +71,15 @@ function Analytics() {
     },
     scales: {
       x: {
-        ticks: { color: '#8A91AC' },
+        ticks: {
+          color: '#8A91AC',
+          autoSkip: true,
+          maxRotation: 0,
+          minRotation: 0,
+          font: {
+            size: (ctx) => (ctx.chart.width < 360 ? 9 : ctx.chart.width < 600 ? 10 : 12),
+          },
+        },
         grid: { color: 'rgba(237, 239, 247, 0.05)' },
       },
       y: {
@@ -79,10 +91,19 @@ function Analytics() {
 
   const doughnutOptions = {
     responsive: true,
+    maintainAspectRatio: false,
     plugins: {
       legend: {
         position: 'bottom',
-        labels: { color: '#EDEFF7', font: { family: 'Inter' }, padding: 16 },
+        labels: {
+          color: '#EDEFF7',
+          font: {
+            family: 'Inter',
+            size: (ctx) => (ctx.chart.width < 360 ? 10 : ctx.chart.width < 600 ? 11 : 13),
+          },
+          padding: 10,
+          boxWidth: 12,
+        },
       },
     },
   };
@@ -124,11 +145,15 @@ function Analytics() {
         <div className="charts-row">
           <div className="chart-card">
             <h3>{t('analytics.chartPlatform')}</h3>
-            <Bar data={platformData} options={chartOptions} />
+            <div className="chart-canvas-wrap">
+              <Bar data={platformData} options={chartOptions} />
+            </div>
           </div>
           <div className="chart-card">
             <h3>{t('analytics.chartCategory')}</h3>
-            <Doughnut data={categoryData} options={doughnutOptions} />
+            <div className="chart-canvas-wrap">
+              <Doughnut data={categoryData} options={doughnutOptions} />
+            </div>
           </div>
         </div>
 
