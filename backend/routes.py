@@ -49,12 +49,37 @@ def submit_report():
     db.session.add(victim)
     db.session.flush()
 
+    harasser_username = data.get('harasser_username')
+    harasser_platform = data.get('platform')
+    harasser = None
+
+    if harasser_username:
+        harasser = Harasser.query.filter_by(
+            username=harasser_username,
+            platform=harasser_platform
+        ).first()
+
+        if harasser:
+            harasser.report_count += 1
+            if harasser.report_count >= 3:
+                harasser.flagged = True
+        else:
+            harasser = Harasser(
+                username=harasser_username,
+                platform=harasser_platform,
+                report_count=1,
+                flagged=False
+            )
+            db.session.add(harasser)
+            db.session.flush()
+
     report = Report(
         victim_id=victim.id,
         category=data.get('category'),
         platform=data.get('platform'),
         description=data.get('description'),
-        status='Pending'
+        status='Pending',
+        harasser_id=harasser.id if harasser else None
     )
     db.session.add(report)
     db.session.flush()
@@ -66,28 +91,6 @@ def submit_report():
     )
     db.session.add(case)
 
-    harasser_username = data.get('harasser_username')
-    harasser_platform = data.get('platform')
-
-    if harasser_username:
-        existing = Harasser.query.filter_by(
-            username=harasser_username,
-            platform=harasser_platform
-        ).first()
-
-        if existing:
-            existing.report_count += 1
-            if existing.report_count >= 3:
-                existing.flagged = True
-        else:
-            harasser = Harasser(
-                username=harasser_username,
-                platform=harasser_platform,
-                report_count=1,
-                flagged=False
-            )
-            db.session.add(harasser)
-
     db.session.commit()
 
     return jsonify({
@@ -95,7 +98,6 @@ def submit_report():
         'token': victim.token,
         'report_id': report.id
     }), 201
-
 
 # ─── 2. TRACK CASE BY TOKEN (Victim Side) ─────────────────────────────────────
 
@@ -142,6 +144,7 @@ def get_all_reports():
     for report in reports:
         victim = Victim.query.get(report.victim_id)
         case = Case.query.filter_by(report_id=report.id).first()
+        harasser = Harasser.query.get(report.harasser_id) if report.harasser_id else None
         result.append({
             'report_id': report.id,
             'case_id': case.id if case else None,
@@ -152,7 +155,9 @@ def get_all_reports():
             'description': report.description,
             'report_status': report.status,
             'case_status': case.status if case else 'N/A',
-            'submitted_at': (report.created_at + timedelta(hours=5)).strftime('%Y-%m-%d %H:%M') + ' PKT'
+            'submitted_at': (report.created_at + timedelta(hours=5)).strftime('%Y-%m-%d %H:%M') + ' PKT',
+            'harasser_username': harasser.username if harasser else None,
+            'harasser_flagged': harasser.flagged if harasser else False
         })
 
     return jsonify({'total': len(result), 'reports': result}), 200

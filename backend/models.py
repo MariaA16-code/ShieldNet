@@ -23,6 +23,7 @@ class Report(db.Model):
     platform = db.Column(db.String(100))
     description = db.Column(db.Text)
     status = db.Column(db.String(50), default='Pending')
+    harasser_id = db.Column(db.Integer, db.ForeignKey('harassers.id'), nullable=True)
     created_at = db.Column(db.DateTime, default=datetime.utcnow)
 
     evidence = db.relationship('Evidence', backref='report', lazy=True)
