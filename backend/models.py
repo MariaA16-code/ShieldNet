@@ -61,6 +61,7 @@ class Harasser(db.Model):
     id = db.Column(db.Integer, primary_key=True)
     username = db.Column(db.String(150))
     platform = db.Column(db.String(100))
+    profile_url = db.Column(db.String(500))
     report_count = db.Column(db.Integer, default=1)
     flagged = db.Column(db.Boolean, default=False)
 

@@ -51,6 +51,7 @@ def submit_report():
 
     harasser_username = data.get('harasser_username')
     harasser_platform = data.get('platform')
+    harasser_profile_url = data.get('harasser_profile_url')
     harasser = None
 
     if harasser_username:
@@ -61,12 +62,15 @@ def submit_report():
 
         if harasser:
             harasser.report_count += 1
+            if harasser_profile_url and not harasser.profile_url:
+                harasser.profile_url = harasser_profile_url
             if harasser.report_count >= 3:
                 harasser.flagged = True
         else:
             harasser = Harasser(
                 username=harasser_username,
                 platform=harasser_platform,
+                profile_url=harasser_profile_url,
                 report_count=1,
                 flagged=False
             )
@@ -80,6 +84,7 @@ def submit_report():
         description=data.get('description'),
         status='Pending',
         harasser_id=harasser.id if harasser else None
+        
     )
     db.session.add(report)
     db.session.flush()
@@ -372,6 +377,7 @@ def send_dmca(report_id):
     victim = Victim.query.get(report.victim_id)
     evidence = Evidence.query.filter_by(report_id=report.id).first()
     case = Case.query.filter_by(report_id=report.id).first()
+    harasser = Harasser.query.get(report.harasser_id) if report.harasser_id else None
 
     report_data = {
         'report_id': report.id,
@@ -381,7 +387,18 @@ def send_dmca(report_id):
         'description': report.description,
         'status': case.status if case else 'Pending',
         'manipulation_score': evidence.manipulation_score if evidence else 'N/A',
-        'verdict': evidence.verdict if evidence else 'N/A'
+        'verdict': evidence.verdict if evidence else 'N/A',
+        'pixel_difference': evidence.pixel_difference if evidence else 'N/A',
+        'verdict': evidence.verdict if evidence else 'N/A',
+         # ── Harasser ──
+        'harasser_username': harasser.username if harasser else 'Not provided',
+        'harasser_platform': harasser.platform if harasser else 'N/A',
+        'harasser_report_count': harasser.report_count if harasser else 0,
+        'harasser_flagged': harasser.flagged if harasser else False,
+        'harasser_profile_url': harasser.profile_url if harasser else None,
+        'original_image_path': evidence.original_image if evidence else None,
+        'fake_image_path': evidence.fake_image if evidence else None
+        
     }
 
     takedown = Takedown(

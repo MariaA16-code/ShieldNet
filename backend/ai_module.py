@@ -11,7 +11,7 @@ HARASSMENT_KEYWORDS = [
     'send you', 'expose you', 'leak your', 'leak my', 'never leave you alone',
     "won't stop", 'wont stop', 'keeps messaging', 'keeps texting',
     'doxx', 'doxxing', 'blackmail', 'harass', 'harassing',
-    'scared of him', 'scared of her', 'afraid of'
+    'scared of him', 'scared of her', 'afraid of' , 'threats' , 'death','kidnap'
 ]
 
 def check_harassment_keywords(text):
