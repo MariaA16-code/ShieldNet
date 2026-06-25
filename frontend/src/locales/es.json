@@ -49,6 +49,8 @@
     "fileSizeError": "El archivo debe ser menor a 25MB.",
     "harasserInfo": "Nombre de usuario del acosador (si lo conoces)",
     "harasserInfoPlaceholder": "ej. su @usuario",
+    "harasserProfileUrl": "Enlace del perfil del acosador (opcional)",
+"harasserProfileUrlPlaceholder": "Pega el enlace de su perfil, si lo conoces",
     "contact": "Información de contacto (opcional, encriptada)",
     "contactPlaceholder": "Correo o teléfono — solo si quieres recibir actualizaciones",
     "submitError": "Algo salió mal al enviar tu reporte. Por favor intenta de nuevo.",

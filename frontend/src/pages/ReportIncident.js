@@ -16,6 +16,7 @@ function ReportIncident() {
     platform: '',
     description: '',
     harasser_username: '',
+    harasser_profile_url: '',
   });
 
   // Single-file state (used for all non-photo categories)
@@ -191,6 +192,7 @@ function ReportIncident() {
         platform: formData.platform,
         description: formData.description,
         harasser_username: formData.harasser_username,
+        harasser_profile_url: formData.harasser_profile_url,
       };
 
       const response = await apiClient.post('/api/report', payload);
@@ -310,6 +312,15 @@ function ReportIncident() {
             name="harasser_username"
             placeholder={t('report.harasserInfoPlaceholder')}
             value={formData.harasser_username}
+            onChange={handleChange}
+          />
+
+          <label>{t('report.harasserProfileUrl')}</label>
+          <input
+            type="url"
+            name="harasser_profile_url"
+            placeholder={t('report.harasserProfileUrlPlaceholder')}
+            value={formData.harasser_profile_url}
             onChange={handleChange}
           />
 

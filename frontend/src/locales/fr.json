@@ -49,6 +49,8 @@
     "fileSizeError": "Le fichier doit faire moins de 25 Mo.",
     "harasserInfo": "Nom d'utilisateur du harceleur (si connu)",
     "harasserInfoPlaceholder": "ex. son @nomdutilisateur",
+    "harasserProfileUrl": "Lien du profil du harceleur (facultatif)",
+"harasserProfileUrlPlaceholder": "Collez le lien de son profil, si connu",
     "contact": "Coordonnées (facultatif, chiffré)",
     "contactPlaceholder": "Email ou téléphone — uniquement si vous voulez des mises à jour",
     "submitError": "Une erreur s'est produite lors de l'envoi de votre signalement. Veuillez réessayer.",

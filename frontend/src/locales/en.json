@@ -49,6 +49,8 @@
     "fileSizeError": "File must be under 25MB.",
     "harasserInfo": "Harasser Username (if known)",
     "harasserInfoPlaceholder": "e.g. their @username",
+    "harasserProfileUrl": "Harasser's Profile Link (optional)",
+"harasserProfileUrlPlaceholder": "Paste their profile link, if known",
     "contact": "Contact Info (optional, encrypted)",
     "contactPlaceholder": "Email or phone — only if you want updates",
     "submitError": "Something went wrong submitting your report. Please try again.",
