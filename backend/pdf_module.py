@@ -97,6 +97,28 @@ def generate_complaint_pdf(report_data, output_path):
         normal_style
     ))
     elements.append(Spacer(1, 0.2 * inch))
+    
+# ─── Harasser Information ──────────────────────────────────────────────
+    elements.append(Paragraph("Reported Harasser Information", heading_style))
+
+    harasser_data = [
+        ['Username/Handle', str(report_data.get('harasser_username', 'Not provided'))],
+        ['Platform', str(report_data.get('harasser_platform', 'N/A'))],
+        ['Total Reports Filed', str(report_data.get('harasser_report_count', 0))],
+        ['Flagged (3+ reports)', 'Yes' if report_data.get('harasser_flagged') else 'No'],
+    ]
+
+    harasser_table = Table(harasser_data, colWidths=[2 * inch, 4 * inch])
+    harasser_table.setStyle(TableStyle([
+        ('BACKGROUND', (0, 0), (0, -1), colors.HexColor('#f0f0f0')),
+        ('FONTNAME', (0, 0), (0, -1), 'Helvetica-Bold'),
+        ('FONTSIZE', (0, 0), (-1, -1), 10),
+        ('GRID', (0, 0), (-1, -1), 0.5, colors.HexColor('#dddddd')),
+        ('PADDING', (0, 0), (-1, -1), 6),
+    ]))
+
+    elements.append(harasser_table)
+    elements.append(Spacer(1, 0.2 * inch))
 
     # ─── AI Analysis Results ──────────────────────────────────────────────────
     analysis_type = report_data.get('analysis_type')
