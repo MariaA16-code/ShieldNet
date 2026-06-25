@@ -256,6 +256,7 @@ function AdminDashboard() {
                 <th>Platform</th>
                 <th>Country</th>
                 <th>Description</th>
+                <th>Harasser</th>
                 <th>Submitted</th>
                 <th>Status</th>
                 <th>Actions</th>
@@ -264,13 +265,13 @@ function AdminDashboard() {
             <tbody>
               {loadingReports && reports.length === 0 && (
                 <tr>
-                  <td colSpan={8} className="admin-table-empty">Loading reports…</td>
+                  <td colSpan={9} className="admin-table-empty">Loading reports…</td>
                 </tr>
               )}
 
               {!loadingReports && reports.length === 0 && (
                 <tr>
-                  <td colSpan={8} className="admin-table-empty">No reports yet.</td>
+                  <td colSpan={9} className="admin-table-empty">No reports yet.</td>
                 </tr>
               )}
 
@@ -290,6 +291,20 @@ function AdminDashboard() {
                     <td>{report.country}</td>
                     <td className="admin-cell-desc" title={report.description}>
                       {report.description}
+                    </td>
+                    <td>
+                      {report.harasser_username ? (
+                        <>
+                          {report.harasser_username}
+                          {report.harasser_flagged && (
+                            <span className="admin-pill admin-pill--flagged" style={{ marginLeft: '6px' }}>
+                              Flagged
+                            </span>
+                          )}
+                        </>
+                      ) : (
+                        <span className="admin-cell-sub">Not provided</span>
+                      )}
                     </td>
                     <td className="admin-cell-mono admin-cell-sub">{report.submitted_at}</td>
                     <td>
