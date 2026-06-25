@@ -2,7 +2,7 @@ from reportlab.lib.pagesizes import A4
 from reportlab.lib import colors
 from reportlab.lib.styles import getSampleStyleSheet, ParagraphStyle
 from reportlab.lib.units import inch
-from reportlab.platypus import SimpleDocTemplate, Paragraph, Spacer, Table, TableStyle, HRFlowable
+from reportlab.platypus import SimpleDocTemplate, Paragraph, Spacer, Table, TableStyle, HRFlowable, Image
 from datetime import datetime
 import os
 
@@ -122,6 +122,26 @@ def generate_complaint_pdf(report_data, output_path):
 
         elements.append(ai_table)
         elements.append(Spacer(1, 0.2 * inch))
+     # ─── Embedded Evidence Images ──────────────────────────────────────
+        original_path = report_data.get('original_image_path')
+        fake_path = report_data.get('fake_image_path')
+
+        if original_path and os.path.exists(original_path):
+            elements.append(Paragraph("Original Photo (Evidence)", heading_style))
+            elements.append(Image(original_path, width=3*inch, height=3*inch, kind='proportional'))
+            elements.append(Spacer(1, 0.15 * inch))
+
+        if fake_path and os.path.exists(fake_path):
+            elements.append(Paragraph("Manipulated / Fake Photo (Evidence)", heading_style))
+            elements.append(Image(fake_path, width=3*inch, height=3*inch, kind='proportional'))
+            elements.append(Spacer(1, 0.2 * inch))
+
+        if not (original_path and os.path.exists(original_path)) or not (fake_path and os.path.exists(fake_path)):
+            elements.append(Paragraph(
+                "Note: One or both original evidence images are no longer available on file.",
+                normal_style
+            ))
+            elements.append(Spacer(1, 0.15 * inch))   
 
     elif analysis_type == 'text':
         elements.append(Paragraph("AI Analysis Results", heading_style))

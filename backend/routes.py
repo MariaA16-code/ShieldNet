@@ -325,7 +325,9 @@ def generate_pdf(report_id):
             'manipulation_score': evidence.manipulation_score if evidence else None,
             'verdict': evidence.verdict if evidence else 'No analysis available',
             'pixel_difference': evidence.pixel_difference if evidence else None,
-            'face_match': 'N/A'
+            'face_match': 'N/A',
+            'original_image_path': evidence.original_image if evidence else None,
+            'fake_image_path': evidence.fake_image if evidence else None
         })
     else:
         report_data.update({
