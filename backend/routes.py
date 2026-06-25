@@ -304,6 +304,7 @@ def generate_pdf(report_id):
     victim = Victim.query.get(report.victim_id)
     case = Case.query.filter_by(report_id=report.id).first()
     evidence = Evidence.query.filter_by(report_id=report.id).first()
+    harasser = Harasser.query.get(report.harasser_id) if report.harasser_id else None
 
     PKT = timedelta(hours=5)
     is_image_category = (report.category or '').lower() in ['fake / edited photo', 'deepfake video']
@@ -316,7 +317,12 @@ def generate_pdf(report_id):
         'category': report.category,
         'country': victim.country if victim else 'N/A',
         'description': report.description,
-        'submitted_at': (report.created_at + PKT).strftime('%Y-%m-%d %H:%M') + ' PKT'
+        'submitted_at': (report.created_at + PKT).strftime('%Y-%m-%d %H:%M') + ' PKT',
+         # ── Harasser ──
+        'harasser_username': harasser.username if harasser else 'Not provided',
+        'harasser_platform': harasser.platform if harasser else 'N/A',
+        'harasser_report_count': harasser.report_count if harasser else 0,
+        'harasser_flagged': harasser.flagged if harasser else False,
     }
 
     if is_image_category:
