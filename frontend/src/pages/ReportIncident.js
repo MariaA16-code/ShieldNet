@@ -33,6 +33,7 @@ function ReportIncident() {
   const [loading, setLoading] = useState(false);
   const [generatedToken, setGeneratedToken] = useState('');
   const [submitError, setSubmitError] = useState('');
+  const [tokenCopied, setTokenCopied] = useState(false);
 
   const MAX_FILE_SIZE = 25 * 1024 * 1024; // 25MB
   const ALLOWED_TYPES = ['image/jpeg', 'image/png', 'image/webp', 'image/gif', 'video/mp4', 'video/quicktime', 'video/webm'];
@@ -161,6 +162,16 @@ function ReportIncident() {
     if (input) input.value = '';
   };
 
+  const handleCopyToken = async () => {
+    try {
+      await navigator.clipboard.writeText(generatedToken);
+      setTokenCopied(true);
+      setTimeout(() => setTokenCopied(false), 2000);
+    } catch (err) {
+      console.error('Copy failed:', err);
+    }
+  };
+
   const handleSubmit = async (e) => {
     e.preventDefault();
 
@@ -228,7 +239,17 @@ function ReportIncident() {
             <span className="eyebrow">{t('report.successEyebrow')}</span>
             <h1>{t('report.successTitle')}</h1>
             <p className="success-sub">{t('report.successSub')}</p>
-            <div className="token-box mono">{generatedToken}</div>
+            <div className="token-box-wrap">
+              <div className="token-box mono">{generatedToken}</div>
+              <button
+                type="button"
+                className="token-copy-btn"
+                onClick={handleCopyToken}
+                aria-label="Copy token"
+              >
+                {tokenCopied ? '✓ Copied' : 'Copy'}
+              </button>
+            </div>
             <p className="success-note">{t('report.successNote')}</p>
           </div>
         </div>

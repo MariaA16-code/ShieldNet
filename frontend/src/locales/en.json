@@ -3,7 +3,8 @@
     "home": "Home",
     "track": "Track a case",
     "stats": "Statistics",
-    "report": "Report now"
+    "report": "Report now",
+    "help":"Help"
   },
   "home": {
     "eyebrow": "Anonymous · Encrypted · Free",
@@ -88,5 +89,28 @@
     "mentalHealth": "Mental health support",
     "copyright": "ShieldNet — Academic Final Year Project",
     "university": "University of Lahore, IET Department"
-  }
+  },
+  "help": {
+  "eyebrow": "Support",
+  "title": "Help & FAQ",
+  "subtitle": "Answers to common questions about using ShieldNet. If you don't see what you're looking for, you can reach out at the bottom of this page.",
+  "stillStuck": "Still stuck?",
+  "contactText": "If your question wasn't answered above, you can email us directly and we'll do our best to help.",
+  "emailUs": "Email us",
+  "faqs": [
+    { "category": "technical", "question": "I submitted a report but didn't get a token. What happened?", "answer": "If you didn't see a token after submitting, the request may not have gone through — possibly due to a slow connection or a server timeout. Please try submitting again. If it happens repeatedly, check your internet connection and try a different browser." },
+    { "category": "technical", "question": "I lost my tracking token. Can I get it back?", "answer": "We don't ask for your name, email, or login, so there's no account to recover your token from. If you didn't save it, you won't be able to look up that specific case. We recommend saving your token somewhere safe (a notes app, a password manager, or written down) as soon as you receive it." },
+    { "category": "technical", "question": "The page isn't loading or looks broken. What should I do?", "answer": "Try refreshing the page first. If that doesn't help, clear your browser cache or try a different browser. Our servers occasionally take 30–60 seconds to \"wake up\" after periods of inactivity, so please be patient on your first request of the day." },
+    { "category": "technical", "question": "My file won't upload. What file types are supported?", "answer": "We accept JPEG, PNG, WebP, and GIF images, plus MP4, MOV, and WebM videos. Files must be under 25MB. If your file is larger or in a different format, try compressing it or converting it before uploading." },
+    { "category": "technical", "question": "The PDF download isn't working.", "answer": "PDF generation can occasionally take a moment, especially right after submitting a report. Wait a few seconds and try again. If it still fails, your case is still saved — try the download again later from the Track a Case page." },
+    { "category": "technical", "question": "The site looks different in my language. Is that a bug?", "answer": "ShieldNet supports English, Urdu, Arabic, French, and Spanish. If something looks untranslated or out of place in your language, it's likely a translation gap we haven't caught yet — not a sign that the report itself failed to submit." },
+    { "category": "technical", "question": "I can't find my case using my token.", "answer": "Double check that you've entered the token exactly as it was given to you, including any dashes or capital letters. Tokens are case-sensitive. If you're still unable to find your case, the token may have been mistyped during submission." },
+    { "category": "technical", "question": "Does the site work on mobile?", "answer": "Yes, ShieldNet is designed to work on phones, tablets, and computers. If something looks cut off or doesn't fit your screen, try rotating your device or refreshing the page." },
+    { "category": "safety", "question": "Will the harasser find out I reported them?", "answer": "No. We never contact the person you're reporting directly using your name or any identifying information. Any takedown request sent to a platform comes from ShieldNet, not from you personally." },
+    { "category": "safety", "question": "Is my identity really anonymous?", "answer": "Yes. We don't require an account, a name, or a login to submit a report. The only personal information we ever collect is an optional contact field, which you can leave blank entirely. Your tracking token is not linked to your identity in any way." },
+    { "category": "safety", "question": "What happens to my evidence after I submit it?", "answer": "Your evidence is stored securely and used only to support your case and verify your report. It is never shared publicly or used for any purpose beyond your report." },
+    { "category": "safety", "question": "I'm scared to report. What should I know first?", "answer": "That fear is completely understandable, and you're allowed to take your time. You don't need to have all the evidence ready, and you don't need to share your real name. Reporting what happened, even with limited details, can be a first step — and you're in control of how much you share." },
+    { "category": "safety", "question": "What if I need urgent help right now?", "answer": "If you are in immediate danger or need urgent support, please contact the National Cyber Crime Investigation Agency (NCCIA) at nccia.gov.pk or call the FIA helpline at 1991. These services exist specifically to help in urgent situations." }
+  ]
+}
 }

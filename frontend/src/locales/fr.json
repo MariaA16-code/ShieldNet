@@ -3,7 +3,8 @@
     "home": "Accueil",
     "track": "Suivre un dossier",
     "stats": "Statistiques",
-    "report": "Signaler maintenant"
+    "report": "Signaler maintenant",
+    "help": "Aide"
   },
   "home": {
     "eyebrow": "Anonyme · Chiffré · Gratuit",
@@ -88,5 +89,28 @@
     "mentalHealth": "Soutien en santé mentale",
     "copyright": "ShieldNet — Projet de fin d'études académique",
     "university": "Université de Lahore, Département IET"
-  }
+  },
+  "help": {
+  "eyebrow": "Assistance",
+  "title": "Aide et FAQ",
+  "subtitle": "Réponses aux questions courantes sur l'utilisation de ShieldNet. Si vous ne trouvez pas ce que vous cherchez, vous pouvez nous contacter en bas de cette page.",
+  "stillStuck": "Toujours bloqué ?",
+  "contactText": "Si votre question n'a pas été répondue ci-dessus, vous pouvez nous envoyer un e-mail directement et nous ferons notre possible pour vous aider.",
+  "emailUs": "Nous contacter par e-mail",
+  "faqs": [
+    { "category": "technical", "question": "J'ai soumis un signalement mais je n'ai pas reçu de jeton. Que s'est-il passé ?", "answer": "Si vous n'avez pas vu de jeton après l'envoi, la demande n'a peut-être pas été transmise correctement — probablement en raison d'une connexion lente ou d'un délai d'expiration du serveur. Veuillez réessayer de soumettre votre signalement. Si cela se reproduit, vérifiez votre connexion Internet et essayez un autre navigateur." },
+    { "category": "technical", "question": "J'ai perdu mon jeton de suivi. Puis-je le récupérer ?", "answer": "Nous ne demandons ni votre nom, ni votre e-mail, ni de connexion, il n'existe donc aucun compte permettant de récupérer votre jeton. Si vous ne l'avez pas enregistré, vous ne pourrez pas retrouver ce dossier précis. Nous vous recommandons d'enregistrer votre jeton en lieu sûr (une application de notes, un gestionnaire de mots de passe, ou par écrit) dès que vous le recevez." },
+    { "category": "technical", "question": "La page ne se charge pas ou semble cassée. Que dois-je faire ?", "answer": "Essayez d'abord de rafraîchir la page. Si cela ne fonctionne pas, videz le cache de votre navigateur ou essayez-en un autre. Nos serveurs mettent parfois 30 à 60 secondes à se \"réveiller\" après une période d'inactivité, alors merci de patienter lors de votre première requête de la journée." },
+    { "category": "technical", "question": "Mon fichier ne s'envoie pas. Quels types de fichiers sont acceptés ?", "answer": "Nous acceptons les images JPEG, PNG, WebP et GIF, ainsi que les vidéos MP4, MOV et WebM. Les fichiers doivent faire moins de 25 Mo. Si votre fichier est plus volumineux ou dans un autre format, essayez de le compresser ou de le convertir avant de l'envoyer." },
+    { "category": "technical", "question": "Le téléchargement du PDF ne fonctionne pas.", "answer": "La génération du PDF peut parfois prendre un instant, surtout juste après l'envoi d'un signalement. Attendez quelques secondes et réessayez. Si cela échoue toujours, votre dossier reste enregistré — réessayez le téléchargement plus tard depuis la page Suivre un dossier." },
+    { "category": "technical", "question": "Le site a un aspect différent dans ma langue. Est-ce un bug ?", "answer": "ShieldNet est disponible en anglais, ourdou, arabe, français et espagnol. Si quelque chose apparaît non traduit ou mal placé dans votre langue, il s'agit probablement d'un oubli de traduction que nous n'avons pas encore corrigé — et non d'un signe que votre signalement n'a pas été envoyé." },
+    { "category": "technical", "question": "Je ne trouve pas mon dossier avec mon jeton.", "answer": "Vérifiez que vous avez saisi le jeton exactement comme il vous a été communiqué, y compris les tirets ou majuscules. Les jetons sont sensibles à la casse. Si vous ne parvenez toujours pas à retrouver votre dossier, le jeton a peut-être été mal saisi lors de l'envoi." },
+    { "category": "technical", "question": "Le site fonctionne-t-il sur mobile ?", "answer": "Oui, ShieldNet est conçu pour fonctionner sur téléphones, tablettes et ordinateurs. Si quelque chose semble coupé ou ne s'adapte pas à votre écran, essayez de faire pivoter votre appareil ou de rafraîchir la page." },
+    { "category": "safety", "question": "La personne qui me harcèle saura-t-elle que je l'ai signalée ?", "answer": "Non. Nous ne contactons jamais directement la personne que vous signalez avec votre nom ou toute information permettant de vous identifier. Toute demande de retrait envoyée à une plateforme provient de ShieldNet, et non de vous personnellement." },
+    { "category": "safety", "question": "Mon identité est-elle vraiment anonyme ?", "answer": "Oui. Aucun compte, nom ou identifiant n'est requis pour soumettre un signalement. La seule information personnelle que nous collectons est un champ de contact facultatif, que vous pouvez laisser entièrement vide. Votre jeton de suivi n'est lié à votre identité d'aucune façon." },
+    { "category": "safety", "question": "Qu'arrive-t-il à mes preuves après l'envoi ?", "answer": "Vos preuves sont stockées de manière sécurisée et utilisées uniquement pour appuyer votre dossier et vérifier votre signalement. Elles ne sont jamais partagées publiquement ni utilisées à d'autres fins que votre signalement." },
+    { "category": "safety", "question": "J'ai peur de signaler. Que dois-je savoir avant tout ?", "answer": "Cette peur est tout à fait compréhensible, et vous avez le droit de prendre votre temps. Vous n'avez pas besoin d'avoir toutes les preuves prêtes, ni de partager votre vrai nom. Signaler ce qui s'est passé, même avec peu de détails, peut être un premier pas — et c'est vous qui décidez de ce que vous partagez." },
+    { "category": "safety", "question": "Que faire si j'ai besoin d'une aide urgente immédiatement ?", "answer": "Si vous êtes en danger immédiat ou avez besoin d'une aide urgente, veuillez contacter la National Cyber Crime Investigation Agency (NCCIA) sur nccia.gov.pk ou appeler la ligne d'assistance de la FIA au 1991. Ces services existent spécifiquement pour aider dans les situations urgentes." }
+  ]
+}
 }

@@ -1,0 +1,188 @@
+@import url('https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@500;600;700&family=JetBrains+Mono:wght@500&display=swap');
+
+.help-page {
+  position: relative;
+  min-height: 100vh;
+  padding: 60px 60px 80px;
+  background: #0A0E16;
+  color: #EDEFF7;
+  overflow: hidden;
+}
+
+/* ---------- Background blobs (static, matches rest of site) ---------- */
+
+.help-bg {
+  position: absolute;
+  inset: 0;
+  z-index: 0;
+  pointer-events: none;
+}
+
+.help-blob {
+  position: absolute;
+  border-radius: 50%;
+  mix-blend-mode: lighten;
+  opacity: 0.35;
+  filter: blur(90px);
+}
+
+.help-blob.h1 {
+  width: 400px;
+  height: 400px;
+  background: #6C5CE7;
+  top: -140px;
+  right: -110px;
+}
+
+.help-blob.h2 {
+  width: 340px;
+  height: 340px;
+  background: #4A7DFF;
+  bottom: -100px;
+  left: -100px;
+}
+
+.help-header {
+  position: relative;
+  z-index: 1;
+  max-width: 640px;
+  margin-bottom: 40px;
+}
+
+.eyebrow {
+  color: #9B8CF5;
+  font-size: 13px;
+  font-weight: 500;
+  letter-spacing: 0.05em;
+  text-transform: uppercase;
+}
+
+.help-header h1 {
+  font-family: 'Space Grotesk', sans-serif;
+  font-size: 32px;
+  font-weight: 600;
+  letter-spacing: -0.01em;
+  margin: 14px 0 10px;
+  color: #EDEFF7;
+}
+
+.help-sub {
+  color: #8A91AC;
+  font-size: 15px;
+  line-height: 1.6;
+}
+
+.faq-list {
+  position: relative;
+  z-index: 1;
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+  max-width: 720px;
+  margin-bottom: 48px;
+}
+
+.faq-item {
+  background: #141B2E;
+  border: 1px solid rgba(237, 239, 247, 0.08);
+  border-radius: 12px;
+  overflow: hidden;
+}
+
+.faq-item.open {
+  border-color: rgba(155, 140, 245, 0.35);
+}
+
+.faq-question {
+  width: 100%;
+  background: none;
+  border: none;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 16px;
+  padding: 18px 22px;
+  color: #EDEFF7;
+  font-size: 15px;
+  font-weight: 500;
+  text-align: left;
+  cursor: pointer;
+}
+
+.faq-icon {
+  flex-shrink: 0;
+  font-family: 'JetBrains Mono', monospace;
+  font-size: 18px;
+  color: #9B8CF5;
+}
+
+.faq-answer {
+  padding: 0 22px 20px;
+  color: #8A91AC;
+  font-size: 14px;
+  line-height: 1.6;
+  margin: 0;
+}
+
+.help-contact-card {
+  position: relative;
+  z-index: 1;
+  background: #141B2E;
+  border: 1px solid rgba(237, 239, 247, 0.08);
+  border-radius: 16px;
+  padding: 36px;
+  max-width: 480px;
+}
+
+.help-contact-card h3 {
+  font-family: 'Space Grotesk', sans-serif;
+  font-size: 20px;
+  font-weight: 600;
+  margin: 0 0 10px;
+  color: #EDEFF7;
+}
+
+.help-contact-card p {
+  color: #8A91AC;
+  font-size: 14px;
+  line-height: 1.6;
+  margin: 0 0 20px;
+}
+
+.help-contact-btn {
+  display: inline-block;
+  background: #4A7DFF;
+  color: #0A0E16;
+  padding: 12px 24px;
+  border-radius: 8px;
+  font-weight: 600;
+  font-size: 14px;
+  text-decoration: none;
+}
+
+.help-contact-btn:hover {
+  background: #6996ff;
+}
+
+@media (max-width: 768px) {
+  .help-page {
+    padding: 40px 24px 60px;
+  }
+
+  .help-header h1 {
+    font-size: 26px;
+  }
+
+  .faq-question {
+    padding: 16px 18px;
+    font-size: 14px;
+  }
+
+  .faq-answer {
+    padding: 0 18px 18px;
+  }
+
+  .help-contact-card {
+    padding: 28px;
+  }
+}

@@ -5,6 +5,7 @@ import Home from './pages/Home';
 import ReportIncident from './pages/ReportIncident';
 import TrackCase from './pages/TrackCase';
 import AdminDashboard from './pages/AdminDashboard';
+import Help from './pages/Help';
 
 function App() {
   return (
@@ -15,9 +16,9 @@ function App() {
         <Route path="/track" element={<TrackCase />} />
         <Route path="/analytics" element={<Analytics />} />
         <Route path="/admin" element={<AdminDashboard />} />
+        <Route path="/help" element={<Help />} />
       </Routes>
     </BrowserRouter>
   );
 }
-
 export default App;

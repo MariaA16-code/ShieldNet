@@ -196,7 +196,35 @@
     font-size: 15px;
   }
 }
+.token-box-wrap {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  justify-content: center;
+}
 
+.token-copy-btn {
+  background: #9B8CF5;
+  color: #0A0E16;
+  border: none;
+  border-radius: 8px;
+  padding: 8px 14px;
+  font-family: 'Space Grotesk', sans-serif;
+  font-weight: 600;
+  font-size: 0.85rem;
+  cursor: pointer;
+  transition: background 0.2s ease, transform 0.15s ease;
+  white-space: nowrap;
+}
+
+.token-copy-btn:hover {
+  background: #4A7DFF;
+  transform: translateY(-1px);
+}
+
+.token-copy-btn:active {
+  transform: translateY(0);
+}
 .success-note {
   color: #8A91AC;
   font-size: 13px;

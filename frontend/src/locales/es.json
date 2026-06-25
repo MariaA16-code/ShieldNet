@@ -3,7 +3,8 @@
     "home": "Inicio",
     "track": "Rastrear un caso",
     "stats": "Estadísticas",
-    "report": "Reportar ahora"
+    "report": "Reportar ahora",
+    "help": "Ayuda"
   },
   "home": {
     "eyebrow": "Anónimo · Encriptado · Gratis",
@@ -88,5 +89,28 @@
     "mentalHealth": "Apoyo de salud mental",
     "copyright": "ShieldNet — Proyecto Académico de Último Año",
     "university": "Universidad de Lahore, Departamento de IET"
-  }
+  },
+  "help": {
+  "eyebrow": "Soporte",
+  "title": "Ayuda y preguntas frecuentes",
+  "subtitle": "Respuestas a preguntas comunes sobre el uso de ShieldNet. Si no encuentras lo que buscas, puedes contactarnos al final de esta página.",
+  "stillStuck": "¿Sigues con dudas?",
+  "contactText": "Si tu pregunta no fue respondida arriba, puedes escribirnos directamente por correo y haremos lo posible por ayudarte.",
+  "emailUs": "Escríbenos",
+  "faqs": [
+    { "category": "technical", "question": "Envié un reporte pero no recibí un token. ¿Qué pasó?", "answer": "Si no viste un token después de enviar tu reporte, es posible que la solicitud no se haya completado — quizás por una conexión lenta o un tiempo de espera agotado del servidor. Por favor, intenta enviarlo de nuevo. Si esto ocurre repetidamente, revisa tu conexión a internet y prueba con otro navegador." },
+    { "category": "technical", "question": "Perdí mi token de seguimiento. ¿Puedo recuperarlo?", "answer": "No solicitamos tu nombre, correo electrónico ni inicio de sesión, así que no existe una cuenta desde la cual recuperar tu token. Si no lo guardaste, no podrás encontrar ese caso en particular. Te recomendamos guardar tu token en un lugar seguro (una app de notas, un gestor de contraseñas, o escrito a mano) en cuanto lo recibas." },
+    { "category": "technical", "question": "La página no carga o se ve dañada. ¿Qué debo hacer?", "answer": "Primero intenta actualizar la página. Si eso no ayuda, borra la caché de tu navegador o prueba con otro navegador. Nuestros servidores ocasionalmente tardan entre 30 y 60 segundos en \"despertar\" tras periodos de inactividad, así que ten paciencia con tu primera solicitud del día." },
+    { "category": "technical", "question": "Mi archivo no se sube. ¿Qué tipos de archivo son compatibles?", "answer": "Aceptamos imágenes JPEG, PNG, WebP y GIF, además de videos MP4, MOV y WebM. Los archivos deben ser menores a 25 MB. Si tu archivo es más grande o tiene un formato diferente, intenta comprimirlo o convertirlo antes de subirlo." },
+    { "category": "technical", "question": "La descarga del PDF no funciona.", "answer": "La generación del PDF puede tardar un momento ocasionalmente, especialmente justo después de enviar un reporte. Espera unos segundos e intenta de nuevo. Si sigue fallando, tu caso sigue guardado — intenta descargarlo más tarde desde la página de Seguimiento de caso." },
+    { "category": "technical", "question": "El sitio se ve diferente en mi idioma. ¿Es un error?", "answer": "ShieldNet está disponible en inglés, urdu, árabe, francés y español. Si algo se ve sin traducir o fuera de lugar en tu idioma, probablemente sea un vacío de traducción que aún no hemos detectado, no una señal de que tu reporte no se haya enviado." },
+    { "category": "technical", "question": "No puedo encontrar mi caso usando mi token.", "answer": "Verifica de nuevo que hayas ingresado el token exactamente como te lo dieron, incluyendo guiones o letras mayúsculas. Los tokens distinguen entre mayúsculas y minúsculas. Si aún no puedes encontrar tu caso, es posible que el token se haya escrito mal durante el envío." },
+    { "category": "technical", "question": "¿El sitio funciona en móviles?", "answer": "Sí, ShieldNet está diseñado para funcionar en teléfonos, tabletas y computadoras. Si algo se ve cortado o no se ajusta a tu pantalla, intenta girar tu dispositivo o actualizar la página." },
+    { "category": "safety", "question": "¿El acosador se enterará de que lo reporté?", "answer": "No. Nunca contactamos directamente a la persona que estás reportando usando tu nombre o cualquier información que te identifique. Cualquier solicitud de retiro de contenido enviada a una plataforma proviene de ShieldNet, no de ti personalmente." },
+    { "category": "safety", "question": "¿Mi identidad realmente es anónima?", "answer": "Sí. No requerimos una cuenta, un nombre ni un inicio de sesión para enviar un reporte. La única información personal que llegamos a recopilar es un campo de contacto opcional, que puedes dejar completamente en blanco. Tu token de seguimiento no está vinculado a tu identidad de ninguna manera." },
+    { "category": "safety", "question": "¿Qué pasa con mi evidencia después de enviarla?", "answer": "Tu evidencia se almacena de forma segura y se usa únicamente para respaldar tu caso y verificar tu reporte. Nunca se comparte públicamente ni se usa para ningún otro fin más allá de tu reporte." },
+    { "category": "safety", "question": "Tengo miedo de reportar. ¿Qué debo saber primero?", "answer": "Ese miedo es completamente comprensible, y tienes derecho a tomarte tu tiempo. No necesitas tener toda la evidencia lista, ni compartir tu nombre real. Reportar lo que pasó, incluso con detalles limitados, puede ser un primer paso — y tú decides cuánto compartir." },
+    { "category": "safety", "question": "¿Qué hago si necesito ayuda urgente en este momento?", "answer": "Si estás en peligro inmediato o necesitas apoyo urgente, comunícate con la Agencia Nacional de Investigación de Delitos Cibernéticos (NCCIA) en nccia.gov.pk o llama a la línea de ayuda de la FIA al 1991. Estos servicios existen específicamente para ayudar en situaciones urgentes." }
+  ]
+}
 }
