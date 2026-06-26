@@ -425,3 +425,59 @@ def send_dmca(report_id):
     else:
         db.session.commit()
         return jsonify({'error': result['error']}), 500
+    
+    # ─── 9. PUBLIC STATS ──────────────────────────────────────────────────────────
+
+@api.route('/api/stats', methods=['GET'])
+def get_stats():
+    from sqlalchemy import func
+    from datetime import datetime, timedelta
+
+    now = datetime.utcnow()
+    month_start = now.replace(day=1, hour=0, minute=0, second=0, microsecond=0)
+
+    # Total reports this month
+    reports_this_month = Report.query.filter(
+        Report.created_at >= month_start
+    ).count()
+
+    # Total reports ever
+    total_reports = Report.query.count()
+
+    # Reports with AI evidence (have evidence row)
+    total_with_evidence = Evidence.query.count()
+    evidence_verified_pct = round((total_with_evidence / total_reports * 100), 1) if total_reports > 0 else 0
+
+    # Resolved or Takedown Sent cases
+    resolved = Case.query.filter(
+        Case.status.in_(['Resolved', 'Takedown Sent'])
+    ).count()
+    total_cases = Case.query.count()
+    resolution_pct = round((resolved / total_cases * 100), 1) if total_cases > 0 else 0
+
+    # Reports per platform
+    platform_counts = db.session.query(
+        Report.platform, func.count(Report.id)
+    ).group_by(Report.platform).all()
+    platforms = {p: c for p, c in platform_counts}
+
+    # Reports per category
+    category_counts = db.session.query(
+        Report.category, func.count(Report.id)
+    ).group_by(Report.category).all()
+    categories = {c: count for c, count in category_counts}
+
+    # Flagged harassers
+    flagged_count = Harasser.query.filter_by(flagged=True).count()
+
+    return jsonify({
+        'reports_this_month': reports_this_month,
+        'total_reports': total_reports,
+        'evidence_verified_pct': evidence_verified_pct,
+        'resolution_success_pct': resolution_pct,
+        'platforms_monitored': len(platforms),
+        'reports_per_platform': platforms,
+        'reports_per_category': categories,
+        'flagged_harassers': flagged_count,
+        'anonymous_pct': 100
+    }), 200
