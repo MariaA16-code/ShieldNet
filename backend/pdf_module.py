@@ -74,6 +74,7 @@ def generate_complaint_pdf(report_data, output_path):
         ['Platform', str(report_data.get('platform', 'N/A'))],
         ['Category', str(report_data.get('category', 'N/A'))],
         ['Country', str(report_data.get('country', 'N/A'))],
+        ['Contact Info', str(report_data.get('contact', 'Not provided'))],
     ]
 
     case_table = Table(case_data, colWidths=[2 * inch, 4 * inch])

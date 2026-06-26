@@ -12,6 +12,7 @@ def send_dmca_email(report_data):
     report_id = report_data.get('report_id', 'N/A')
     category = report_data.get('category', 'N/A')
     description = report_data.get('description', 'N/A')
+    contact = report_data.get('contact', 'Not provided')
     token = report_data.get('token', 'N/A')
     manipulation_score = report_data.get('manipulation_score', 'N/A')
     pixel_difference = report_data.get('pixel_difference', 'N/A')
@@ -40,6 +41,7 @@ def send_dmca_email(report_data):
     <p><b>Date:</b> {date}<br>
     <b>Case ID:</b> {report_id}<br>
     <b>Tracking Token:</b> {token}</p>
+    <b>Contact Info:</b> {contact}<br>
     <hr>
 
     <p><b>PLATFORM:</b> {platform}<br>

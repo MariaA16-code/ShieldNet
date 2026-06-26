@@ -323,6 +323,7 @@ def generate_pdf(report_id):
         'country': victim.country if victim else 'N/A',
         'description': report.description,
         'submitted_at': (report.created_at + PKT).strftime('%Y-%m-%d %H:%M') + ' PKT',
+        'contact': victim.contact_encrypted if victim else 'Not provided',
          # ── Harasser ──
         'harasser_username': harasser.username if harasser else 'Not provided',
         'harasser_platform': harasser.platform if harasser else 'N/A',
@@ -386,6 +387,7 @@ def send_dmca(report_id):
         'category': report.category,
         'description': report.description,
         'status': case.status if case else 'Pending',
+        'contact': victim.contact_encrypted if victim else 'Not provided',
         'manipulation_score': evidence.manipulation_score if evidence else 'N/A',
         'verdict': evidence.verdict if evidence else 'N/A',
         'pixel_difference': evidence.pixel_difference if evidence else 'N/A',
