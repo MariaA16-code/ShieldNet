@@ -1,6 +1,7 @@
 import React, { useEffect, useState, useRef } from 'react';
 import { Link } from 'react-router-dom';
 import { useTranslation } from 'react-i18next';
+import axios from '../api/client';
 import Navbar from '../components/Navbar';
 import Footer from '../components/Footer';
 import './Home.css';
@@ -18,12 +19,27 @@ function Home() {
   const [mouse, setMouse] = useState({ x: 0.5, y: 0.5 });
   const heroRef = useRef(null);
 
+  const [stats, setStats] = useState(null);
+
   const title1 = t('home.title1');
   const title2 = t('home.title2');
   const title3 = t('home.title3');
 
   const [typedLines, setTypedLines] = useState(['', '', '']);
   const [activeLine, setActiveLine] = useState(0);
+
+  // Live homepage stats
+  useEffect(() => {
+    const fetchStats = async () => {
+      try {
+        const res = await axios.get('/api/stats');
+        setStats(res.data);
+      } catch (err) {
+        console.error('Failed to fetch stats:', err);
+      }
+    };
+    fetchStats();
+  }, []);
 
   // Background blobs follow the cursor
   useEffect(() => {
@@ -138,11 +154,15 @@ function Home() {
 
             <div className="stats-strip">
               <div className="stat">
-                <span className="stat-number">128</span>
+                <span className="stat-number">
+                  {stats ? stats.reports_this_month : '—'}
+                </span>
                 <span className="stat-label">{t('home.stat1Label')}</span>
               </div>
               <div className="stat">
-                <span className="stat-number">94%</span>
+                <span className="stat-number">
+                  {stats ? `${stats.evidence_verified_pct}%` : '—'}
+                </span>
                 <span className="stat-label">{t('home.stat2Label')}</span>
               </div>
               <div className="stat">

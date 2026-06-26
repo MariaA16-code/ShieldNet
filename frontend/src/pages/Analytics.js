@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useState, useEffect } from 'react';
 import { Bar, Doughnut } from 'react-chartjs-2';
 import {
   Chart as ChartJS,
@@ -11,6 +11,7 @@ import {
 } from 'chart.js';
 import { MapContainer, TileLayer, CircleMarker, Popup } from 'react-leaflet';
 import { useTranslation } from 'react-i18next';
+import axios from '../api/client';
 import Navbar from '../components/Navbar';
 import Footer from '../components/Footer';
 import './Analytics.css';
@@ -19,32 +20,54 @@ ChartJS.register(CategoryScale, LinearScale, BarElement, ArcElement, Tooltip, Le
 
 function Analytics() {
   const { t } = useTranslation();
+  const [stats, setStats] = useState(null);
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState(false);
+
+  useEffect(() => {
+    const fetchStats = async () => {
+      try {
+        const res = await axios.get('/api/stats');
+        setStats(res.data);
+      } catch (err) {
+        console.error('Failed to fetch stats:', err);
+        setError(true);
+      } finally {
+        setLoading(false);
+      }
+    };
+    fetchStats();
+  }, []);
+
+  // Platform chart — built from live reports_per_platform object.
+  // Falls back to empty arrays if stats haven't loaded yet, so Chart.js
+  // doesn't crash on an undefined dataset.
+  const platformLabels = stats ? Object.keys(stats.reports_per_platform || {}) : [];
+  const platformCounts = stats ? Object.values(stats.reports_per_platform || {}) : [];
 
   const platformData = {
-    labels: ['Instagram', 'Facebook', 'TikTok', 'Twitter/X', 'Snapchat', 'YouTube'],
+    labels: platformLabels,
     datasets: [
       {
         label: 'Reports',
-        data: [42, 31, 24, 18, 9, 4],
+        data: platformCounts,
         backgroundColor: '#9B8CF5',
         borderRadius: 6,
       },
     ],
   };
 
+  // Category chart — built from live reports_per_category object.
+  const categoryLabels = stats ? Object.keys(stats.reports_per_category || {}) : [];
+  const categoryCounts = stats ? Object.values(stats.reports_per_category || {}) : [];
+  const categoryColors = ['#9B8CF5', '#4A7DFF', '#6B7390', '#FF6B6B', '#6C5CE7', '#2C3548'];
+
   const categoryData = {
-    labels: [
-      t('report.categories.fakePhoto'),
-      t('analytics.categoryHarassment'),
-      t('report.categories.impersonation'),
-      t('report.categories.stalking'),
-      t('report.categories.threats'),
-      t('report.categories.deepfakeVideo'),
-    ],
+    labels: categoryLabels,
     datasets: [
       {
-        data: [35, 28, 20, 12, 8, 5],
-        backgroundColor: ['#9B8CF5', '#4A7DFF', '#6B7390', '#FF6B6B', '#6C5CE7', '#2C3548'],
+        data: categoryCounts,
+        backgroundColor: categoryLabels.map((_, i) => categoryColors[i % categoryColors.length]),
         borderWidth: 0,
       },
     ],
@@ -123,21 +146,35 @@ function Analytics() {
           <p className="analytics-sub">{t('analytics.subtitle')}</p>
         </div>
 
+        {error && (
+          <p style={{ color: '#FF6B6B', textAlign: 'center' }}>
+            Couldn't load live stats — showing may be incomplete.
+          </p>
+        )}
+
         <div className="stats-row">
           <div className="stat-card">
-            <span className="stat-number mono">128</span>
+            <span className="stat-number mono">
+              {loading ? '—' : stats?.total_reports ?? 0}
+            </span>
             <span className="stat-label">{t('analytics.stat1')}</span>
           </div>
           <div className="stat-card">
-            <span className="stat-number mono">94%</span>
+            <span className="stat-number mono">
+              {loading ? '—' : `${stats?.evidence_verified_pct ?? 0}%`}
+            </span>
             <span className="stat-label">{t('analytics.stat2')}</span>
           </div>
           <div className="stat-card">
-            <span className="stat-number mono">76%</span>
+            <span className="stat-number mono">
+              {loading ? '—' : `${stats?.resolution_success_pct ?? 0}%`}
+            </span>
             <span className="stat-label">{t('analytics.stat3')}</span>
           </div>
           <div className="stat-card">
-            <span className="stat-number mono">6</span>
+            <span className="stat-number mono">
+              {loading ? '—' : stats?.platforms_monitored ?? 0}
+            </span>
             <span className="stat-label">{t('analytics.stat4')}</span>
           </div>
         </div>
