@@ -1,0 +1,108 @@
+{
+  "@@locale": "fr",
+
+  "appTitle": "ShieldNet",
+
+  "navHome": "Accueil",
+  "navReport": "Signaler",
+  "navTrack": "Suivre",
+  "navStats": "Statistiques",
+  "navHelp": "Aide",
+
+  "languageSelectorLabel": "Langue",
+
+  "homeEyebrow": "Anonyme · Chiffré · Gratuit",
+  "homeHeadline": "Signalez le cyberharcèlement.\nRestez protégé.",
+  "homeSubtitle": "ShieldNet offre à toute personne touchée par le cyberharcèlement un moyen sûr d'agir. Signalez un incident de manière anonyme, sans compte requis. Téléchargez des preuves via des canaux chiffrés et vérifiés. Suivez votre dossier à tout moment grâce à un jeton privé. Aucun nom, aucune exposition, aucun jugement. Votre vie privée n'est jamais compromise, par conception.",
+
+  "ourPromiseTitle": "Notre engagement",
+  "ourPromiseAnonymous": "100 %\nAnonyme",
+  "ourPromiseSecure": "Sécurisé et\nChiffré",
+  "ourPromiseNoData": "Aucune donnée\npersonnelle",
+  "ourPromiseCommunity": "Porté par la\ncommunauté",
+
+  "needHelpTitle": "Besoin d'aide immédiate ?",
+  "needHelpBodyPrefix": "Si vous êtes en danger ou avez besoin d'une assistance urgente, consultez notre page ",
+  "needHelpBodyLink": "Aide et assistance",
+  "needHelpBodySuffix": " pour les numéros d'urgence et les ressources.",
+
+  "reportAppBarTitle": "Signaler un incident",
+  "reportEyebrow": "Anonyme · Chiffré · Gratuit",
+  "reportHeadline": "Signaler un incident",
+  "reportSubtitle": "Soumettez de manière anonyme — aucun compte nécessaire.",
+
+  "reportCountryLabel": "Pays",
+  "reportCategoryLabel": "Catégorie",
+  "reportPlatformLabel": "Plateforme",
+  "reportHarasserUsernameLabel": "Nom d'utilisateur du harceleur",
+  "reportHarasserUsernameHint": "@nomdutilisateur du harceleur",
+  "reportHarasserUrlLabel": "URL du profil du harceleur (facultatif)",
+  "reportHarasserUrlHint": "https://instagram.com/username",
+  "reportDescriptionLabel": "Description",
+  "reportDescriptionHint": "Décrivez ce qui s'est passé en détail...",
+  "reportEvidenceSectionTitle": "PREUVES (obligatoires pour cette catégorie)",
+  "reportOriginalImageLabel": "Image originale",
+  "reportFakeImageLabel": "Image modifiée / falsifiée",
+  "reportVideoLabel": "Vidéo deepfake",
+  "reportContactLabel": "Votre contact (facultatif)",
+  "reportContactHint": "E-mail ou téléphone pour le suivi",
+  "reportSubmitButton": "Envoyer le signalement",
+  "reportServerDelayNotice": "Le serveur peut prendre 10 à 15 secondes pour répondre s'il était inactif.",
+
+  "reportValidationRequired": "Ce champ est obligatoire",
+  "reportValidationDescribe": "Veuillez décrire ce qui s'est passé",
+  "reportValidationSelect": "Veuillez sélectionner {label}",
+  "@reportValidationSelect": {
+    "placeholders": { "label": { "type": "String" } }
+  },
+  "reportValidationFillFields": "Veuillez remplir tous les champs obligatoires ci-dessus.",
+  "reportValidationNeedsImages": "Cette catégorie nécessite à la fois l'image originale et l'image modifiée.",
+  "reportValidationNeedsVideo": "Veuillez télécharger la vidéo requise pour cette catégorie.",
+  "reportSubmitGenericError": "Une erreur s'est produite lors de l'envoi de votre signalement. Veuillez réessayer.",
+
+  "helpAppBarTitle": "Aide et FAQ",
+  "helpEyebrow": "Assistance",
+  "helpHeadline": "Aide et FAQ",
+  "helpSubtitle": "Réponses aux questions fréquentes sur l'utilisation de ShieldNet. Si vous ne trouvez pas ce que vous cherchez, vous pouvez nous contacter en bas de cette page.",
+
+  "helpEmergencyTitle": "Besoin d'aide immédiate ?",
+  "helpEmergencyBody": "Si vous êtes en danger immédiat, contactez directement les services d'urgence — appuyez sur n'importe quel numéro ci-dessous pour appeler.",
+  "helpEmergencyFia": "Ligne d'assistance FIA cybercriminalité",
+  "helpEmergencyPolice": "Police",
+  "helpEmergencyAmbulance": "Ambulance",
+  "helpEmergencyWomen": "Ligne d'assistance pour les femmes",
+
+  "helpFaqSectionTitle": "QUESTIONS FRÉQUEMMENT POSÉES",
+
+  "helpFaq1Q": "J'ai soumis un signalement mais je n'ai pas reçu de jeton. Que s'est-il passé ?",
+  "helpFaq1A": "Si la connexion a été interrompue avant le chargement de la confirmation, votre signalement n'a peut-être pas été enregistré. Veuillez le soumettre à nouveau — les signalements en double ne posent aucun problème de notre côté.",
+  "helpFaq2Q": "J'ai perdu mon jeton de suivi. Puis-je le récupérer ?",
+  "helpFaq2A": "Si vous avez fourni des coordonnées lors du signalement, l'équipe d'administration peut vérifier votre identité et vous le renvoyer. Sinon, comme ShieldNet ne collecte aucune donnée personnelle par défaut, le jeton ne peut pas être récupéré.",
+  "helpFaq3Q": "Le harceleur saura-t-il que je l'ai signalé ?",
+  "helpFaq3A": "Non. Les signalements sont totalement anonymes, sauf si vous choisissez de fournir des coordonnées, et ces informations ne sont jamais visibles que par l'équipe d'administration — jamais par la personne signalée.",
+  "helpFaq4Q": "Mon identité est-elle vraiment anonyme ?",
+  "helpFaq4A": "Oui. Par défaut, nous ne collectons aucun nom, compte ou identifiant d'appareil. Le champ de contact est facultatif et n'est utilisé que pour le suivi si vous le fournissez.",
+  "helpFaq5Q": "Qu'advient-il de mes preuves après leur envoi ?",
+  "helpFaq5A": "Les preuves sont analysées pour aider à vérifier le signalement, puis stockées en toute sécurité et utilisées uniquement pour le processus de retrait et d'examen.",
+  "helpFaq6Q": "Que faire si j'ai besoin d'une aide urgente immédiate ?",
+  "helpFaq6A": "Si vous êtes en danger immédiat, contactez d'abord les services d'urgence locaux. Pour le cyberharcèlement spécifiquement, vous pouvez appeler la ligne d'assistance FIA cybercriminalité au 1991 — voir les numéros d'urgence ci-dessus.",
+
+  "helpSupportTitle": "Toujours bloqué ?",
+  "helpSupportBody": "Si votre question n'a pas trouvé de réponse ci-dessus, vous pouvez nous envoyer un e-mail directement et nous ferons notre possible pour vous aider.",
+  "helpSupportEmailButton": "Contacter le support par e-mail",
+  "helpSupportEmailFailed": "Impossible d'ouvrir une application de messagerie sur cet appareil.",
+  "helpSupportCallFailed": "Impossible de lancer un appel vers le {number}.",
+  "@helpSupportCallFailed": {
+    "placeholders": { "number": { "type": "String" } }
+  },
+
+  "helpFooterTagline": "Protéger les victimes. Exposer les agresseurs. Connecter le monde.",
+  "helpFooterPlatformTitle": "PLATEFORME",
+  "helpFooterEmergencyTitle": "RESSOURCES D'URGENCE",
+  "helpFooterReport": "Signaler",
+  "helpFooterTrack": "Suivre",
+  "helpFooterStatistics": "Statistiques",
+  "helpFooterFia": "FIA cybercriminalité : 1991",
+  "helpFooterPolice": "Police : 15",
+  "helpFooterWomen": "Ligne d'assistance pour les femmes : 1099"
+}

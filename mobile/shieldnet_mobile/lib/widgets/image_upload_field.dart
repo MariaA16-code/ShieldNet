@@ -1,13 +1,32 @@
-import 'dart:io';
+import 'dart:typed_data';
 import 'package:flutter/material.dart';
 import 'package:file_picker/file_picker.dart';
 import '../theme.dart';
 
+/// A picked file kept entirely in memory as bytes + a filename.
+///
+/// Why not `dart:io File`? `File` is backed by a real filesystem path,
+/// and `file_picker` only ever returns a usable `.path` on mobile/
+/// desktop — on Flutter Web, `.path` is always null by design (browsers
+/// don't expose real filesystem paths to JS/Dart for security reasons).
+/// `.bytes` is the one property that works identically on every
+/// platform, so this app standardizes on bytes everywhere instead of
+/// branching the picker logic per platform.
+class PickedFile {
+  final String name;
+  final Uint8List bytes;
+
+  const PickedFile({required this.name, required this.bytes});
+
+  int get sizeInBytes => bytes.length;
+}
+
 class ImageUploadField extends StatelessWidget {
   final String label;
-  final File? file;
+  final PickedFile? file;
   final VoidCallback onPick;
   final VoidCallback onRemove;
+  final String hint; // e.g. 'Tap to choose a video'
 
   const ImageUploadField({
     super.key,
@@ -15,6 +34,7 @@ class ImageUploadField extends StatelessWidget {
     required this.file,
     required this.onPick,
     required this.onRemove,
+    this.hint = 'Tap to choose an image',
   });
 
   @override
@@ -51,9 +71,7 @@ class ImageUploadField extends StatelessWidget {
                   ),
                   const SizedBox(height: 2),
                   Text(
-                    file != null
-                        ? file!.path.split(Platform.pathSeparator).last
-                        : 'Tap to choose an image',
+                    file != null ? file!.name : hint,
                     style: Theme.of(context).textTheme.bodyLarge?.copyWith(
                           fontSize: 14,
                         ),
@@ -76,8 +94,30 @@ class ImageUploadField extends StatelessWidget {
   }
 }
 
-Future<File?> pickImageFile() async {
-  final result = await FilePicker.platform.pickFiles(type: FileType.image);
-  if (result == null || result.files.single.path == null) return null;
-  return File(result.files.single.path!);
+/// Opens the system file picker for a single image and returns it as
+/// in-memory bytes. `withData: true` is required explicitly — recent
+/// file_picker versions default it to `false` on every platform
+/// including web, so omitting it silently returns null bytes there.
+Future<PickedFile?> pickImageFile() async {
+  final result = await FilePicker.platform.pickFiles(
+    type: FileType.image,
+    withData: true,
+  );
+  if (result == null || result.files.isEmpty) return null;
+  final picked = result.files.single;
+  if (picked.bytes == null) return null;
+  return PickedFile(name: picked.name, bytes: picked.bytes!);
+}
+
+/// Same as [pickImageFile] but restricted to common video formats, for
+/// the Deepfake Video evidence category.
+Future<PickedFile?> pickVideoFile() async {
+  final result = await FilePicker.platform.pickFiles(
+    type: FileType.video,
+    withData: true,
+  );
+  if (result == null || result.files.isEmpty) return null;
+  final picked = result.files.single;
+  if (picked.bytes == null) return null;
+  return PickedFile(name: picked.name, bytes: picked.bytes!);
 }

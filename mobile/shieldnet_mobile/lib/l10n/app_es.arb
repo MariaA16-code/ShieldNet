@@ -1,0 +1,108 @@
+{
+  "@@locale": "es",
+
+  "appTitle": "ShieldNet",
+
+  "navHome": "Inicio",
+  "navReport": "Reportar",
+  "navTrack": "Seguimiento",
+  "navStats": "Estadísticas",
+  "navHelp": "Ayuda",
+
+  "languageSelectorLabel": "Idioma",
+
+  "homeEyebrow": "Anónimo · Cifrado · Gratis",
+  "homeHeadline": "Denuncia el acoso cibernético.\nMantente protegido.",
+  "homeSubtitle": "ShieldNet ofrece a cualquier persona afectada por el acoso cibernético una forma segura de avanzar. Denuncia un incidente de forma anónima, sin necesidad de cuenta. Sube pruebas a través de canales cifrados y verificados. Haz seguimiento de tu caso en cualquier momento usando un token privado. Sin nombres, sin exposición, sin juicios. Tu privacidad nunca se ve comprometida, por diseño.",
+
+  "ourPromiseTitle": "Nuestra promesa",
+  "ourPromiseAnonymous": "100 %\nAnónimo",
+  "ourPromiseSecure": "Seguro y\nCifrado",
+  "ourPromiseNoData": "Sin datos\npersonales",
+  "ourPromiseCommunity": "Impulsado por la\ncomunidad",
+
+  "needHelpTitle": "¿Necesitas ayuda urgente?",
+  "needHelpBodyPrefix": "Si estás en peligro o necesitas asistencia urgente, visita nuestra página de ",
+  "needHelpBodyLink": "Ayuda y Soporte",
+  "needHelpBodySuffix": " para ver números de emergencia y recursos.",
+
+  "reportAppBarTitle": "Reportar un incidente",
+  "reportEyebrow": "Anónimo · Cifrado · Gratis",
+  "reportHeadline": "Reportar un incidente",
+  "reportSubtitle": "Envía tu reporte de forma anónima — no se necesita cuenta.",
+
+  "reportCountryLabel": "País",
+  "reportCategoryLabel": "Categoría",
+  "reportPlatformLabel": "Plataforma",
+  "reportHarasserUsernameLabel": "Nombre de usuario del acosador",
+  "reportHarasserUsernameHint": "@usuario del acosador",
+  "reportHarasserUrlLabel": "URL del perfil del acosador (opcional)",
+  "reportHarasserUrlHint": "https://instagram.com/username",
+  "reportDescriptionLabel": "Descripción",
+  "reportDescriptionHint": "Describe lo que ocurrió en detalle...",
+  "reportEvidenceSectionTitle": "EVIDENCIA (obligatoria para esta categoría)",
+  "reportOriginalImageLabel": "Imagen original",
+  "reportFakeImageLabel": "Imagen editada / falsa",
+  "reportVideoLabel": "Video deepfake",
+  "reportContactLabel": "Tu contacto (opcional)",
+  "reportContactHint": "Correo o teléfono para seguimiento",
+  "reportSubmitButton": "Enviar reporte",
+  "reportServerDelayNotice": "El servidor puede tardar de 10 a 15 segundos en responder si ha estado inactivo.",
+
+  "reportValidationRequired": "Este campo es obligatorio",
+  "reportValidationDescribe": "Por favor describe lo que ocurrió",
+  "reportValidationSelect": "Por favor selecciona {label}",
+  "@reportValidationSelect": {
+    "placeholders": { "label": { "type": "String" } }
+  },
+  "reportValidationFillFields": "Por favor completa todos los campos obligatorios anteriores.",
+  "reportValidationNeedsImages": "Esta categoría requiere tanto la imagen original como la editada.",
+  "reportValidationNeedsVideo": "Por favor sube el video requerido para esta categoría.",
+  "reportSubmitGenericError": "Algo salió mal al enviar tu reporte. Por favor intenta de nuevo.",
+
+  "helpAppBarTitle": "Ayuda y preguntas frecuentes",
+  "helpEyebrow": "Soporte",
+  "helpHeadline": "Ayuda y preguntas frecuentes",
+  "helpSubtitle": "Respuestas a preguntas frecuentes sobre el uso de ShieldNet. Si no encuentras lo que buscas, puedes contactarnos al final de esta página.",
+
+  "helpEmergencyTitle": "¿Necesitas ayuda inmediata?",
+  "helpEmergencyBody": "Si estás en peligro inmediato, contacta directamente a los servicios de emergencia — toca cualquier número de abajo para llamar.",
+  "helpEmergencyFia": "Línea de ayuda de ciberdelitos FIA",
+  "helpEmergencyPolice": "Policía",
+  "helpEmergencyAmbulance": "Ambulancia",
+  "helpEmergencyWomen": "Línea de ayuda para mujeres",
+
+  "helpFaqSectionTitle": "PREGUNTAS FRECUENTES",
+
+  "helpFaq1Q": "Envié un reporte pero no recibí un token. ¿Qué pasó?",
+  "helpFaq1A": "Si la conexión se interrumpió antes de que cargara la confirmación, es posible que tu reporte no se haya guardado. Por favor envíalo de nuevo — los reportes duplicados no son un problema de nuestro lado.",
+  "helpFaq2Q": "Perdí mi token de seguimiento. ¿Puedo recuperarlo?",
+  "helpFaq2A": "Si proporcionaste información de contacto al reportar, el equipo de administración puede verificar tu identidad y reenviártelo. De lo contrario, como ShieldNet no almacena datos personales por defecto, el token no se puede recuperar.",
+  "helpFaq3Q": "¿El acosador sabrá que lo reporté?",
+  "helpFaq3A": "No. Los reportes son completamente anónimos a menos que elijas proporcionar datos de contacto, y esa información solo es visible para el equipo de administración — nunca para la persona reportada.",
+  "helpFaq4Q": "¿Mi identidad realmente permanece anónima?",
+  "helpFaq4A": "Sí. Por defecto no recopilamos nombre, cuenta ni identificador de dispositivo alguno. El campo de contacto es opcional y solo se usa para seguimiento si lo proporcionas.",
+  "helpFaq5Q": "¿Qué pasa con mi evidencia después de enviarla?",
+  "helpFaq5A": "La evidencia se analiza para ayudar a verificar el reporte, luego se almacena de forma segura y se usa únicamente para el proceso de retirada y revisión.",
+  "helpFaq6Q": "¿Qué hago si necesito ayuda urgente ahora mismo?",
+  "helpFaq6A": "Si estás en peligro inmediato, contacta primero a los servicios de emergencia locales. Para el acoso cibernético específicamente, puedes llamar a la línea de ayuda de ciberdelitos FIA al 1991 — consulta los números de emergencia arriba.",
+
+  "helpSupportTitle": "¿Sigues atascado?",
+  "helpSupportBody": "Si tu pregunta no fue respondida arriba, puedes enviarnos un correo directamente y haremos todo lo posible por ayudarte.",
+  "helpSupportEmailButton": "Enviar correo a soporte",
+  "helpSupportEmailFailed": "No se pudo abrir una aplicación de correo en este dispositivo.",
+  "helpSupportCallFailed": "No se pudo iniciar una llamada al {number}.",
+  "@helpSupportCallFailed": {
+    "placeholders": { "number": { "type": "String" } }
+  },
+
+  "helpFooterTagline": "Protegiendo a las víctimas. Exponiendo a los agresores. Conectando al mundo.",
+  "helpFooterPlatformTitle": "PLATAFORMA",
+  "helpFooterEmergencyTitle": "RECURSOS DE EMERGENCIA",
+  "helpFooterReport": "Reportar",
+  "helpFooterTrack": "Seguimiento",
+  "helpFooterStatistics": "Estadísticas",
+  "helpFooterFia": "Ciberdelitos FIA: 1991",
+  "helpFooterPolice": "Policía: 15",
+  "helpFooterWomen": "Línea de ayuda para mujeres: 1099"
+}

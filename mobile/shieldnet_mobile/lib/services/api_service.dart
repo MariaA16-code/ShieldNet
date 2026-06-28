@@ -1,6 +1,6 @@
 import 'dart:convert';
-import 'dart:io';
 import 'package:http/http.dart' as http;
+import '../widgets/image_upload_field.dart';
 
 class ApiService {
   static const String baseUrl = 'https://shieldnet-backend.onrender.com';
@@ -46,18 +46,49 @@ class ApiService {
     return _handleResponse(response);
   }
 
+  /// Sends both evidence images for AI analysis using in-memory bytes.
+  /// Uses [PickedFile] (bytes + name) instead of dart:io File so this
+  /// works on Flutter Web where File paths are always null.
   static Future<Map<String, dynamic>> analyzeReportImages({
     required int reportId,
-    required File originalImage,
-    required File fakeImage,
+    required PickedFile originalImage,
+    required PickedFile fakeImage,
   }) async {
     final uri = Uri.parse('$baseUrl/api/analyze/$reportId');
     final request = http.MultipartRequest('POST', uri);
     request.files.add(
-      await http.MultipartFile.fromPath('original', originalImage.path),
+      http.MultipartFile.fromBytes(
+        'original',
+        originalImage.bytes,
+        filename: originalImage.name,
+      ),
     );
     request.files.add(
-      await http.MultipartFile.fromPath('fake', fakeImage.path),
+      http.MultipartFile.fromBytes(
+        'fake',
+        fakeImage.bytes,
+        filename: fakeImage.name,
+      ),
+    );
+    final streamedResponse = await request.send().timeout(_timeout);
+    final response = await http.Response.fromStream(streamedResponse);
+    return _handleResponse(response);
+  }
+
+  /// Uploads a deepfake video as evidence against an existing report.
+  /// Uses [PickedFile] bytes so it works on Flutter Web.
+  static Future<Map<String, dynamic>> uploadReportVideo({
+    required int reportId,
+    required PickedFile video,
+  }) async {
+    final uri = Uri.parse('$baseUrl/api/analyze/$reportId');
+    final request = http.MultipartRequest('POST', uri);
+    request.files.add(
+      http.MultipartFile.fromBytes(
+        'video',
+        video.bytes,
+        filename: video.name,
+      ),
     );
     final streamedResponse = await request.send().timeout(_timeout);
     final response = await http.Response.fromStream(streamedResponse);
@@ -162,7 +193,7 @@ class ApiException implements Exception {
 class ShieldNetValues {
   static const List<String> categories = [
     'Fake / edited photo',
-    'Deepfake video',
+    'Deepfake video',   // lowercase v — matches _needsVideo in report_screen
     'Impersonation',
     'Sexual harassment',
     'Stalking',
@@ -182,7 +213,6 @@ class ShieldNetValues {
 
   static const List<String> imageBasedCategories = [
     'Fake / edited photo',
-    'Deepfake video',
   ];
 
   static const List<String> statusSteps = [

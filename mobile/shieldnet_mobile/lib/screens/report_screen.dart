@@ -1,4 +1,3 @@
-import 'dart:io';
 import 'package:flutter/material.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import '../services/api_service.dart';
@@ -21,27 +20,17 @@ class _ReportScreenState extends State<ReportScreen> {
   final _harasserProfileUrlController = TextEditingController();
   final _contactController = TextEditingController();
 
-  String? _country;
+  final String _country = 'Pakistan';
+
   String? _category;
   String? _platform;
 
-  File? _originalImage;
-  File? _fakeImage;
+  PickedFile? _originalImage;
+  PickedFile? _fakeImage;
+  PickedFile? _video;
 
   bool _submitting = false;
   String? _errorMessage;
-
-  static const List<String> _countries = [
-    'Pakistan',
-    'India',
-    'USA',
-    'UK',
-    'Canada',
-    'Australia',
-    'UAE',
-    'Saudi Arabia',
-    'Other',
-  ];
 
   @override
   void dispose() {
@@ -55,6 +44,8 @@ class _ReportScreenState extends State<ReportScreen> {
   bool get _needsImages =>
       _category != null && ShieldNetValues.imageBasedCategories.contains(_category);
 
+  bool get _needsVideo => _category == 'Deepfake video'; // fixed: lowercase v
+
   Future<void> _pickOriginal() async {
     final file = await pickImageFile();
     if (file != null) setState(() => _originalImage = file);
@@ -63,6 +54,11 @@ class _ReportScreenState extends State<ReportScreen> {
   Future<void> _pickFake() async {
     final file = await pickImageFile();
     if (file != null) setState(() => _fakeImage = file);
+  }
+
+  Future<void> _pickVideo() async {
+    final file = await pickVideoFile();
+    if (file != null) setState(() => _video = file);
   }
 
   Future<void> _saveTokenLocally(String token, int? reportId) async {
@@ -80,7 +76,7 @@ class _ReportScreenState extends State<ReportScreen> {
 
   Future<void> _submit() async {
     if (!_formKey.currentState!.validate()) return;
-    if (_country == null || _category == null || _platform == null) {
+    if (_category == null || _platform == null) {
       setState(() {
         _errorMessage = 'Please fill in all required fields above.';
       });
@@ -93,6 +89,12 @@ class _ReportScreenState extends State<ReportScreen> {
       });
       return;
     }
+    if (_needsVideo && _video == null) {
+      setState(() {
+        _errorMessage = 'Please upload the video for this category.';
+      });
+      return;
+    }
 
     setState(() {
       _submitting = true;
@@ -101,7 +103,7 @@ class _ReportScreenState extends State<ReportScreen> {
 
     try {
       final result = await ApiService.submitReport(
-        country: _country!,
+        country: _country,
         category: _category!,
         platform: _platform!,
         description: _descriptionController.text.trim(),
@@ -115,8 +117,6 @@ class _ReportScreenState extends State<ReportScreen> {
           ? result['report_id'] as int
           : int.tryParse(result['report_id']?.toString() ?? '');
 
-      // If this category needs evidence images, send them for AI
-      // analysis right after the report itself is created.
       if (_needsImages &&
           reportId != null &&
           _originalImage != null &&
@@ -127,11 +127,16 @@ class _ReportScreenState extends State<ReportScreen> {
             originalImage: _originalImage!,
             fakeImage: _fakeImage!,
           );
-        } catch (_) {
-          // The report itself already succeeded — image analysis
-          // failing shouldn't block the person from getting their
-          // token. Admin can still review evidence manually later.
-        }
+        } catch (_) {}
+      }
+
+      if (_needsVideo && reportId != null && _video != null) {
+        try {
+          await ApiService.uploadReportVideo(
+            reportId: reportId,
+            video: _video!,
+          );
+        } catch (_) {}
       }
 
       await _saveTokenLocally(token, reportId);
@@ -172,18 +177,25 @@ class _ReportScreenState extends State<ReportScreen> {
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.stretch,
               children: [
-                _buildDropdown(
-                  label: 'Country',
-                  value: _country,
-                  items: _countries,
-                  onChanged: (v) => setState(() => _country = v),
+                InputDecorator(
+                  decoration: const InputDecoration(labelText: 'Country'),
+                  child: Text(_country),
                 ),
                 const SizedBox(height: 16),
                 _buildDropdown(
                   label: 'Category',
                   value: _category,
                   items: ShieldNetValues.categories,
-                  onChanged: (v) => setState(() => _category = v),
+                  onChanged: (v) => setState(() {
+                    _category = v;
+                    if (!_needsImages) {
+                      _originalImage = null;
+                      _fakeImage = null;
+                    }
+                    if (!_needsVideo) {
+                      _video = null;
+                    }
+                  }),
                 ),
                 const SizedBox(height: 16),
                 _buildDropdown(
@@ -243,6 +255,20 @@ class _ReportScreenState extends State<ReportScreen> {
                     file: _fakeImage,
                     onPick: _pickFake,
                     onRemove: () => setState(() => _fakeImage = null),
+                  ),
+                ],
+                if (_needsVideo) ...[
+                  const SizedBox(height: 16),
+                  Text(
+                    'EVIDENCE (required for this category)',
+                    style: Theme.of(context).textTheme.labelSmall,
+                  ),
+                  const SizedBox(height: 10),
+                  ImageUploadField(
+                    label: 'Deepfake video',
+                    file: _video,
+                    onPick: _pickVideo,
+                    onRemove: () => setState(() => _video = null),
                   ),
                 ],
                 const SizedBox(height: 16),

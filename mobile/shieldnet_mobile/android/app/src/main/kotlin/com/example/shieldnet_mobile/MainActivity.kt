@@ -1,5 +1,6 @@
-package com.example.shieldnet_mobile
+﻿package com.example.shieldnet_mobile
 
 import io.flutter.embedding.android.FlutterActivity
 
-class MainActivity : FlutterActivity()
+class MainActivity : FlutterActivity() {
+}
