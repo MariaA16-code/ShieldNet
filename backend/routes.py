@@ -391,7 +391,7 @@ def send_dmca(report_id):
         'manipulation_score': evidence.manipulation_score if evidence else 'N/A',
         'verdict': evidence.verdict if evidence else 'N/A',
         'pixel_difference': evidence.pixel_difference if evidence else 'N/A',
-        'verdict': evidence.verdict if evidence else 'N/A',
+        
          # ── Harasser ──
         'harasser_username': harasser.username if harasser else 'Not provided',
         'harasser_platform': harasser.platform if harasser else 'N/A',
