@@ -1,6 +1,9 @@
+import 'dart:io';
 import 'package:flutter/material.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 import '../services/api_service.dart';
 import '../widgets/hero_section.dart';
+import '../widgets/image_upload_field.dart';
 import 'success_screen.dart';
 
 class ReportScreen extends StatefulWidget {
@@ -21,6 +24,9 @@ class _ReportScreenState extends State<ReportScreen> {
   String? _country;
   String? _category;
   String? _platform;
+
+  File? _originalImage;
+  File? _fakeImage;
 
   bool _submitting = false;
   String? _errorMessage;
@@ -49,11 +55,41 @@ class _ReportScreenState extends State<ReportScreen> {
   bool get _needsImages =>
       _category != null && ShieldNetValues.imageBasedCategories.contains(_category);
 
+  Future<void> _pickOriginal() async {
+    final file = await pickImageFile();
+    if (file != null) setState(() => _originalImage = file);
+  }
+
+  Future<void> _pickFake() async {
+    final file = await pickImageFile();
+    if (file != null) setState(() => _fakeImage = file);
+  }
+
+  Future<void> _saveTokenLocally(String token, int? reportId) async {
+    final prefs = await SharedPreferences.getInstance();
+    final existing = prefs.getStringList('saved_tokens') ?? [];
+    if (!existing.contains(token)) {
+      existing.add(token);
+      await prefs.setStringList('saved_tokens', existing);
+    }
+    await prefs.setString('last_token', token);
+    if (reportId != null) {
+      await prefs.setInt('last_report_id', reportId);
+    }
+  }
+
   Future<void> _submit() async {
     if (!_formKey.currentState!.validate()) return;
     if (_country == null || _category == null || _platform == null) {
       setState(() {
         _errorMessage = 'Please fill in all required fields above.';
+      });
+      return;
+    }
+    if (_needsImages && (_originalImage == null || _fakeImage == null)) {
+      setState(() {
+        _errorMessage =
+            'This category requires both the original and edited image.';
       });
       return;
     }
@@ -74,12 +110,37 @@ class _ReportScreenState extends State<ReportScreen> {
         contact: _contactController.text.trim(),
       );
 
+      final token = result['token']?.toString() ?? '';
+      final reportId = result['report_id'] is int
+          ? result['report_id'] as int
+          : int.tryParse(result['report_id']?.toString() ?? '');
+
+      // If this category needs evidence images, send them for AI
+      // analysis right after the report itself is created.
+      if (_needsImages &&
+          reportId != null &&
+          _originalImage != null &&
+          _fakeImage != null) {
+        try {
+          await ApiService.analyzeReportImages(
+            reportId: reportId,
+            originalImage: _originalImage!,
+            fakeImage: _fakeImage!,
+          );
+        } catch (_) {
+          // The report itself already succeeded — image analysis
+          // failing shouldn't block the person from getting their
+          // token. Admin can still review evidence manually later.
+        }
+      }
+
+      await _saveTokenLocally(token, reportId);
+
       if (!mounted) return;
 
-      final token = result['token']?.toString() ?? '';
       Navigator.of(context).push(
         MaterialPageRoute(
-          builder: (_) => SuccessScreen(token: token),
+          builder: (_) => SuccessScreen(token: token, reportId: reportId),
         ),
       );
     } catch (e) {
@@ -130,8 +191,7 @@ class _ReportScreenState extends State<ReportScreen> {
                   value: _platform,
                   items: ShieldNetValues.platforms,
                   onChanged: (v) => setState(() => _platform = v),
-                  displayLabel: (p) =>
-                      p[0].toUpperCase() + p.substring(1),
+                  displayLabel: (p) => p[0].toUpperCase() + p.substring(1),
                 ),
                 const SizedBox(height: 16),
                 TextFormField(
@@ -166,26 +226,23 @@ class _ReportScreenState extends State<ReportScreen> {
                 ),
                 if (_needsImages) ...[
                   const SizedBox(height: 16),
-                  Container(
-                    padding: const EdgeInsets.all(14),
-                    decoration: BoxDecoration(
-                      color: Theme.of(context).cardColor,
-                      borderRadius: BorderRadius.circular(12),
-                    ),
-                    child: Row(
-                      children: [
-                        const Icon(Icons.info_outline, size: 18),
-                        const SizedBox(width: 10),
-                        Expanded(
-                          child: Text(
-                            'This category needs both the original and the '
-                            'edited image. Image upload is coming in the '
-                            'next update.',
-                            style: Theme.of(context).textTheme.bodyMedium,
-                          ),
-                        ),
-                      ],
-                    ),
+                  Text(
+                    'EVIDENCE (required for this category)',
+                    style: Theme.of(context).textTheme.labelSmall,
+                  ),
+                  const SizedBox(height: 10),
+                  ImageUploadField(
+                    label: 'Original image',
+                    file: _originalImage,
+                    onPick: _pickOriginal,
+                    onRemove: () => setState(() => _originalImage = null),
+                  ),
+                  const SizedBox(height: 10),
+                  ImageUploadField(
+                    label: 'Edited / fake image',
+                    file: _fakeImage,
+                    onPick: _pickFake,
+                    onRemove: () => setState(() => _fakeImage = null),
                   ),
                 ],
                 const SizedBox(height: 16),
