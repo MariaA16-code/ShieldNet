@@ -38,6 +38,10 @@ mail.init_app(app)
 
 @app.route('/')
 def home():
+    try:
+        db.session.execute(db.text('SELECT 1'))
+    except:
+        pass
     return {"message": "ShieldNet backend is running ✅"}
 
 from models import Victim, Report, Evidence, Takedown, Harasser, Case
