@@ -43,30 +43,29 @@ class HelpScreen extends StatelessWidget {
       'a': 'If you are in immediate danger, contact local emergency '
           'services first. For cyber harassment specifically, you can '
           'call the FIA Cybercrime Helpline at 1991 — see the emergency '
-          'numbers above.',
+          'numbers below.',
     },
   ];
 
+  // Ambulance (1122) removed as requested
   static const List<_EmergencyContact> _emergencyContacts = [
     _EmergencyContact(
       label: 'FIA Cyber Crime Helpline',
       number: '1991',
       icon: Icons.shield_outlined,
+      color: Color(0xFF9B8CF5),
     ),
     _EmergencyContact(
       label: 'Police',
       number: '15',
       icon: Icons.local_police_outlined,
-    ),
-    _EmergencyContact(
-      label: 'Ambulance',
-      number: '1122',
-      icon: Icons.medical_services_outlined,
+      color: Color(0xFF4A7DFF),
     ),
     _EmergencyContact(
       label: 'Women Helpline',
       number: '1099',
       icon: Icons.support_outlined,
+      color: Color(0xFFFF6B6B),
     ),
   ];
 
@@ -123,35 +122,34 @@ class HelpScreen extends StatelessWidget {
           eyebrow: 'Support',
           headline: 'Help & FAQ',
           subtitle:
-              'Answers to common questions about using ShieldNet. If you '
-              'don\'t see what you\'re looking for, you can reach out at '
-              'the bottom of this page.',
+              'Answers to common questions about using ShieldNet. '
+              'If you don\'t see what you\'re looking for, '
+              'you can reach out at the bottom of this page.',
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.stretch,
             children: [
-              _EmergencyCard(
-                contacts: _emergencyContacts,
-                onCall: (number) => _callNumber(context, number),
-              ),
-              const SizedBox(height: 24),
-              Text(
-                'FREQUENTLY ASKED QUESTIONS',
-                style: GoogleFonts.inter(
-                  color: AppTheme.textSecondary,
-                  fontSize: 12,
-                  fontWeight: FontWeight.w600,
-                  letterSpacing: 1.2,
-                ),
+              // ── FAQ section ──────────────────────────────────────
+              _SectionHeader(
+                icon: Icons.help_outline_rounded,
+                label: 'FREQUENTLY ASKED QUESTIONS',
               ),
               const SizedBox(height: 12),
               ..._faqs.map((faq) => _FaqTile(
                     question: faq['q']!,
                     answer: faq['a']!,
                   )),
-              const SizedBox(height: 12),
-              _SupportCard(onEmailTap: () => _launchEmail(context)),
               const SizedBox(height: 24),
-              const _HelpFooter(),
+
+              // ── Still stuck card ─────────────────────────────────
+              _SupportCard(onEmailTap: () => _launchEmail(context)),
+              const SizedBox(height: 28),
+
+              // ── Emergency contacts (moved to bottom) ─────────────
+              _EmergencySection(
+                contacts: _emergencyContacts,
+                onCall: (number) => _callNumber(context, number),
+              ),
+              const SizedBox(height: 24),
             ],
           ),
         ),
@@ -160,150 +158,49 @@ class HelpScreen extends StatelessWidget {
   }
 }
 
+// ── Data class ────────────────────────────────────────────────────────────────
 class _EmergencyContact {
   final String label;
   final String number;
   final IconData icon;
+  final Color color;
 
   const _EmergencyContact({
     required this.label,
     required this.number,
     required this.icon,
+    required this.color,
   });
 }
 
-class _EmergencyCard extends StatelessWidget {
-  final List<_EmergencyContact> contacts;
-  final void Function(String number) onCall;
+// ── Section header ────────────────────────────────────────────────────────────
+class _SectionHeader extends StatelessWidget {
+  final IconData icon;
+  final String label;
 
-  const _EmergencyCard({required this.contacts, required this.onCall});
-
-  @override
-  Widget build(BuildContext context) {
-    return Container(
-      padding: const EdgeInsets.all(18),
-      decoration: BoxDecoration(
-        color: AppTheme.error.withValues(alpha: 0.08),
-        borderRadius: BorderRadius.circular(18),
-        border: Border.all(color: AppTheme.error.withValues(alpha: 0.35)),
-      ),
-      child: Column(
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: [
-          Row(
-            children: [
-              Icon(Icons.warning_amber_rounded,
-                  color: AppTheme.error, size: 20),
-              const SizedBox(width: 8),
-              Text(
-                'Need Immediate Help?',
-                style: GoogleFonts.lexend(
-                  color: AppTheme.textPrimary,
-                  fontSize: 16,
-                  fontWeight: FontWeight.w600,
-                ),
-              ),
-            ],
-          ),
-          const SizedBox(height: 4),
-          Text(
-            'If you are in immediate danger, contact emergency services '
-            'directly — tap any number below to call.',
-            style: GoogleFonts.inter(
-              color: AppTheme.textSecondary,
-              fontSize: 13,
-              height: 1.4,
-            ),
-          ),
-          const SizedBox(height: 16),
-          for (var i = 0; i < contacts.length; i += 2)
-            Padding(
-              padding: EdgeInsets.only(
-                bottom: i + 2 < contacts.length ? 10 : 0,
-              ),
-              child: Row(
-                children: [
-                  Expanded(
-                    child: _EmergencyTile(
-                      contact: contacts[i],
-                      onTap: () => onCall(contacts[i].number),
-                    ),
-                  ),
-                  if (i + 1 < contacts.length) ...[
-                    const SizedBox(width: 10),
-                    Expanded(
-                      child: _EmergencyTile(
-                        contact: contacts[i + 1],
-                        onTap: () => onCall(contacts[i + 1].number),
-                      ),
-                    ),
-                  ],
-                ],
-              ),
-            ),
-        ],
-      ),
-    );
-  }
-}
-
-class _EmergencyTile extends StatelessWidget {
-  final _EmergencyContact contact;
-  final VoidCallback onTap;
-
-  const _EmergencyTile({required this.contact, required this.onTap});
+  const _SectionHeader({required this.icon, required this.label});
 
   @override
   Widget build(BuildContext context) {
-    return Material(
-      color: Colors.transparent,
-      child: InkWell(
-        onTap: onTap,
-        borderRadius: BorderRadius.circular(14),
-        child: Container(
-          padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 12),
-          decoration: BoxDecoration(
-            color: AppTheme.cardColor,
-            borderRadius: BorderRadius.circular(14),
-            border: Border.all(color: AppTheme.border),
-          ),
-          child: Row(
-            children: [
-              Icon(contact.icon, color: AppTheme.error, size: 18),
-              const SizedBox(width: 10),
-              Expanded(
-                child: Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: [
-                    Text(
-                      contact.label,
-                      maxLines: 1,
-                      overflow: TextOverflow.ellipsis,
-                      style: GoogleFonts.inter(
-                        color: AppTheme.textSecondary,
-                        fontSize: 11,
-                      ),
-                    ),
-                    Text(
-                      contact.number,
-                      style: GoogleFonts.lexend(
-                        color: AppTheme.textPrimary,
-                        fontSize: 16,
-                        fontWeight: FontWeight.w700,
-                      ),
-                    ),
-                  ],
-                ),
-              ),
-              Icon(Icons.call, color: AppTheme.success, size: 16),
-            ],
+    return Row(
+      children: [
+        Icon(icon, color: AppTheme.purple, size: 14),
+        const SizedBox(width: 8),
+        Text(
+          label,
+          style: GoogleFonts.inter(
+            color: AppTheme.textSecondary,
+            fontSize: 11,
+            fontWeight: FontWeight.w600,
+            letterSpacing: 1.2,
           ),
         ),
-      ),
+      ],
     );
   }
 }
 
+// ── FAQ tile ──────────────────────────────────────────────────────────────────
 class _FaqTile extends StatefulWidget {
   final String question;
   final String answer;
@@ -320,15 +217,24 @@ class _FaqTileState extends State<_FaqTile> {
   @override
   Widget build(BuildContext context) {
     return Container(
-      margin: const EdgeInsets.only(bottom: 12),
+      margin: const EdgeInsets.only(bottom: 10),
       decoration: BoxDecoration(
         color: AppTheme.cardColor,
         borderRadius: BorderRadius.circular(14),
         border: Border.all(
           color: _expanded
-              ? AppTheme.purple.withValues(alpha: 0.4)
+              ? AppTheme.purple.withValues(alpha: 0.45)
               : AppTheme.border,
         ),
+        boxShadow: _expanded
+            ? [
+                BoxShadow(
+                  color: AppTheme.purple.withValues(alpha: 0.06),
+                  blurRadius: 12,
+                  offset: const Offset(0, 4),
+                ),
+              ]
+            : null,
       ),
       child: Column(
         children: [
@@ -343,19 +249,38 @@ class _FaqTileState extends State<_FaqTile> {
                     child: Text(
                       widget.question,
                       style: GoogleFonts.inter(
-                        color: AppTheme.textPrimary,
-                        fontSize: 14.5,
+                        color: _expanded
+                            ? AppTheme.textPrimary
+                            : AppTheme.textPrimary,
+                        fontSize: 14,
                         fontWeight: FontWeight.w600,
                         height: 1.4,
                       ),
                     ),
                   ),
-                  const SizedBox(width: 8),
-                  AnimatedRotation(
-                    turns: _expanded ? 0.125 : 0,
+                  const SizedBox(width: 12),
+                  AnimatedContainer(
                     duration: const Duration(milliseconds: 220),
-                    curve: Curves.easeOut,
-                    child: Icon(Icons.add, color: AppTheme.purple, size: 22),
+                    width: 28,
+                    height: 28,
+                    decoration: BoxDecoration(
+                      color: _expanded
+                          ? AppTheme.purple.withValues(alpha: 0.15)
+                          : AppTheme.border.withValues(alpha: 0.5),
+                      borderRadius: BorderRadius.circular(8),
+                    ),
+                    child: AnimatedRotation(
+                      turns: _expanded ? 0.125 : 0,
+                      duration: const Duration(milliseconds: 220),
+                      curve: Curves.easeOut,
+                      child: Icon(
+                        Icons.add,
+                        color: _expanded
+                            ? AppTheme.purple
+                            : AppTheme.textSecondary,
+                        size: 18,
+                      ),
+                    ),
                   ),
                 ],
               ),
@@ -366,18 +291,27 @@ class _FaqTileState extends State<_FaqTile> {
             curve: Curves.easeOut,
             alignment: Alignment.topCenter,
             child: _expanded
-                ? Padding(
+                ? Container(
+                    width: double.infinity,
                     padding: const EdgeInsets.fromLTRB(16, 0, 16, 16),
-                    child: Align(
-                      alignment: Alignment.centerLeft,
-                      child: Text(
-                        widget.answer,
-                        style: GoogleFonts.inter(
-                          color: AppTheme.textSecondary,
-                          fontSize: 13.5,
-                          height: 1.55,
+                    child: Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        Divider(
+                          color: AppTheme.border,
+                          height: 1,
+                          thickness: 1,
                         ),
-                      ),
+                        const SizedBox(height: 12),
+                        Text(
+                          widget.answer,
+                          style: GoogleFonts.inter(
+                            color: AppTheme.textSecondary,
+                            fontSize: 13.5,
+                            height: 1.6,
+                          ),
+                        ),
+                      ],
                     ),
                   )
                 : const SizedBox(width: double.infinity, height: 0),
@@ -388,6 +322,7 @@ class _FaqTileState extends State<_FaqTile> {
   }
 }
 
+// ── Support card ──────────────────────────────────────────────────────────────
 class _SupportCard extends StatelessWidget {
   final VoidCallback onEmailTap;
 
@@ -398,38 +333,75 @@ class _SupportCard extends StatelessWidget {
     return Container(
       padding: const EdgeInsets.all(20),
       decoration: BoxDecoration(
-        color: AppTheme.purple.withValues(alpha: 0.08),
-        borderRadius: BorderRadius.circular(18),
-        border: Border.all(color: AppTheme.purple.withValues(alpha: 0.25)),
+        color: AppTheme.purple.withValues(alpha: 0.07),
+        borderRadius: BorderRadius.circular(16),
+        border: Border.all(
+            color: AppTheme.purple.withValues(alpha: 0.22)),
       ),
-      child: Column(
+      child: Row(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          Text(
-            'Still stuck?',
-            style: GoogleFonts.lexend(
-              color: AppTheme.textPrimary,
-              fontSize: 18,
-              fontWeight: FontWeight.w600,
+          Container(
+            width: 40,
+            height: 40,
+            decoration: BoxDecoration(
+              color: AppTheme.purple.withValues(alpha: 0.15),
+              borderRadius: BorderRadius.circular(10),
             ),
+            child: const Icon(Icons.mail_outline_rounded,
+                color: AppTheme.purple, size: 20),
           ),
-          const SizedBox(height: 8),
-          Text(
-            'If your question wasn\'t answered above, you can email us '
-            'directly and we\'ll do our best to help.',
-            style: GoogleFonts.inter(
-              color: AppTheme.textSecondary,
-              fontSize: 13.5,
-              height: 1.5,
-            ),
-          ),
-          const SizedBox(height: 16),
-          SizedBox(
-            width: double.infinity,
-            child: ElevatedButton.icon(
-              onPressed: onEmailTap,
-              icon: const Icon(Icons.mail_outline, size: 18),
-              label: const Text('Email Support'),
+          const SizedBox(width: 14),
+          Expanded(
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                Text(
+                  'Still stuck?',
+                  style: GoogleFonts.lexend(
+                    color: AppTheme.textPrimary,
+                    fontSize: 15,
+                    fontWeight: FontWeight.w600,
+                  ),
+                ),
+                const SizedBox(height: 4),
+                Text(
+                  'Email us and we\'ll do our best to help.',
+                  style: GoogleFonts.inter(
+                    color: AppTheme.textSecondary,
+                    fontSize: 13,
+                    height: 1.4,
+                  ),
+                ),
+                const SizedBox(height: 12),
+                GestureDetector(
+                  onTap: onEmailTap,
+                  child: Container(
+                    padding: const EdgeInsets.symmetric(
+                        horizontal: 16, vertical: 10),
+                    decoration: BoxDecoration(
+                      gradient: AppTheme.accentGradient,
+                      borderRadius: BorderRadius.circular(10),
+                    ),
+                    child: Row(
+                      mainAxisSize: MainAxisSize.min,
+                      children: [
+                        const Icon(Icons.mail_outline,
+                            color: Colors.white, size: 15),
+                        const SizedBox(width: 8),
+                        Text(
+                          'Email Support',
+                          style: GoogleFonts.inter(
+                            color: Colors.white,
+                            fontSize: 13,
+                            fontWeight: FontWeight.w600,
+                          ),
+                        ),
+                      ],
+                    ),
+                  ),
+                ),
+              ],
             ),
           ),
         ],
@@ -438,117 +410,156 @@ class _SupportCard extends StatelessWidget {
   }
 }
 
-class _HelpFooter extends StatelessWidget {
-  const _HelpFooter();
+// ── Emergency section (moved to bottom) ──────────────────────────────────────
+class _EmergencySection extends StatelessWidget {
+  final List<_EmergencyContact> contacts;
+  final void Function(String number) onCall;
+
+  const _EmergencySection({
+    required this.contacts,
+    required this.onCall,
+  });
 
   @override
   Widget build(BuildContext context) {
     return Container(
-      padding: const EdgeInsets.fromLTRB(4, 20, 4, 8),
+      padding: const EdgeInsets.all(20),
       decoration: BoxDecoration(
-        border: Border(top: BorderSide(color: AppTheme.border)),
+        color: AppTheme.error.withValues(alpha: 0.06),
+        borderRadius: BorderRadius.circular(16),
+        border:
+            Border.all(color: AppTheme.error.withValues(alpha: 0.28)),
       ),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
+          // Header
           Row(
             children: [
               Container(
-                width: 8,
-                height: 8,
+                width: 36,
+                height: 36,
                 decoration: BoxDecoration(
-                  color: AppTheme.success,
-                  shape: BoxShape.circle,
-                  boxShadow: [
-                    BoxShadow(
-                      color: AppTheme.success.withValues(alpha: 0.6),
-                      blurRadius: 6,
-                      spreadRadius: 1,
+                  color: AppTheme.error.withValues(alpha: 0.12),
+                  borderRadius: BorderRadius.circular(9),
+                ),
+                child: Icon(Icons.warning_amber_rounded,
+                    color: AppTheme.error, size: 18),
+              ),
+              const SizedBox(width: 12),
+              Expanded(
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    Text(
+                      'Need Immediate Help?',
+                      style: GoogleFonts.lexend(
+                        color: AppTheme.textPrimary,
+                        fontSize: 15,
+                        fontWeight: FontWeight.w600,
+                      ),
+                    ),
+                    Text(
+                      'Tap any number below to call directly.',
+                      style: GoogleFonts.inter(
+                        color: AppTheme.textSecondary,
+                        fontSize: 12,
+                        height: 1.3,
+                      ),
                     ),
                   ],
                 ),
               ),
-              const SizedBox(width: 8),
-              Text(
-                'ShieldNet',
-                style: GoogleFonts.lexend(
-                  color: AppTheme.textPrimary,
-                  fontSize: 16,
-                  fontWeight: FontWeight.w600,
-                ),
-              ),
             ],
           ),
-          const SizedBox(height: 6),
-          Text(
-            'Protecting victims. Exposing abusers. Connecting the world.',
-            style: GoogleFonts.inter(
-              color: AppTheme.textSecondary,
-              fontSize: 12.5,
-              height: 1.4,
-            ),
-          ),
-          const SizedBox(height: 20),
-          Row(
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: [
-              Expanded(
-                child: _FooterColumn(
-                  title: 'PLATFORM',
-                  items: const ['Report', 'Track', 'Statistics'],
+          const SizedBox(height: 16),
+          // Contact tiles — vertical list for 3 items
+          ...contacts.map((contact) => Padding(
+                padding: const EdgeInsets.only(bottom: 10),
+                child: _EmergencyTile(
+                  contact: contact,
+                  onTap: () => onCall(contact.number),
                 ),
-              ),
-              Expanded(
-                child: _FooterColumn(
-                  title: 'EMERGENCY RESOURCES',
-                  items: const [
-                    'FIA Cyber Crime: 1991',
-                    'Police: 15',
-                    'Women Helpline: 1099',
-                  ],
-                ),
-              ),
-            ],
-          ),
+              )),
         ],
       ),
     );
   }
 }
 
-class _FooterColumn extends StatelessWidget {
-  final String title;
-  final List<String> items;
+// ── Emergency tile ────────────────────────────────────────────────────────────
+class _EmergencyTile extends StatelessWidget {
+  final _EmergencyContact contact;
+  final VoidCallback onTap;
 
-  const _FooterColumn({required this.title, required this.items});
+  const _EmergencyTile({required this.contact, required this.onTap});
 
   @override
   Widget build(BuildContext context) {
-    return Column(
-      crossAxisAlignment: CrossAxisAlignment.start,
-      children: [
-        Text(
-          title,
-          style: GoogleFonts.inter(
-            color: AppTheme.textSecondary,
-            fontSize: 11,
-            fontWeight: FontWeight.w600,
-            letterSpacing: 1,
+    return Material(
+      color: Colors.transparent,
+      child: InkWell(
+        onTap: onTap,
+        borderRadius: BorderRadius.circular(12),
+        child: Container(
+          padding:
+              const EdgeInsets.symmetric(horizontal: 14, vertical: 12),
+          decoration: BoxDecoration(
+            color: AppTheme.cardColor,
+            borderRadius: BorderRadius.circular(12),
+            border: Border.all(color: AppTheme.border),
+          ),
+          child: Row(
+            children: [
+              Container(
+                width: 36,
+                height: 36,
+                decoration: BoxDecoration(
+                  color: contact.color.withValues(alpha: 0.12),
+                  borderRadius: BorderRadius.circular(9),
+                ),
+                child: Icon(contact.icon,
+                    color: contact.color, size: 18),
+              ),
+              const SizedBox(width: 12),
+              Expanded(
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    Text(
+                      contact.label,
+                      style: GoogleFonts.inter(
+                        color: AppTheme.textSecondary,
+                        fontSize: 11,
+                        fontWeight: FontWeight.w500,
+                      ),
+                    ),
+                    const SizedBox(height: 1),
+                    Text(
+                      contact.number,
+                      style: GoogleFonts.lexend(
+                        color: AppTheme.textPrimary,
+                        fontSize: 18,
+                        fontWeight: FontWeight.w700,
+                      ),
+                    ),
+                  ],
+                ),
+              ),
+              Container(
+                width: 36,
+                height: 36,
+                decoration: BoxDecoration(
+                  color: AppTheme.success.withValues(alpha: 0.12),
+                  borderRadius: BorderRadius.circular(9),
+                ),
+                child: Icon(Icons.call_rounded,
+                    color: AppTheme.success, size: 18),
+              ),
+            ],
           ),
         ),
-        const SizedBox(height: 10),
-        for (final item in items)
-          Padding(
-            padding: const EdgeInsets.only(bottom: 8),
-            child: Text(
-              item,
-              style: GoogleFonts.inter(
-                color: AppTheme.textSecondary,
-                fontSize: 12.5,
-              ),
-            ),
-          ),
-      ],
+      ),
     );
   }
 }

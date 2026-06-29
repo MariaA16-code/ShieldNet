@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
 import '../theme.dart';
 import '../widgets/need_help_card.dart';
+import '../widgets/scan_grid_background.dart';
 
 class HomeScreen extends StatefulWidget {
   final void Function(int)? onNavigate;
@@ -65,7 +66,6 @@ class _HomeScreenState extends State<HomeScreen>
         titleSpacing: 20,
         title: Row(
           children: [
-            // Shield logo
             Container(
               width: 34,
               height: 34,
@@ -108,12 +108,6 @@ class _HomeScreenState extends State<HomeScreen>
             ),
           ],
         ),
-        actions: [
-          Padding(
-            padding: const EdgeInsets.only(right: 16),
-            child: _LanguageSelector(onTap: () {}),
-          ),
-        ],
       ),
       body: RefreshIndicator(
         onRefresh: _onRefresh,
@@ -128,39 +122,31 @@ class _HomeScreenState extends State<HomeScreen>
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.stretch,
                 children: [
-                  // ── Hero section with Earth background ──────────────
+                  // ── Scan-grid hero ──────────────────────────────────
                   SizedBox(
                     height: screenHeight * 0.62,
                     child: Stack(
                       fit: StackFit.expand,
                       children: [
-                        // Earth background image
-                        Image.asset(
-                          'assets/images/earth_bg.jpg',
-                          fit: BoxFit.cover,
-                          alignment: Alignment.topCenter,
-                          errorBuilder: (_, _, _) => Container(
-                            color: const Color(0xFF0A0E16),
-                          ),
-                        ),
+                        // New signature background — replaces the
+                        // never-confirmed earth_bg.jpg asset.
+                        ScanGridBackground(height: screenHeight * 0.62),
 
-                        // Dark gradient overlay — top & bottom fade
                         Container(
                           decoration: const BoxDecoration(
                             gradient: LinearGradient(
                               begin: Alignment.topCenter,
                               end: Alignment.bottomCenter,
                               colors: [
-                                Color(0xCC0A0E16),
-                                Color(0x1A9B8CF5),
-                                Color(0xFF0A0E16),
+                                Color(0x000A0E16),
+                                Color(0x1A00D4FF),
+                                Color(0xFF040D12),
                               ],
                               stops: [0.0, 0.5, 1.0],
                             ),
                           ),
                         ),
-
-                        // Purple glow behind shield
+                        // Glow behind shield
                         Positioned(
                           top: screenHeight * 0.12,
                           left: 0,
@@ -183,18 +169,14 @@ class _HomeScreenState extends State<HomeScreen>
                             ),
                           ),
                         ),
-
-                        // Glowing shield icon
+                        // Glowing shield
                         Positioned(
                           top: screenHeight * 0.10,
                           left: 0,
                           right: 0,
-                          child: Center(
-                            child: _GlowingShield(),
-                          ),
+                          child: const Center(child: _GlowingShield()),
                         ),
-
-                        // Hero text — bottom of the hero area
+                        // Hero text
                         Positioned(
                           bottom: 32,
                           left: 24,
@@ -255,13 +237,12 @@ class _HomeScreenState extends State<HomeScreen>
                     ),
                   ),
 
-                  // ── Action cards ─────────────────────────────────────
+                  // ── Action cards ──────────────────────────────────
                   Padding(
                     padding: const EdgeInsets.fromLTRB(20, 4, 20, 8),
                     child: Column(
                       crossAxisAlignment: CrossAxisAlignment.stretch,
                       children: [
-                        // Report an Incident — primary action card
                         _ActionCard(
                           icon: Icons.edit_document,
                           iconColor: AppTheme.purple,
@@ -272,8 +253,6 @@ class _HomeScreenState extends State<HomeScreen>
                               widget.onNavigate?.call(_reportTabIndex),
                         ),
                         const SizedBox(height: 12),
-
-                        // Need help card (existing widget — untouched)
                         NeedHelpCard(
                           onTap: () =>
                               widget.onNavigate?.call(_helpTabIndex),
@@ -292,8 +271,10 @@ class _HomeScreenState extends State<HomeScreen>
   }
 }
 
-// ── Glowing Shield ────────────────────────────────────────────────────────────
+// ── Glowing Shield ─────────────────────────────────────────────────────────────
 class _GlowingShield extends StatefulWidget {
+  const _GlowingShield();
+
   @override
   State<_GlowingShield> createState() => _GlowingShieldState();
 }
@@ -311,7 +292,8 @@ class _GlowingShieldState extends State<_GlowingShield>
       duration: const Duration(milliseconds: 2200),
     )..repeat(reverse: true);
     _pulse = Tween<double>(begin: 0.85, end: 1.0).animate(
-      CurvedAnimation(parent: _pulseController, curve: Curves.easeInOut),
+      CurvedAnimation(
+          parent: _pulseController, curve: Curves.easeInOut),
     );
   }
 
@@ -333,9 +315,10 @@ class _GlowingShieldState extends State<_GlowingShield>
             shape: BoxShape.circle,
             boxShadow: [
               BoxShadow(
-                color: AppTheme.purple.withValues(alpha: 0.5 * _pulse.value),
-                blurRadius: 40 * _pulse.value,
-                spreadRadius: 8 * _pulse.value,
+                color: AppTheme.purple
+                    .withValues(alpha: 0.5 * _pulse.value),
+                blurRadius: 40.0 * _pulse.value,
+                spreadRadius: 8.0 * _pulse.value,
               ),
             ],
           ),
@@ -363,7 +346,7 @@ class _GlowingShieldState extends State<_GlowingShield>
   }
 }
 
-// ── Action Card ───────────────────────────────────────────────────────────────
+// ── Action Card ────────────────────────────────────────────────────────────────
 class _ActionCard extends StatelessWidget {
   final IconData icon;
   final Color iconColor;
@@ -392,108 +375,85 @@ class _ActionCard extends StatelessWidget {
             color: AppTheme.cardColor,
             borderRadius: BorderRadius.circular(18),
             border: Border.all(
-                color: iconColor.withValues(alpha: 0.25)),
+              color: AppTheme.border,
+              width: 1,
+            ),
             boxShadow: [
               BoxShadow(
-                color: iconColor.withValues(alpha: 0.08),
-                blurRadius: 16,
-                offset: const Offset(0, 4),
+                color: iconColor.withValues(alpha: 0.10),
+                blurRadius: 18,
+                offset: const Offset(0, 6),
               ),
             ],
           ),
-          child: Row(
+          child: Stack(
             children: [
-              Container(
-                width: 52,
-                height: 52,
-                decoration: BoxDecoration(
-                  shape: BoxShape.circle,
-                  color: iconColor.withValues(alpha: 0.15),
+              // Faint top inner highlight — fakes glass catching light
+              Positioned(
+                top: 0,
+                left: 16,
+                right: 16,
+                child: Container(
+                  height: 1,
+                  color: Colors.white.withValues(alpha: 0.05),
                 ),
-                child: Icon(icon, color: iconColor, size: 24),
               ),
-              const SizedBox(width: 16),
-              Expanded(
-                child: Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: [
-                    Text(
-                      title,
-                      style: GoogleFonts.lexend(
-                        color: AppTheme.textPrimary,
-                        fontSize: 16,
-                        fontWeight: FontWeight.w600,
-                      ),
+              Row(
+                children: [
+                  Container(
+                    width: 52,
+                    height: 52,
+                    decoration: BoxDecoration(
+                      shape: BoxShape.circle,
+                      color: iconColor.withValues(alpha: 0.15),
+                      boxShadow: [
+                        BoxShadow(
+                          color: iconColor.withValues(alpha: 0.25),
+                          blurRadius: 14,
+                          spreadRadius: 0,
+                        ),
+                      ],
                     ),
-                    const SizedBox(height: 4),
-                    Text(
-                      subtitle,
-                      style: GoogleFonts.inter(
-                        color: AppTheme.textSecondary,
-                        fontSize: 13,
-                        height: 1.4,
-                      ),
+                    child: Icon(icon, color: iconColor, size: 24),
+                  ),
+                  const SizedBox(width: 16),
+                  Expanded(
+                    child: Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        Text(
+                          title,
+                          style: GoogleFonts.lexend(
+                            color: AppTheme.textPrimary,
+                            fontSize: 16,
+                            fontWeight: FontWeight.w600,
+                          ),
+                        ),
+                        const SizedBox(height: 4),
+                        Text(
+                          subtitle,
+                          style: GoogleFonts.inter(
+                            color: AppTheme.textSecondary,
+                            fontSize: 13,
+                            height: 1.4,
+                          ),
+                        ),
+                      ],
                     ),
-                  ],
-                ),
+                  ),
+                  const SizedBox(width: 8),
+                  Container(
+                    width: 32,
+                    height: 32,
+                    decoration: BoxDecoration(
+                      shape: BoxShape.circle,
+                      color: iconColor.withValues(alpha: 0.1),
+                    ),
+                    child: Icon(Icons.chevron_right,
+                        color: iconColor, size: 20),
+                  ),
+                ],
               ),
-              const SizedBox(width: 8),
-              Container(
-                width: 32,
-                height: 32,
-                decoration: BoxDecoration(
-                  shape: BoxShape.circle,
-                  color: iconColor.withValues(alpha: 0.1),
-                ),
-                child: Icon(Icons.chevron_right,
-                    color: iconColor, size: 20),
-              ),
-            ],
-          ),
-        ),
-      ),
-    );
-  }
-}
-
-// ── Language Selector ─────────────────────────────────────────────────────────
-class _LanguageSelector extends StatelessWidget {
-  final VoidCallback onTap;
-
-  const _LanguageSelector({required this.onTap});
-
-  @override
-  Widget build(BuildContext context) {
-    return Material(
-      color: Colors.transparent,
-      child: InkWell(
-        onTap: onTap,
-        borderRadius: BorderRadius.circular(20),
-        child: Container(
-          padding:
-              const EdgeInsets.symmetric(horizontal: 12, vertical: 7),
-          decoration: BoxDecoration(
-            borderRadius: BorderRadius.circular(20),
-            border: Border.all(
-                color: AppTheme.purple.withValues(alpha: 0.5)),
-            color: AppTheme.purple.withValues(alpha: 0.08),
-          ),
-          child: Row(
-            mainAxisSize: MainAxisSize.min,
-            children: [
-              Icon(Icons.language, size: 15, color: AppTheme.purple),
-              const SizedBox(width: 5),
-              Text(
-                'EN',
-                style: GoogleFonts.inter(
-                  color: AppTheme.textPrimary,
-                  fontSize: 13,
-                  fontWeight: FontWeight.w600,
-                ),
-              ),
-              const SizedBox(width: 2),
-              Icon(Icons.keyboard_arrow_down,
-                  size: 15, color: AppTheme.textSecondary),
             ],
           ),
         ),

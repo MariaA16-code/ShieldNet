@@ -28,9 +28,6 @@ environment:
 # the latest version available on pub.dev. To see which dependencies have newer
 # versions available, run `flutter pub outdated`.
 dependencies:
-  flutter_localizations:
-    sdk: flutter
-  intl: any
 
   flutter:
     sdk: flutter
@@ -67,7 +64,6 @@ flutter:
   # The following line ensures that the Material Icons font is
   # included with your application, so that you can use the icons in
   # the material Icons class.
-  generate: true
   uses-material-design: true
  
   assets:

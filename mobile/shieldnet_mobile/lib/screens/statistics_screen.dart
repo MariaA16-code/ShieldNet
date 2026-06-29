@@ -1,8 +1,9 @@
+import 'dart:convert';
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:fl_chart/fl_chart.dart';
+import 'package:http/http.dart' as http;
 import '../theme.dart';
-import '../services/api_service.dart';
 
 class StatisticsScreen extends StatefulWidget {
   const StatisticsScreen({super.key});
@@ -21,7 +22,6 @@ class _StatisticsScreenState extends State<StatisticsScreen>
   late Animation<double> _fadeAnim;
   late Animation<double> _countAnim;
 
-  // Full display names for platforms
   static const Map<String, String> _platformNames = {
     'facebook': 'Facebook',
     'instagram': 'Instagram',
@@ -66,23 +66,48 @@ class _StatisticsScreenState extends State<StatisticsScreen>
     super.dispose();
   }
 
+  // Direct HTTP call — bypasses ApiService to get the real error
   Future<void> _loadStats() async {
     setState(() {
       _loading = true;
       _error = null;
     });
     try {
-      final data = await ApiService.getStats();
-      setState(() {
-        _stats = data;
-        _loading = false;
-      });
-      _animController.forward(from: 0);
+      final uri = Uri.parse(
+          'https://shieldnet-backend.onrender.com/api/stats');
+      final response = await http
+          .get(uri, headers: {
+            'Accept': 'application/json',
+            'Content-Type': 'application/json',
+          })
+          .timeout(const Duration(seconds: 90));
+
+      if (response.statusCode == 200) {
+        final data =
+            jsonDecode(response.body) as Map<String, dynamic>;
+        if (mounted) {
+          setState(() {
+            _stats = data;
+            _loading = false;
+          });
+          _animController.forward(from: 0);
+        }
+      } else {
+        if (mounted) {
+          setState(() {
+            _error =
+                'Server error ${response.statusCode}:\n${response.body}';
+            _loading = false;
+          });
+        }
+      }
     } catch (e) {
-      setState(() {
-        _error = 'Could not load statistics. Please try again.';
-        _loading = false;
-      });
+      if (mounted) {
+        setState(() {
+          _error = 'Error: ${e.toString()}';
+          _loading = false;
+        });
+      }
     }
   }
 
@@ -159,7 +184,8 @@ class _StatisticsScreenState extends State<StatisticsScreen>
               child: CircularProgressIndicator(
                 color: AppTheme.purple,
                 strokeWidth: 2.5,
-                backgroundColor: AppTheme.purple.withValues(alpha: 0.15),
+                backgroundColor:
+                    AppTheme.purple.withValues(alpha: 0.15),
               ),
             ),
             const SizedBox(height: 16),
@@ -167,6 +193,13 @@ class _StatisticsScreenState extends State<StatisticsScreen>
               'Loading statistics...',
               style: GoogleFonts.inter(
                   color: AppTheme.textSecondary, fontSize: 13),
+            ),
+            const SizedBox(height: 8),
+            Text(
+              'Server may take up to 60s to wake up',
+              style: GoogleFonts.inter(
+                  color: AppTheme.textSecondary.withValues(alpha: 0.5),
+                  fontSize: 11),
             ),
           ],
         ),
@@ -191,7 +224,7 @@ class _StatisticsScreenState extends State<StatisticsScreen>
               ),
               const SizedBox(height: 20),
               Text(
-                'No Connection',
+                'Could Not Load Stats',
                 style: GoogleFonts.lexend(
                   color: AppTheme.textPrimary,
                   fontSize: 18,
@@ -199,13 +232,22 @@ class _StatisticsScreenState extends State<StatisticsScreen>
                 ),
               ),
               const SizedBox(height: 8),
-              Text(
-                _error!,
-                textAlign: TextAlign.center,
-                style: GoogleFonts.inter(
-                    color: AppTheme.textSecondary,
-                    fontSize: 13,
-                    height: 1.5),
+              Container(
+                padding: const EdgeInsets.all(12),
+                decoration: BoxDecoration(
+                  color: AppTheme.cardColor,
+                  borderRadius: BorderRadius.circular(8),
+                  border: Border.all(color: AppTheme.border),
+                ),
+                child: Text(
+                  _error!,
+                  textAlign: TextAlign.center,
+                  style: GoogleFonts.jetBrainsMono(
+                    color: AppTheme.error,
+                    fontSize: 11,
+                    height: 1.5,
+                  ),
+                ),
               ),
               const SizedBox(height: 28),
               GestureDetector(
@@ -248,35 +290,26 @@ class _StatisticsScreenState extends State<StatisticsScreen>
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
-              // 4 metric cards in a row
               _buildMetricCards(),
               const SizedBox(height: 20),
-
-              // Key metrics progress bars
               _buildCard(
                 title: 'Key Metrics',
                 icon: Icons.trending_up_rounded,
                 child: _buildProgressBars(),
               ),
               const SizedBox(height: 16),
-
-              // Platform bar chart
               _buildCard(
                 title: 'Reports by Platform',
                 icon: Icons.bar_chart_rounded,
                 child: _buildPlatformChart(),
               ),
               const SizedBox(height: 16),
-
-              // Category donut chart
               _buildCard(
                 title: 'Reports by Category',
                 icon: Icons.pie_chart_rounded,
                 child: _buildCategoryChart(),
               ),
               const SizedBox(height: 16),
-
-              // Privacy note
               Container(
                 padding: const EdgeInsets.all(14),
                 decoration: BoxDecoration(
@@ -310,7 +343,6 @@ class _StatisticsScreenState extends State<StatisticsScreen>
     );
   }
 
-  // ── Wrapper card with section title ───────────────────────────────────────
   Widget _buildCard({
     required String title,
     required IconData icon,
@@ -348,12 +380,11 @@ class _StatisticsScreenState extends State<StatisticsScreen>
     );
   }
 
-  // ── 4 metric cards in a single row ────────────────────────────────────────
   Widget _buildMetricCards() {
-    
-final total = (_stats?['total_reports'] ?? 0) as num;
-final flagged = (_stats?['flagged_harassers'] ?? 0) as num;
-final platforms = (_stats?['platforms_monitored'] ?? 0) as num;
+    final total = (_stats?['total_reports'] ?? 0) as num;
+    final flagged = (_stats?['flagged_harassers'] ?? 0) as num;
+    final platforms = (_stats?['platforms_monitored'] ?? 0) as num;
+
     return AnimatedBuilder(
       animation: _countAnim,
       builder: (context, _) {
@@ -375,7 +406,7 @@ final platforms = (_stats?['platforms_monitored'] ?? 0) as num;
                 iconColor: AppTheme.success,
                 label: 'Cases\nResolved',
                 value:
-                    '${((_stats?['resolution_success_pct'] ?? 0.0) as num).toDouble() * t ~/ 1}%',
+                    '${(((_stats?['resolution_success_pct'] ?? 0.0) as num).toDouble() * t).toInt()}%',
               ),
             ),
             const SizedBox(width: 8),
@@ -402,7 +433,6 @@ final platforms = (_stats?['platforms_monitored'] ?? 0) as num;
     );
   }
 
-  // ── Progress bars ─────────────────────────────────────────────────────────
   Widget _buildProgressBars() {
     final evidencePct =
         ((_stats?['evidence_verified_pct'] ?? 0.0) as num).toDouble();
@@ -449,18 +479,16 @@ final platforms = (_stats?['platforms_monitored'] ?? 0) as num;
     );
   }
 
-  // ── Platform bar chart ────────────────────────────────────────────────────
   Widget _buildPlatformChart() {
-    final raw = _stats?['reports_per_platform'] as Map<String, dynamic>?;
+    final raw =
+        _stats?['reports_per_platform'] as Map<String, dynamic>?;
     if (raw == null || raw.isEmpty) {
       return _emptyState('No platform data available yet.');
     }
 
-    // Sort by value descending
     final entries = raw.entries.toList()
       ..sort((a, b) =>
           (b.value as num).compareTo(a.value as num));
-
     final maxVal = (entries.first.value as num).toDouble();
 
     return AnimatedBuilder(
@@ -477,8 +505,6 @@ final platforms = (_stats?['platforms_monitored'] ?? 0) as num;
                 touchTooltipData: BarTouchTooltipData(
                   getTooltipColor: (_) => AppTheme.background,
                   tooltipRoundedRadius: 8,
-                  tooltipPadding: const EdgeInsets.symmetric(
-                      horizontal: 10, vertical: 6),
                   getTooltipItem: (group, groupIndex, rod, _) {
                     final name = _platformNames[
                             entries[groupIndex].key.toLowerCase()] ??
@@ -486,9 +512,8 @@ final platforms = (_stats?['platforms_monitored'] ?? 0) as num;
                     return BarTooltipItem(
                       '$name\n',
                       GoogleFonts.inter(
-                        color: AppTheme.textSecondary,
-                        fontSize: 11,
-                      ),
+                          color: AppTheme.textSecondary,
+                          fontSize: 11),
                       children: [
                         TextSpan(
                           text: rod.toY.toInt().toString(),
@@ -517,12 +542,10 @@ final platforms = (_stats?['platforms_monitored'] ?? 0) as num;
                       if (idx < 0 || idx >= entries.length) {
                         return const SizedBox();
                       }
-                      final count =
-                          (entries[idx].value as num).toInt();
                       return Padding(
                         padding: const EdgeInsets.only(bottom: 4),
                         child: Text(
-                          count.toString(),
+                          (entries[idx].value as num).toInt().toString(),
                           style: GoogleFonts.jetBrainsMono(
                             color: AppTheme.textPrimary,
                             fontSize: 11,
@@ -572,9 +595,8 @@ final platforms = (_stats?['platforms_monitored'] ?? 0) as num;
               ),
               borderData: FlBorderData(show: false),
               barGroups: List.generate(entries.length, (i) {
-                final animY =
-                    (entries[i].value as num).toDouble() *
-                        _countAnim.value;
+                final animY = (entries[i].value as num).toDouble() *
+                    _countAnim.value;
                 return BarChartGroupData(
                   x: i,
                   barRods: [
@@ -583,20 +605,15 @@ final platforms = (_stats?['platforms_monitored'] ?? 0) as num;
                       gradient: const LinearGradient(
                         begin: Alignment.bottomCenter,
                         end: Alignment.topCenter,
-                        colors: [
-                          Color(0xFF4A7DFF),
-                          Color(0xFF9B8CF5),
-                        ],
+                        colors: [Color(0xFF4A7DFF), Color(0xFF9B8CF5)],
                       ),
                       width: 28,
                       borderRadius: const BorderRadius.vertical(
                           top: Radius.circular(8)),
                       backDrawRodData: BackgroundBarChartRodData(
                         show: true,
-                        toY: (maxVal * 1.35)
-                            .clamp(1, double.infinity),
-                        color: AppTheme.border
-                            .withValues(alpha: 0.25),
+                        toY: (maxVal * 1.35).clamp(1, double.infinity),
+                        color: AppTheme.border.withValues(alpha: 0.25),
                       ),
                     ),
                   ],
@@ -609,7 +626,6 @@ final platforms = (_stats?['platforms_monitored'] ?? 0) as num;
     );
   }
 
-  // ── Category donut chart ──────────────────────────────────────────────────
   Widget _buildCategoryChart() {
     final raw =
         _stats?['reports_per_category'] as Map<String, dynamic>?;
@@ -620,7 +636,6 @@ final platforms = (_stats?['platforms_monitored'] ?? 0) as num;
     final entries = raw.entries.toList()
       ..sort((a, b) =>
           (b.value as num).compareTo(a.value as num));
-
     final total = entries
         .map((e) => (e.value as num).toDouble())
         .reduce((a, b) => a + b);
@@ -631,7 +646,6 @@ final platforms = (_stats?['platforms_monitored'] ?? 0) as num;
         return Row(
           crossAxisAlignment: CrossAxisAlignment.center,
           children: [
-            // Donut
             SizedBox(
               width: 150,
               height: 150,
@@ -645,16 +659,14 @@ final platforms = (_stats?['platforms_monitored'] ?? 0) as num;
                       pieTouchData: PieTouchData(
                         touchCallback: (event, response) {
                           setState(() {
-                            if (!event
-                                    .isInterestedForInteractions ||
+                            if (!event.isInterestedForInteractions ||
                                 response == null ||
                                 response.touchedSection == null) {
                               _touchedPieIndex = -1;
                               return;
                             }
                             _touchedPieIndex = response
-                                .touchedSection!
-                                .touchedSectionIndex;
+                                .touchedSection!.touchedSectionIndex;
                           });
                         },
                       ),
@@ -672,7 +684,6 @@ final platforms = (_stats?['platforms_monitored'] ?? 0) as num;
                       }),
                     ),
                   ),
-                  // Total in center
                   Column(
                     mainAxisSize: MainAxisSize.min,
                     children: [
@@ -697,17 +708,14 @@ final platforms = (_stats?['platforms_monitored'] ?? 0) as num;
               ),
             ),
             const SizedBox(width: 16),
-            // Legend
             Expanded(
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: List.generate(entries.length, (i) {
-                  final val =
-                      (entries[i].value as num).toDouble();
+                  final val = (entries[i].value as num).toDouble();
                   final pct = total > 0
                       ? (val / total * 100).toStringAsFixed(0)
                       : '0';
-                  final name = entries[i].key;
                   final isActive = i == _touchedPieIndex;
                   return Padding(
                     padding: const EdgeInsets.only(bottom: 10),
@@ -725,7 +733,7 @@ final platforms = (_stats?['platforms_monitored'] ?? 0) as num;
                         const SizedBox(width: 8),
                         Expanded(
                           child: Text(
-                            name,
+                            entries[i].key,
                             style: GoogleFonts.inter(
                               color: isActive
                                   ? AppTheme.textPrimary
@@ -778,11 +786,9 @@ final platforms = (_stats?['platforms_monitored'] ?? 0) as num;
                 color: AppTheme.textSecondary.withValues(alpha: 0.3),
                 size: 36),
             const SizedBox(height: 10),
-            Text(
-              message,
-              style: GoogleFonts.inter(
-                  color: AppTheme.textSecondary, fontSize: 13),
-            ),
+            Text(message,
+                style: GoogleFonts.inter(
+                    color: AppTheme.textSecondary, fontSize: 13)),
           ],
         ),
       ),

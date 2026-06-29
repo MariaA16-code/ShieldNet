@@ -2,9 +2,6 @@ import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
 import '../theme.dart';
 
-/// "Need help right now?" card. Tapping anywhere navigates to the Help
-/// tab via [onTap] — emergency numbers/resources live only on the Help
-/// screen; this card is just the door to it.
 class NeedHelpCard extends StatelessWidget {
   final VoidCallback? onTap;
 
@@ -60,8 +57,8 @@ class NeedHelpCard extends StatelessWidget {
                         ),
                         children: [
                           const TextSpan(
-                            text: 'If you are in danger or need urgent '
-                                'assistance, visit our ',
+                            text:
+                                'If you are in danger or need urgent assistance, visit our ',
                           ),
                           TextSpan(
                             text: 'Help & Support',
@@ -71,8 +68,8 @@ class NeedHelpCard extends StatelessWidget {
                             ),
                           ),
                           const TextSpan(
-                            text: ' page for emergency numbers and '
-                                'resources.',
+                            text:
+                                ' page for emergency numbers and resources.',
                           ),
                         ],
                       ),

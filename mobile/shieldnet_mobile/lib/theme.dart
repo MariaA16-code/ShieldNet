@@ -1,39 +1,26 @@
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
 
-/// ShieldNet Mobile — visual identity.
-///
-/// Palette matches the web app exactly (background, cardColor, purple,
-/// blue, success) so the product family reads as one thing across
-/// platforms. Typography (Lexend for headlines, Inter for body) is
-/// mobile's own signature touch.
 class AppTheme {
-  // ---------------------------------------------------------------------
-  // Core palette — matches web app
-  // ---------------------------------------------------------------------
-  static const Color background = Color(0xFF0A0E16);
-  static const Color cardColor = Color(0xFF141B2E);
-  static const Color purple = Color(0xFF9B8CF5);
-  static const Color blue = Color(0xFF4A7DFF);
-  static const Color success = Color(0xFF00C9A7);
-  static const Color warning = Color(0xFFFFB347);
-  static const Color error = Color(0xFFFF6B6B);
+  // ── Core Palette ───────────────────────────────────────────
+  static const Color background  = Color(0xFF040D12);
+  static const Color cardColor   = Color(0xFF0A1628);
+  static const Color purple      = Color(0xFF00D4FF);
+  static const Color blue        = Color(0xFF0066FF);
+  static const Color success     = Color(0xFF00FF88);
+  static const Color warning     = Color(0xFFFFB347);
+  static const Color error       = Color(0xFFFF4444);
+  static const Color textPrimary = Color(0xFFFFFFFF);
+  static const Color textSecondary = Color(0xFF6B8A9A);
+  static const Color border      = Color(0xFF0F2335);
 
-  static const Color textPrimary = Color(0xFFEDEFF5);
-  static const Color textSecondary = Color(0xFF8B92A8);
-  static const Color border = Color(0xFF232B3D);
-
-  /// Used sparingly — primary buttons and active states only.
-  /// Not used as a decorative background gradient.
   static const LinearGradient accentGradient = LinearGradient(
     begin: Alignment.topLeft,
     end: Alignment.bottomRight,
-    colors: [purple, blue],
+    colors: [Color(0xFF00D4FF), Color(0xFF0066FF)],
   );
 
-  // ---------------------------------------------------------------------
-  // ThemeData
-  // ---------------------------------------------------------------------
+  // ── ThemeData ──────────────────────────────────────────────
   static ThemeData get theme {
     return ThemeData(
       useMaterial3: true,
@@ -49,7 +36,6 @@ class AppTheme {
       ),
 
       textTheme: TextTheme(
-        // Eyebrow labels — e.g. "ANONYMOUS · ENCRYPTED · FREE"
         labelSmall: GoogleFonts.inter(
           fontSize: 12,
           fontWeight: FontWeight.w600,

@@ -1,8 +1,11 @@
 import 'package:flutter/material.dart';
+import 'package:google_fonts/google_fonts.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import '../services/api_service.dart';
+import '../theme.dart';
 import '../widgets/hero_section.dart';
 import '../widgets/image_upload_field.dart';
+import '../widgets/field_label.dart';
 import 'success_screen.dart';
 
 class ReportScreen extends StatefulWidget {
@@ -165,6 +168,11 @@ class _ReportScreenState extends State<ReportScreen> {
 
   @override
   Widget build(BuildContext context) {
+    // Phone-realistic content width: even when tested wide in
+    // flutter run -d chrome, the form never stretches past a
+    // sensible mobile reading width.
+    const maxContentWidth = 430.0;
+
     return Scaffold(
       appBar: AppBar(title: const Text('Report Incident')),
       body: SingleChildScrollView(
@@ -172,145 +180,229 @@ class _ReportScreenState extends State<ReportScreen> {
           eyebrow: 'Anonymous · Encrypted · Free',
           headline: 'Report an incident',
           subtitle: 'Submit anonymously — no account needed.',
-          child: Form(
-            key: _formKey,
-            child: Column(
-              crossAxisAlignment: CrossAxisAlignment.stretch,
-              children: [
-                InputDecorator(
-                  decoration: const InputDecoration(labelText: 'Country'),
-                  child: Text(_country),
-                ),
-                const SizedBox(height: 16),
-                _buildDropdown(
-                  label: 'Category',
-                  value: _category,
-                  items: ShieldNetValues.categories,
-                  onChanged: (v) => setState(() {
-                    _category = v;
-                    if (!_needsImages) {
-                      _originalImage = null;
-                      _fakeImage = null;
-                    }
-                    if (!_needsVideo) {
-                      _video = null;
-                    }
-                  }),
-                ),
-                const SizedBox(height: 16),
-                _buildDropdown(
-                  label: 'Platform',
-                  value: _platform,
-                  items: ShieldNetValues.platforms,
-                  onChanged: (v) => setState(() => _platform = v),
-                  displayLabel: (p) => p[0].toUpperCase() + p.substring(1),
-                ),
-                const SizedBox(height: 16),
-                TextFormField(
-                  controller: _harasserUsernameController,
-                  decoration: const InputDecoration(
-                    labelText: 'Harasser Username',
-                    hintText: '@username of the harasser',
-                  ),
-                  validator: (v) => (v == null || v.trim().isEmpty)
-                      ? 'This field is required'
-                      : null,
-                ),
-                const SizedBox(height: 16),
-                TextFormField(
-                  controller: _harasserProfileUrlController,
-                  decoration: const InputDecoration(
-                    labelText: 'Harasser Profile URL (optional)',
-                    hintText: 'https://instagram.com/username',
-                  ),
-                ),
-                const SizedBox(height: 16),
-                TextFormField(
-                  controller: _descriptionController,
-                  maxLines: 5,
-                  decoration: const InputDecoration(
-                    labelText: 'Description',
-                    hintText: 'Describe what happened in detail...',
-                  ),
-                  validator: (v) => (v == null || v.trim().isEmpty)
-                      ? 'Please describe what happened'
-                      : null,
-                ),
-                if (_needsImages) ...[
-                  const SizedBox(height: 16),
-                  Text(
-                    'EVIDENCE (required for this category)',
-                    style: Theme.of(context).textTheme.labelSmall,
-                  ),
-                  const SizedBox(height: 10),
-                  ImageUploadField(
-                    label: 'Original image',
-                    file: _originalImage,
-                    onPick: _pickOriginal,
-                    onRemove: () => setState(() => _originalImage = null),
-                  ),
-                  const SizedBox(height: 10),
-                  ImageUploadField(
-                    label: 'Edited / fake image',
-                    file: _fakeImage,
-                    onPick: _pickFake,
-                    onRemove: () => setState(() => _fakeImage = null),
-                  ),
-                ],
-                if (_needsVideo) ...[
-                  const SizedBox(height: 16),
-                  Text(
-                    'EVIDENCE (required for this category)',
-                    style: Theme.of(context).textTheme.labelSmall,
-                  ),
-                  const SizedBox(height: 10),
-                  ImageUploadField(
-                    label: 'Deepfake video',
-                    file: _video,
-                    onPick: _pickVideo,
-                    onRemove: () => setState(() => _video = null),
-                  ),
-                ],
-                const SizedBox(height: 16),
-                TextFormField(
-                  controller: _contactController,
-                  decoration: const InputDecoration(
-                    labelText: 'Your Contact (optional)',
-                    hintText: 'Email or phone for follow-up',
-                  ),
-                ),
-                const SizedBox(height: 24),
-                if (_errorMessage != null) ...[
-                  Text(
-                    _errorMessage!,
-                    style: Theme.of(context)
-                        .textTheme
-                        .bodyMedium
-                        ?.copyWith(color: Theme.of(context).colorScheme.error),
-                  ),
-                  const SizedBox(height: 12),
-                ],
-                ElevatedButton(
-                  onPressed: _submitting ? null : _submit,
-                  child: _submitting
-                      ? const SizedBox(
-                          height: 20,
-                          width: 20,
-                          child: CircularProgressIndicator(
-                            strokeWidth: 2,
-                            color: Colors.black,
+          child: Center(
+            child: ConstrainedBox(
+              constraints: const BoxConstraints(maxWidth: maxContentWidth),
+              child: Form(
+                key: _formKey,
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.stretch,
+                  children: [
+                    // ── Country ──────────────────────────────────
+                    const FieldLabel(
+                      icon: Icons.public_rounded,
+                      text: 'Country',
+                    ),
+                    _ReadOnlyBox(value: _country),
+
+                    const SizedBox(height: 20),
+
+                    // ── Category ─────────────────────────────────
+                    const FieldLabel(
+                      icon: Icons.sell_rounded,
+                      text: 'Category',
+                      required: true,
+                    ),
+                    _buildDropdown(
+                      value: _category,
+                      items: ShieldNetValues.categories,
+                      hint: 'Select a category',
+                      onChanged: (v) => setState(() {
+                        _category = v;
+                        if (!_needsImages) {
+                          _originalImage = null;
+                          _fakeImage = null;
+                        }
+                        if (!_needsVideo) {
+                          _video = null;
+                        }
+                      }),
+                    ),
+
+                    const SizedBox(height: 20),
+
+                    // ── Platform ─────────────────────────────────
+                    const FieldLabel(
+                      icon: Icons.smartphone_rounded,
+                      text: 'Platform',
+                      required: true,
+                    ),
+                    _buildDropdown(
+                      value: _platform,
+                      items: ShieldNetValues.platforms,
+                      hint: 'Select a platform',
+                      onChanged: (v) => setState(() => _platform = v),
+                      displayLabel: (p) => p[0].toUpperCase() + p.substring(1),
+                    ),
+
+                    const SizedBox(height: 20),
+
+                    // ── Harasser username ─────────────────────────
+                    const FieldLabel(
+                      icon: Icons.person_rounded,
+                      text: 'Harasser Username',
+                      required: true,
+                    ),
+                    TextFormField(
+                      controller: _harasserUsernameController,
+                      decoration: const InputDecoration(
+                        hintText: '@username of the harasser',
+                      ),
+                      validator: (v) => (v == null || v.trim().isEmpty)
+                          ? 'This field is required'
+                          : null,
+                    ),
+
+                    const SizedBox(height: 20),
+
+                    // ── Profile URL ───────────────────────────────
+                    const FieldLabel(
+                      icon: Icons.link_rounded,
+                      text: 'Harasser Profile URL',
+                    ),
+                    TextFormField(
+                      controller: _harasserProfileUrlController,
+                      decoration: const InputDecoration(
+                        hintText: 'https://instagram.com/username',
+                      ),
+                    ),
+
+                    const SizedBox(height: 20),
+
+                    // ── Description ───────────────────────────────
+                    const FieldLabel(
+                      icon: Icons.description_rounded,
+                      text: 'Description',
+                      required: true,
+                    ),
+                    TextFormField(
+                      controller: _descriptionController,
+                      maxLines: 5,
+                      decoration: const InputDecoration(
+                        hintText: 'Describe what happened in detail...',
+                      ),
+                      validator: (v) => (v == null || v.trim().isEmpty)
+                          ? 'Please describe what happened'
+                          : null,
+                    ),
+
+                    if (_needsImages) ...[
+                      const SizedBox(height: 20),
+                      const FieldLabel(
+                        icon: Icons.image_rounded,
+                        text: 'Evidence — required for this category',
+                        required: true,
+                      ),
+                      const SizedBox(height: 4),
+                      ImageUploadField(
+                        label: 'Original image',
+                        file: _originalImage,
+                        onPick: _pickOriginal,
+                        onRemove: () => setState(() => _originalImage = null),
+                      ),
+                      const SizedBox(height: 10),
+                      ImageUploadField(
+                        label: 'Edited / fake image',
+                        file: _fakeImage,
+                        onPick: _pickFake,
+                        onRemove: () => setState(() => _fakeImage = null),
+                      ),
+                    ],
+
+                    if (_needsVideo) ...[
+                      const SizedBox(height: 20),
+                      const FieldLabel(
+                        icon: Icons.videocam_rounded,
+                        text: 'Evidence — required for this category',
+                        required: true,
+                      ),
+                      const SizedBox(height: 4),
+                      ImageUploadField(
+                        label: 'Deepfake video',
+                        file: _video,
+                        onPick: _pickVideo,
+                        onRemove: () => setState(() => _video = null),
+                      ),
+                    ],
+
+                    const SizedBox(height: 20),
+
+                    // ── Contact ────────────────────────────────────
+                    const FieldLabel(
+                      icon: Icons.mail_outline_rounded,
+                      text: 'Your Contact',
+                    ),
+                    TextFormField(
+                      controller: _contactController,
+                      decoration: const InputDecoration(
+                        hintText: 'Email or phone for follow-up',
+                      ),
+                    ),
+
+                    const SizedBox(height: 28),
+
+                    if (_errorMessage != null) ...[
+                      Container(
+                        padding: const EdgeInsets.all(12),
+                        decoration: BoxDecoration(
+                          color: AppTheme.error.withValues(alpha: 0.08),
+                          borderRadius: BorderRadius.circular(12),
+                          border: Border.all(
+                            color: AppTheme.error.withValues(alpha: 0.3),
                           ),
-                        )
-                      : const Text('Submit Report'),
+                        ),
+                        child: Row(
+                          children: [
+                            Icon(Icons.error_outline_rounded,
+                                color: AppTheme.error, size: 18),
+                            const SizedBox(width: 8),
+                            Expanded(
+                              child: Text(
+                                _errorMessage!,
+                                style: GoogleFonts.inter(
+                                  color: AppTheme.error,
+                                  fontSize: 13,
+                                  height: 1.4,
+                                ),
+                              ),
+                            ),
+                          ],
+                        ),
+                      ),
+                      const SizedBox(height: 16),
+                    ],
+
+                    SizedBox(
+                      height: 52,
+                      child: ElevatedButton(
+                        onPressed: _submitting ? null : _submit,
+                        child: _submitting
+                            ? const SizedBox(
+                                height: 20,
+                                width: 20,
+                                child: CircularProgressIndicator(
+                                  strokeWidth: 2,
+                                  color: Colors.black,
+                                ),
+                              )
+                            : const Text('Submit Report'),
+                      ),
+                    ),
+                    const SizedBox(height: 10),
+                    Text(
+                      'The server may take 10–15 seconds to respond if it has '
+                      'been idle.',
+                      style: GoogleFonts.inter(
+                        fontSize: 12,
+                        color: AppTheme.textSecondary,
+                        height: 1.4,
+                      ),
+                      textAlign: TextAlign.center,
+                    ),
+                    const SizedBox(height: 24),
+                  ],
                 ),
-                const SizedBox(height: 8),
-                Text(
-                  'The server may take 10–15 seconds to respond if it has '
-                  'been idle.',
-                  style: Theme.of(context).textTheme.bodyMedium,
-                  textAlign: TextAlign.center,
-                ),
-              ],
+              ),
             ),
           ),
         ),
@@ -319,17 +411,18 @@ class _ReportScreenState extends State<ReportScreen> {
   }
 
   Widget _buildDropdown({
-    required String label,
     required String? value,
     required List<String> items,
     required void Function(String?) onChanged,
+    required String hint,
     String Function(String)? displayLabel,
   }) {
     return DropdownButtonFormField<String>(
       initialValue: value,
-      decoration: InputDecoration(labelText: label),
+      decoration: InputDecoration(hintText: hint),
       dropdownColor: Theme.of(context).cardColor,
       isExpanded: true,
+      icon: const Icon(Icons.keyboard_arrow_down_rounded),
       items: items
           .map(
             (item) => DropdownMenuItem(
@@ -339,7 +432,44 @@ class _ReportScreenState extends State<ReportScreen> {
           )
           .toList(),
       onChanged: onChanged,
-      validator: (v) => v == null ? 'Please select $label' : null,
+      validator: (v) => v == null ? 'Please make a selection' : null,
+    );
+  }
+}
+
+/// Read-only display box for the locked Country field — styled to match
+/// the other inputs so the form feels consistent even though this one
+/// isn't editable.
+class _ReadOnlyBox extends StatelessWidget {
+  final String value;
+
+  const _ReadOnlyBox({required this.value});
+
+  @override
+  Widget build(BuildContext context) {
+    return Container(
+      width: double.infinity,
+      padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 14),
+      decoration: BoxDecoration(
+        color: AppTheme.cardColor,
+        borderRadius: BorderRadius.circular(12),
+        border: Border.all(color: AppTheme.border),
+      ),
+      child: Row(
+        children: [
+          Expanded(
+            child: Text(
+              value,
+              style: GoogleFonts.inter(
+                fontSize: 15,
+                color: AppTheme.textPrimary,
+              ),
+            ),
+          ),
+          Icon(Icons.lock_outline_rounded,
+              size: 16, color: AppTheme.textSecondary),
+        ],
+      ),
     );
   }
 }
