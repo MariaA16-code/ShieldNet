@@ -169,6 +169,14 @@ class _HomeScreenState extends State<HomeScreen>
                             ),
                           ),
                         ),
+                        // Orbiting nodes — small satellites circling the
+                        // shield to read as "actively monitoring".
+                        Positioned(
+                          top: screenHeight * 0.10 - 25,
+                          left: 0,
+                          right: 0,
+                          child: const Center(child: _OrbitingNodes()),
+                        ),
                         // Glowing shield
                         Positioned(
                           top: screenHeight * 0.10,
@@ -266,6 +274,119 @@ class _HomeScreenState extends State<HomeScreen>
             ),
           ),
         ),
+      ),
+    );
+  }
+}
+
+// ── Orbiting Nodes ───────────────────────────────────────────────────────────
+// Two small satellite dots circling the shield at different speeds and
+// radii, in opposite directions — reads as "actively monitoring".
+class _OrbitingNodes extends StatefulWidget {
+  const _OrbitingNodes();
+
+  @override
+  State<_OrbitingNodes> createState() => _OrbitingNodesState();
+}
+
+class _OrbitingNodesState extends State<_OrbitingNodes>
+    with TickerProviderStateMixin {
+  late final AnimationController _outerController;
+  late final AnimationController _innerController;
+
+  @override
+  void initState() {
+    super.initState();
+    _outerController = AnimationController(
+      vsync: this,
+      duration: const Duration(seconds: 7),
+    )..repeat();
+    _innerController = AnimationController(
+      vsync: this,
+      duration: const Duration(seconds: 5),
+    )..repeat();
+  }
+
+  @override
+  void dispose() {
+    _outerController.dispose();
+    _innerController.dispose();
+    super.dispose();
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    return SizedBox(
+      width: 140,
+      height: 140,
+      child: Stack(
+        alignment: Alignment.center,
+        children: [
+          // Faint reference ring for the outer orbit
+          Container(
+            width: 140,
+            height: 140,
+            decoration: BoxDecoration(
+              shape: BoxShape.circle,
+              border: Border.all(
+                color: AppTheme.purple.withValues(alpha: 0.10),
+                width: 1,
+              ),
+            ),
+          ),
+          // Outer node — clockwise, radius 70
+          Positioned.fill(
+            child: RotationTransition(
+              turns: _outerController,
+              child: Align(
+                alignment: Alignment.topCenter,
+                child: Container(
+                  width: 7,
+                  height: 7,
+                  decoration: BoxDecoration(
+                    shape: BoxShape.circle,
+                    color: AppTheme.purple,
+                    boxShadow: [
+                      BoxShadow(
+                        color: AppTheme.purple.withValues(alpha: 0.6),
+                        blurRadius: 6,
+                      ),
+                    ],
+                  ),
+                ),
+              ),
+            ),
+          ),
+          // Inner node — counter-clockwise, radius 45
+          Positioned.fill(
+            child: Center(
+              child: SizedBox(
+                width: 90,
+                height: 90,
+                child: RotationTransition(
+                  turns: ReverseAnimation(_innerController),
+                  child: Align(
+                    alignment: Alignment.topCenter,
+                    child: Container(
+                      width: 5,
+                      height: 5,
+                      decoration: BoxDecoration(
+                        shape: BoxShape.circle,
+                        color: AppTheme.blue,
+                        boxShadow: [
+                          BoxShadow(
+                            color: AppTheme.blue.withValues(alpha: 0.6),
+                            blurRadius: 5,
+                          ),
+                        ],
+                      ),
+                    ),
+                  ),
+                ),
+              ),
+            ),
+          ),
+        ],
       ),
     );
   }

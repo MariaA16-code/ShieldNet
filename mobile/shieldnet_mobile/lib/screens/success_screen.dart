@@ -1,9 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:google_fonts/google_fonts.dart';
-import 'package:url_launcher/url_launcher.dart';
 import '../theme.dart';
-import '../services/api_service.dart';
 
 class SuccessScreen extends StatefulWidget {
   final String token;
@@ -81,40 +79,6 @@ class _SuccessScreenState extends State<SuccessScreen>
     );
     Future.delayed(const Duration(seconds: 3),
         () => setState(() => _tokenCopied = false));
-  }
-
-  Future<void> _downloadPdf(BuildContext context) async {
-    if (widget.reportId == null) {
-      ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(
-          content: Text('PDF is not available for this report yet.',
-              style: GoogleFonts.inter(color: Colors.white)),
-          backgroundColor: AppTheme.error,
-          behavior: SnackBarBehavior.floating,
-          shape: RoundedRectangleBorder(
-              borderRadius: BorderRadius.circular(12)),
-          margin: const EdgeInsets.all(16),
-        ),
-      );
-      return;
-    }
-    final url = ApiService.generatePdfUrl(widget.reportId!);
-    final uri = Uri.parse(url);
-    final launched =
-        await launchUrl(uri, mode: LaunchMode.externalApplication);
-    if (!launched && context.mounted) {
-      ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(
-          content: Text('Could not open the PDF link.',
-              style: GoogleFonts.inter(color: Colors.white)),
-          backgroundColor: AppTheme.error,
-          behavior: SnackBarBehavior.floating,
-          shape: RoundedRectangleBorder(
-              borderRadius: BorderRadius.circular(12)),
-          margin: const EdgeInsets.all(16),
-        ),
-      );
-    }
   }
 
   @override
@@ -336,36 +300,6 @@ class _SuccessScreenState extends State<SuccessScreen>
                               color: _tokenCopied
                                   ? AppTheme.success
                                   : AppTheme.textPrimary,
-                              fontSize: 14,
-                              fontWeight: FontWeight.w600,
-                            ),
-                          ),
-                        ],
-                      ),
-                    ),
-                  ),
-                  const SizedBox(height: 12),
-
-                  // ── Download PDF button ───────────────────────────
-                  GestureDetector(
-                    onTap: () => _downloadPdf(context),
-                    child: Container(
-                      padding: const EdgeInsets.symmetric(vertical: 14),
-                      decoration: BoxDecoration(
-                        color: AppTheme.cardColor,
-                        borderRadius: BorderRadius.circular(14),
-                        border: Border.all(color: AppTheme.border),
-                      ),
-                      child: Row(
-                        mainAxisAlignment: MainAxisAlignment.center,
-                        children: [
-                          Icon(Icons.picture_as_pdf_rounded,
-                              color: AppTheme.blue, size: 18),
-                          const SizedBox(width: 8),
-                          Text(
-                            'Download PDF Report',
-                            style: GoogleFonts.inter(
-                              color: AppTheme.textPrimary,
                               fontSize: 14,
                               fontWeight: FontWeight.w600,
                             ),

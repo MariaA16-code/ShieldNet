@@ -47,28 +47,6 @@ class HelpScreen extends StatelessWidget {
     },
   ];
 
-  // Ambulance (1122) removed as requested
-  static const List<_EmergencyContact> _emergencyContacts = [
-    _EmergencyContact(
-      label: 'FIA Cyber Crime Helpline',
-      number: '1991',
-      icon: Icons.shield_outlined,
-      color: Color(0xFF9B8CF5),
-    ),
-    _EmergencyContact(
-      label: 'Police',
-      number: '15',
-      icon: Icons.local_police_outlined,
-      color: Color(0xFF4A7DFF),
-    ),
-    _EmergencyContact(
-      label: 'Women Helpline',
-      number: '1099',
-      icon: Icons.support_outlined,
-      color: Color(0xFFFF6B6B),
-    ),
-  ];
-
   Future<void> _launchEmail(BuildContext context) async {
     final emailUri = Uri(
       scheme: 'mailto',
@@ -90,24 +68,6 @@ class HelpScreen extends StatelessWidget {
           const SnackBar(
             content: Text('Could not open an email app on this device.'),
           ),
-        );
-      }
-    }
-  }
-
-  Future<void> _callNumber(BuildContext context, String number) async {
-    final telUri = Uri(scheme: 'tel', path: number);
-    try {
-      final launched = await launchUrl(telUri);
-      if (!launched && context.mounted) {
-        ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(content: Text('Could not start a call to $number.')),
-        );
-      }
-    } catch (_) {
-      if (context.mounted) {
-        ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(content: Text('Could not start a call to $number.')),
         );
       }
     }
@@ -144,11 +104,8 @@ class HelpScreen extends StatelessWidget {
               _SupportCard(onEmailTap: () => _launchEmail(context)),
               const SizedBox(height: 28),
 
-              // ── Emergency contacts (moved to bottom) ─────────────
-              _EmergencySection(
-                contacts: _emergencyContacts,
-                onCall: (number) => _callNumber(context, number),
-              ),
+              // ── Footer (Platform / Emergency Resources) ──────────
+              const _PlatformFooter(),
               const SizedBox(height: 24),
             ],
           ),
@@ -156,21 +113,6 @@ class HelpScreen extends StatelessWidget {
       ),
     );
   }
-}
-
-// ── Data class ────────────────────────────────────────────────────────────────
-class _EmergencyContact {
-  final String label;
-  final String number;
-  final IconData icon;
-  final Color color;
-
-  const _EmergencyContact({
-    required this.label,
-    required this.number,
-    required this.icon,
-    required this.color,
-  });
 }
 
 // ── Section header ────────────────────────────────────────────────────────────
@@ -410,156 +352,81 @@ class _SupportCard extends StatelessWidget {
   }
 }
 
-// ── Emergency section (moved to bottom) ──────────────────────────────────────
-class _EmergencySection extends StatelessWidget {
-  final List<_EmergencyContact> contacts;
-  final void Function(String number) onCall;
 
-  const _EmergencySection({
-    required this.contacts,
-    required this.onCall,
-  });
+// ── Footer (Platform / Emergency Resources) ───────────────────────────────────
+class _PlatformFooter extends StatelessWidget {
+  const _PlatformFooter();
+
+  static const List<String> _platformLinks = [
+    'Report now',
+    'Track a case',
+    'Statistics',
+    'Help',
+  ];
+
+  static const List<String> _emergencyResources = [
+    'National Cyber Crime Agency',
+    'FIA Helpline: 1991',
+    'Mental health support',
+  ];
 
   @override
   Widget build(BuildContext context) {
-    return Container(
-      padding: const EdgeInsets.all(20),
-      decoration: BoxDecoration(
-        color: AppTheme.error.withValues(alpha: 0.06),
-        borderRadius: BorderRadius.circular(16),
-        border:
-            Border.all(color: AppTheme.error.withValues(alpha: 0.28)),
-      ),
-      child: Column(
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: [
-          // Header
-          Row(
-            children: [
-              Container(
-                width: 36,
-                height: 36,
-                decoration: BoxDecoration(
-                  color: AppTheme.error.withValues(alpha: 0.12),
-                  borderRadius: BorderRadius.circular(9),
-                ),
-                child: Icon(Icons.warning_amber_rounded,
-                    color: AppTheme.error, size: 18),
-              ),
-              const SizedBox(width: 12),
-              Expanded(
-                child: Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: [
-                    Text(
-                      'Need Immediate Help?',
-                      style: GoogleFonts.lexend(
-                        color: AppTheme.textPrimary,
-                        fontSize: 15,
-                        fontWeight: FontWeight.w600,
-                      ),
-                    ),
-                    Text(
-                      'Tap any number below to call directly.',
-                      style: GoogleFonts.inter(
-                        color: AppTheme.textSecondary,
-                        fontSize: 12,
-                        height: 1.3,
-                      ),
-                    ),
-                  ],
-                ),
-              ),
-            ],
+    return Row(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        Expanded(
+          child: _FooterColumn(
+            title: 'PLATFORM',
+            items: _platformLinks,
           ),
-          const SizedBox(height: 16),
-          // Contact tiles — vertical list for 3 items
-          ...contacts.map((contact) => Padding(
-                padding: const EdgeInsets.only(bottom: 10),
-                child: _EmergencyTile(
-                  contact: contact,
-                  onTap: () => onCall(contact.number),
-                ),
-              )),
-        ],
-      ),
+        ),
+        const SizedBox(width: 16),
+        Expanded(
+          child: _FooterColumn(
+            title: 'EMERGENCY RESOURCES',
+            items: _emergencyResources,
+          ),
+        ),
+      ],
     );
   }
 }
 
-// ── Emergency tile ────────────────────────────────────────────────────────────
-class _EmergencyTile extends StatelessWidget {
-  final _EmergencyContact contact;
-  final VoidCallback onTap;
+// ── Footer column ──────────────────────────────────────────────────────────────
+class _FooterColumn extends StatelessWidget {
+  final String title;
+  final List<String> items;
 
-  const _EmergencyTile({required this.contact, required this.onTap});
+  const _FooterColumn({required this.title, required this.items});
 
   @override
   Widget build(BuildContext context) {
-    return Material(
-      color: Colors.transparent,
-      child: InkWell(
-        onTap: onTap,
-        borderRadius: BorderRadius.circular(12),
-        child: Container(
-          padding:
-              const EdgeInsets.symmetric(horizontal: 14, vertical: 12),
-          decoration: BoxDecoration(
-            color: AppTheme.cardColor,
-            borderRadius: BorderRadius.circular(12),
-            border: Border.all(color: AppTheme.border),
-          ),
-          child: Row(
-            children: [
-              Container(
-                width: 36,
-                height: 36,
-                decoration: BoxDecoration(
-                  color: contact.color.withValues(alpha: 0.12),
-                  borderRadius: BorderRadius.circular(9),
-                ),
-                child: Icon(contact.icon,
-                    color: contact.color, size: 18),
-              ),
-              const SizedBox(width: 12),
-              Expanded(
-                child: Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: [
-                    Text(
-                      contact.label,
-                      style: GoogleFonts.inter(
-                        color: AppTheme.textSecondary,
-                        fontSize: 11,
-                        fontWeight: FontWeight.w500,
-                      ),
-                    ),
-                    const SizedBox(height: 1),
-                    Text(
-                      contact.number,
-                      style: GoogleFonts.lexend(
-                        color: AppTheme.textPrimary,
-                        fontSize: 18,
-                        fontWeight: FontWeight.w700,
-                      ),
-                    ),
-                  ],
-                ),
-              ),
-              Container(
-                width: 36,
-                height: 36,
-                decoration: BoxDecoration(
-                  color: AppTheme.success.withValues(alpha: 0.12),
-                  borderRadius: BorderRadius.circular(9),
-                ),
-                child: Icon(Icons.call_rounded,
-                    color: AppTheme.success, size: 18),
-              ),
-            ],
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        Text(
+          title,
+          style: GoogleFonts.lexend(
+            color: AppTheme.textPrimary,
+            fontSize: 14,
+            fontWeight: FontWeight.w700,
+            letterSpacing: 0.3,
           ),
         ),
-      ),
+        const SizedBox(height: 16),
+        ...items.map((item) => Padding(
+              padding: const EdgeInsets.only(bottom: 14),
+              child: Text(
+                item,
+                style: GoogleFonts.inter(
+                  color: AppTheme.textSecondary,
+                  fontSize: 14.5,
+                  height: 1.3,
+                ),
+              ),
+            )),
+      ],
     );
   }
 }

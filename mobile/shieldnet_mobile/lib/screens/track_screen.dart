@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:shared_preferences/shared_preferences.dart';
+import 'package:url_launcher/url_launcher.dart';
 import '../theme.dart';
 import '../services/api_service.dart';
 import '../widgets/status_timeline.dart';
@@ -67,6 +68,37 @@ class _TrackScreenState extends State<TrackScreen> {
             : 'Could not find a case with that token. Please check and try again.';
         _loading = false;
       });
+    }
+  }
+
+  // ── Extract a usable report id from the tracked-case JSON ──────────
+  // NOTE: assumes the id is returned under 'id', 'report_id', or
+  // 'reportId'. Confirm the actual key against api_service.dart /
+  // the backend response and adjust here if it differs.
+  int? _extractReportId(Map report) {
+    final raw = report['id'] ?? report['report_id'] ?? report['reportId'];
+    if (raw == null) return null;
+    if (raw is int) return raw;
+    return int.tryParse(raw.toString());
+  }
+
+  Future<void> _downloadPdf(BuildContext context, int reportId) async {
+    final url = ApiService.generatePdfUrl(reportId);
+    final uri = Uri.parse(url);
+    final launched =
+        await launchUrl(uri, mode: LaunchMode.externalApplication);
+    if (!launched && context.mounted) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(
+          content: Text('Could not open the PDF link.',
+              style: GoogleFonts.inter(color: Colors.white)),
+          backgroundColor: AppTheme.error,
+          behavior: SnackBarBehavior.floating,
+          shape: RoundedRectangleBorder(
+              borderRadius: BorderRadius.circular(12)),
+          margin: const EdgeInsets.all(16),
+        ),
+      );
     }
   }
 
@@ -251,7 +283,7 @@ class _TrackScreenState extends State<TrackScreen> {
                     ],
 
                     // ── Case Result ───────────────────────
-                    if (_caseData != null) ..._buildCaseResult(),
+                    if (_caseData != null) ..._buildCaseResult(context),
 
                     // ── Empty State ───────────────────────
                     if (_caseData == null && _errorMessage == null)
@@ -512,7 +544,7 @@ class _TrackScreenState extends State<TrackScreen> {
     );
   }
 
-  List<Widget> _buildCaseResult() {
+  List<Widget> _buildCaseResult(BuildContext context) {
     final reports = (_caseData?['reports'] as List?) ?? [];
     if (reports.isEmpty) {
       return [
@@ -671,6 +703,44 @@ class _TrackScreenState extends State<TrackScreen> {
         ),
       );
     }
+
+    // ── Download PDF button (end of page, only shown when a report
+    // id is available) ────────────────────────────────────────────
+    final firstReportId = _extractReportId(reports.first as Map);
+    if (firstReportId != null) {
+      widgets.add(
+        GestureDetector(
+          onTap: () => _downloadPdf(context, firstReportId),
+          child: Container(
+            width: double.infinity,
+            padding: const EdgeInsets.symmetric(vertical: 14),
+            decoration: BoxDecoration(
+              color: AppTheme.cardColor,
+              borderRadius: BorderRadius.circular(14),
+              border: Border.all(color: AppTheme.border),
+            ),
+            child: Row(
+              mainAxisAlignment: MainAxisAlignment.center,
+              children: [
+                Icon(Icons.picture_as_pdf_rounded,
+                    color: AppTheme.blue, size: 18),
+                const SizedBox(width: 8),
+                Text(
+                  'Download PDF Report',
+                  style: GoogleFonts.inter(
+                    color: AppTheme.textPrimary,
+                    fontSize: 14,
+                    fontWeight: FontWeight.w600,
+                  ),
+                ),
+              ],
+            ),
+          ),
+        ),
+      );
+      widgets.add(const SizedBox(height: 8));
+    }
+
     return widgets;
   }
 }
