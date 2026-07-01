@@ -301,42 +301,8 @@ class _TrackScreenState extends State<TrackScreen> {
       children: [
         const SizedBox(height: 8),
 
-        // Hero icon — shield + search, matches reference
-        Center(
-          child: SizedBox(
-            width: 140,
-            height: 140,
-            child: Stack(
-              alignment: Alignment.center,
-              children: [
-                Container(
-                  width: 120,
-                  height: 120,
-                  decoration: BoxDecoration(
-                    shape: BoxShape.circle,
-                    boxShadow: [
-                      BoxShadow(
-                        color: AppTheme.purple.withValues(alpha: 0.18),
-                        blurRadius: 50,
-                        spreadRadius: 10,
-                      ),
-                    ],
-                  ),
-                ),
-                Icon(
-                  Icons.shield_outlined,
-                  size: 110,
-                  color: AppTheme.purple.withValues(alpha: 0.4),
-                ),
-                Icon(
-                  Icons.search_rounded,
-                  size: 44,
-                  color: AppTheme.purple,
-                ),
-              ],
-            ),
-          ),
-        ),
+        // Hero icon — animated radar sweep + gentle bob
+        const Center(child: _TrackingRadarIcon()),
 
         const SizedBox(height: 28),
 
@@ -743,4 +709,159 @@ class _TrackScreenState extends State<TrackScreen> {
 
     return widgets;
   }
+}
+
+// ── Tracking Radar Icon ──────────────────────────────────────────────────────
+// Animated replacement for the old static shield+search icon on the empty
+// state. A rotating radar wedge sweeps inside the shield outline while the
+// whole icon gently bobs up and down.
+class _TrackingRadarIcon extends StatefulWidget {
+  const _TrackingRadarIcon();
+
+  @override
+  State<_TrackingRadarIcon> createState() => _TrackingRadarIconState();
+}
+
+class _TrackingRadarIconState extends State<_TrackingRadarIcon>
+    with TickerProviderStateMixin {
+  late final AnimationController _sweepController;
+  late final AnimationController _bobController;
+  late final Animation<double> _bobAnim;
+
+  @override
+  void initState() {
+    super.initState();
+    _sweepController = AnimationController(
+      vsync: this,
+      duration: const Duration(seconds: 4),
+    )..repeat();
+    _bobController = AnimationController(
+      vsync: this,
+      duration: const Duration(seconds: 3),
+    )..repeat(reverse: true);
+    _bobAnim = Tween<double>(begin: 0, end: -8).animate(
+      CurvedAnimation(parent: _bobController, curve: Curves.easeInOut),
+    );
+  }
+
+  @override
+  void dispose() {
+    _sweepController.dispose();
+    _bobController.dispose();
+    super.dispose();
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    return AnimatedBuilder(
+      animation: _bobAnim,
+      builder: (context, child) {
+        return Transform.translate(
+          offset: Offset(0, _bobAnim.value),
+          child: child,
+        );
+      },
+      child: SizedBox(
+        width: 140,
+        height: 140,
+        child: Stack(
+          alignment: Alignment.center,
+          children: [
+            // Ambient glow behind everything
+            Container(
+              width: 120,
+              height: 120,
+              decoration: BoxDecoration(
+                shape: BoxShape.circle,
+                boxShadow: [
+                  BoxShadow(
+                    color: AppTheme.purple.withValues(alpha: 0.18),
+                    blurRadius: 50,
+                    spreadRadius: 10,
+                  ),
+                ],
+              ),
+            ),
+            // Rotating radar wedge, clipped to a circle
+            SizedBox(
+              width: 110,
+              height: 110,
+              child: ClipOval(
+                child: AnimatedBuilder(
+                  animation: _sweepController,
+                  builder: (context, child) {
+                    return Transform.rotate(
+                      angle: _sweepController.value * 2 * 3.14159265,
+                      child: CustomPaint(
+                        size: const Size(110, 110),
+                        painter: _RadarWedgePainter(
+                          color: AppTheme.purple.withValues(alpha: 0.22),
+                        ),
+                      ),
+                    );
+                  },
+                ),
+              ),
+            ),
+            // Circle outline for the radar boundary
+            Container(
+              width: 110,
+              height: 110,
+              decoration: BoxDecoration(
+                shape: BoxShape.circle,
+                border: Border.all(
+                  color: AppTheme.purple.withValues(alpha: 0.3),
+                  width: 1,
+                ),
+              ),
+            ),
+            // Single shield-check glyph — replaces the previous stacked
+            // shield-outline + search icons, which misaligned at this
+            // size and produced a smudged look.
+            Icon(
+              Icons.verified_user_rounded,
+              size: 48,
+              color: AppTheme.purple,
+            ),
+          ],
+        ),
+      ),
+    );
+  }
+}
+
+// ── Radar wedge painter ───────────────────────────────────────────────────────
+// Draws a single filled wedge (like a radar sweep slice) used by
+// _TrackingRadarIcon, rotated continuously by its parent.
+class _RadarWedgePainter extends CustomPainter {
+  final Color color;
+
+  _RadarWedgePainter({required this.color});
+
+  @override
+  void paint(Canvas canvas, Size size) {
+    final center = Offset(size.width / 2, size.height / 2);
+    final radius = size.width / 2;
+    final paint = Paint()
+      ..shader = SweepGradient(
+        colors: [color, color.withValues(alpha: 0.0)],
+        startAngle: 0.0,
+        endAngle: 1.4, // ~80 degree wedge
+      ).createShader(Rect.fromCircle(center: center, radius: radius));
+
+    final path = Path()
+      ..moveTo(center.dx, center.dy)
+      ..arcTo(
+        Rect.fromCircle(center: center, radius: radius),
+        0.0,
+        1.4,
+        false,
+      )
+      ..close();
+
+    canvas.drawPath(path, paint);
+  }
+
+  @override
+  bool shouldRepaint(covariant _RadarWedgePainter oldDelegate) => false;
 }

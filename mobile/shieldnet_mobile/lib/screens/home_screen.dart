@@ -1,3 +1,5 @@
+import 'dart:math';
+
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
 import '../theme.dart';
@@ -18,13 +20,25 @@ class _HomeScreenState extends State<HomeScreen>
   static const int _reportTabIndex = 1;
   static const int _helpTabIndex = 4;
 
+  // Fixed list of safety tips — one is picked at random per screen
+  // load. No backend dependency.
+  static const List<String> _safetyTips = [
+    'Screenshot harassment before blocking — evidence helps your case move faster.',
+    'Never share your tracking token with anyone. It is the only way to access your case.',
+    'Save screenshots with visible usernames, dates, and platform names for stronger evidence.',
+    'You can report anonymously — no account or personal details are required.',
+    'If you feel unsafe right now, contact local emergency services before filing a report.',
+  ];
+
   late final AnimationController _entranceController;
   late final Animation<double> _fade;
   late final Animation<Offset> _slide;
+  late final String _safetyTip;
 
   @override
   void initState() {
     super.initState();
+    _safetyTip = _safetyTips[Random().nextInt(_safetyTips.length)];
     _entranceController = AnimationController(
       vsync: this,
       duration: const Duration(milliseconds: 700),
@@ -265,6 +279,8 @@ class _HomeScreenState extends State<HomeScreen>
                           onTap: () =>
                               widget.onNavigate?.call(_helpTabIndex),
                         ),
+                        const SizedBox(height: 12),
+                        _SafetyTipCard(tip: _safetyTip),
                         const SizedBox(height: 20),
                       ],
                     ),
@@ -578,6 +594,70 @@ class _ActionCard extends StatelessWidget {
             ],
           ),
         ),
+      ),
+    );
+  }
+}
+
+// ── Safety Tip Card ───────────────────────────────────────────────────────────
+// Static (non-tappable) card showing a single rotating safety tip below
+// the two action cards. Purely additive — does not touch the hero,
+// background, or any existing widget.
+class _SafetyTipCard extends StatelessWidget {
+  final String tip;
+
+  const _SafetyTipCard({required this.tip});
+
+  @override
+  Widget build(BuildContext context) {
+    return Container(
+      padding: const EdgeInsets.all(14),
+      decoration: BoxDecoration(
+        gradient: LinearGradient(
+          begin: Alignment.topLeft,
+          end: Alignment.bottomRight,
+          colors: [
+            AppTheme.purple.withValues(alpha: 0.08),
+            AppTheme.blue.withValues(alpha: 0.04),
+          ],
+        ),
+        borderRadius: BorderRadius.circular(16),
+        border: Border.all(
+          color: AppTheme.purple.withValues(alpha: 0.2),
+        ),
+      ),
+      child: Row(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          Icon(Icons.lightbulb_outline_rounded,
+              color: AppTheme.purple, size: 18),
+          const SizedBox(width: 10),
+          Expanded(
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                Text(
+                  'SAFETY TIP',
+                  style: GoogleFonts.inter(
+                    color: AppTheme.purple,
+                    fontSize: 10.5,
+                    fontWeight: FontWeight.w600,
+                    letterSpacing: 1.0,
+                  ),
+                ),
+                const SizedBox(height: 3),
+                Text(
+                  tip,
+                  style: GoogleFonts.inter(
+                    color: AppTheme.textSecondary,
+                    fontSize: 12.5,
+                    height: 1.5,
+                  ),
+                ),
+              ],
+            ),
+          ),
+        ],
       ),
     );
   }
