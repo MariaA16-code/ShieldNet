@@ -18,6 +18,18 @@ import './Analytics.css';
 
 ChartJS.register(CategoryScale, LinearScale, BarElement, ArcElement, Tooltip, Legend);
 
+// Maps the raw category strings returned by the backend to the matching
+// translation keys already defined under report.categories in each locale file.
+const categoryKeyMap = {
+  'Deepfake video': 'deepfakeVideo',
+  'Fake / edited photo': 'fakePhoto',
+  'Identity theft': 'identityTheft',
+  'Impersonation': 'impersonation',
+  'Sexual harassment': 'sexualHarassment',
+  'Stalking': 'stalking',
+  'Threats': 'threats',
+};
+
 function Analytics() {
   const { t } = useTranslation();
   const [stats, setStats] = useState(null);
@@ -58,8 +70,13 @@ function Analytics() {
   };
 
   // Category chart — built from live reports_per_category object.
-  const categoryLabels = stats ? Object.keys(stats.reports_per_category || {}) : [];
+  // Raw keys (e.g. "Deepfake video") are translated via categoryKeyMap
+  // so the donut legend/tooltips respect the active language.
+  const rawCategoryKeys = stats ? Object.keys(stats.reports_per_category || {}) : [];
   const categoryCounts = stats ? Object.values(stats.reports_per_category || {}) : [];
+  const categoryLabels = rawCategoryKeys.map((key) =>
+    t(`report.categories.${categoryKeyMap[key] || key}`, key)
+  );
   const categoryColors = ['#9B8CF5', '#4A7DFF', '#6B7390', '#FF6B6B', '#6C5CE7', '#2C3548'];
 
   const categoryData = {
