@@ -2,7 +2,9 @@ import 'dart:math';
 
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 import '../theme.dart';
+import '../services/api_service.dart';
 import '../widgets/need_help_card.dart';
 import '../widgets/scan_grid_background.dart';
 
@@ -18,6 +20,7 @@ class HomeScreen extends StatefulWidget {
 class _HomeScreenState extends State<HomeScreen>
     with SingleTickerProviderStateMixin {
   static const int _reportTabIndex = 1;
+  static const int _trackTabIndex = 2;
   static const int _helpTabIndex = 4;
 
   // Fixed list of safety tips — one is picked at random per screen
@@ -35,10 +38,17 @@ class _HomeScreenState extends State<HomeScreen>
   late final Animation<Offset> _slide;
   late final String _safetyTip;
 
+  // ── Protection status (real data, not decorative) ──────────────────
+  // Loads the saved tracking token (same SharedPreferences key used by
+  // Track screen) and, if present, fetches that case's real status.
+  bool _statusLoading = true;
+  String? _activeStatus; // null = no active case found / no token saved
+
   @override
   void initState() {
     super.initState();
     _safetyTip = _safetyTips[Random().nextInt(_safetyTips.length)];
+    _loadProtectionStatus();
     _entranceController = AnimationController(
       vsync: this,
       duration: const Duration(milliseconds: 700),
@@ -55,6 +65,50 @@ class _HomeScreenState extends State<HomeScreen>
           parent: _entranceController, curve: Curves.easeOutCubic),
     );
     _entranceController.forward();
+  }
+
+  Future<void> _loadProtectionStatus() async {
+    try {
+      final prefs = await SharedPreferences.getInstance();
+      final token = prefs.getString('tracking_token');
+      if (token == null || token.isEmpty) {
+        if (mounted) {
+          setState(() {
+            _activeStatus = null;
+            _statusLoading = false;
+          });
+        }
+        return;
+      }
+      final result = await ApiService.trackCase(token);
+      final reports = (result['reports'] as List?) ?? [];
+      if (reports.isEmpty) {
+        if (mounted) {
+          setState(() {
+            _activeStatus = null;
+            _statusLoading = false;
+          });
+        }
+        return;
+      }
+      final status = reports.first['case_status']?.toString() ??
+          reports.first['report_status']?.toString();
+      if (mounted) {
+        setState(() {
+          _activeStatus = status;
+          _statusLoading = false;
+        });
+      }
+    } catch (_) {
+      // Fails quietly — falls back to the "no active case" state rather
+      // than showing an error on the home screen.
+      if (mounted) {
+        setState(() {
+          _activeStatus = null;
+          _statusLoading = false;
+        });
+      }
+    }
   }
 
   @override
@@ -256,6 +310,17 @@ class _HomeScreenState extends State<HomeScreen>
                           ),
                         ),
                       ],
+                    ),
+                  ),
+
+                  // ── Protection status ─────────────────────────────
+                  Padding(
+                    padding: const EdgeInsets.fromLTRB(20, 16, 20, 0),
+                    child: _ProtectionStatusCard(
+                      loading: _statusLoading,
+                      status: _activeStatus,
+                      onTap: () =>
+                          widget.onNavigate?.call(_trackTabIndex),
                     ),
                   ),
 
@@ -599,7 +664,229 @@ class _ActionCard extends StatelessWidget {
   }
 }
 
-// ── Safety Tip Card ───────────────────────────────────────────────────────────
+// ── Protection Status Card ───────────────────────────────────────────────────
+// Shows the real status of the device's most recently saved tracked case
+// (via SharedPreferences token + ApiService.trackCase), inside a filling
+// progress ring around the shield glyph. Falls back to an honest "no
+// active case" state rather than showing fake progress.
+class _ProtectionStatusCard extends StatelessWidget {
+  final bool loading;
+  final String? status;
+  final VoidCallback onTap;
+
+  const _ProtectionStatusCard({
+    required this.loading,
+    required this.status,
+    required this.onTap,
+  });
+
+  // Maps known case_status values to a 0.0–1.0 progress fraction.
+  // Unrecognized statuses fall back to a small non-zero fraction so the
+  // ring still reads as "something is in progress" rather than empty.
+  double _progressFor(String status) {
+    final normalized = status.toLowerCase();
+    if (normalized.contains('resolved')) return 1.0;
+    if (normalized.contains('takedown')) return 0.75;
+    if (normalized.contains('review')) return 0.45;
+    if (normalized.contains('submit')) return 0.15;
+    return 0.3;
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    final hasActiveCase = !loading && status != null;
+
+    return GestureDetector(
+      onTap: onTap,
+      child: Container(
+        padding: const EdgeInsets.all(16),
+        decoration: BoxDecoration(
+          color: AppTheme.cardColor,
+          borderRadius: BorderRadius.circular(16),
+          border: Border.all(color: AppTheme.border),
+        ),
+        child: Row(
+          children: [
+            _StatusRing(
+              loading: loading,
+              progress: hasActiveCase ? _progressFor(status!) : 0.0,
+            ),
+            const SizedBox(width: 14),
+            Expanded(
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  Text(
+                    loading
+                        ? 'Checking status…'
+                        : hasActiveCase
+                            ? 'Your safety status'
+                            : 'No active case',
+                    style: GoogleFonts.lexend(
+                      color: AppTheme.textPrimary,
+                      fontSize: 14,
+                      fontWeight: FontWeight.w600,
+                    ),
+                  ),
+                  const SizedBox(height: 3),
+                  Text(
+                    loading
+                        ? 'Fetching the latest update.'
+                        : hasActiveCase
+                            ? 'Case status: $status'
+                            : 'You have no case currently being tracked.',
+                    style: GoogleFonts.inter(
+                      color: AppTheme.textSecondary,
+                      fontSize: 12,
+                      height: 1.4,
+                    ),
+                  ),
+                ],
+              ),
+            ),
+            if (hasActiveCase)
+              Icon(Icons.chevron_right,
+                  color: AppTheme.textSecondary, size: 18),
+          ],
+        ),
+      ),
+    );
+  }
+}
+
+// ── Status Ring ───────────────────────────────────────────────────────────────
+class _StatusRing extends StatefulWidget {
+  final bool loading;
+  final double progress;
+
+  const _StatusRing({required this.loading, required this.progress});
+
+  @override
+  State<_StatusRing> createState() => _StatusRingState();
+}
+
+class _StatusRingState extends State<_StatusRing>
+    with SingleTickerProviderStateMixin {
+  late final AnimationController _controller;
+  late Animation<double> _progressAnim;
+
+  @override
+  void initState() {
+    super.initState();
+    _controller = AnimationController(
+      vsync: this,
+      duration: const Duration(milliseconds: 900),
+    );
+    _progressAnim = Tween<double>(begin: 0, end: widget.progress).animate(
+      CurvedAnimation(parent: _controller, curve: Curves.easeOutCubic),
+    );
+    if (!widget.loading) _controller.forward();
+  }
+
+  @override
+  void didUpdateWidget(covariant _StatusRing oldWidget) {
+    super.didUpdateWidget(oldWidget);
+    if (oldWidget.progress != widget.progress || oldWidget.loading != widget.loading) {
+      _progressAnim = Tween<double>(
+        begin: _progressAnim.value,
+        end: widget.progress,
+      ).animate(CurvedAnimation(parent: _controller, curve: Curves.easeOutCubic));
+      _controller.forward(from: 0);
+    }
+  }
+
+  @override
+  void dispose() {
+    _controller.dispose();
+    super.dispose();
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    return SizedBox(
+      width: 52,
+      height: 52,
+      child: Stack(
+        alignment: Alignment.center,
+        children: [
+          if (widget.loading)
+            SizedBox(
+              width: 52,
+              height: 52,
+              child: CircularProgressIndicator(
+                strokeWidth: 3,
+                color: AppTheme.purple.withValues(alpha: 0.5),
+              ),
+            )
+          else
+            AnimatedBuilder(
+              animation: _progressAnim,
+              builder: (context, _) {
+                return CustomPaint(
+                  size: const Size(52, 52),
+                  painter: _RingPainter(
+                    progress: _progressAnim.value,
+                    trackColor: AppTheme.purple.withValues(alpha: 0.12),
+                    progressColor: AppTheme.purple,
+                  ),
+                );
+              },
+            ),
+          Icon(
+            Icons.shield_outlined,
+            color: AppTheme.purple,
+            size: 20,
+          ),
+        ],
+      ),
+    );
+  }
+}
+
+class _RingPainter extends CustomPainter {
+  final double progress;
+  final Color trackColor;
+  final Color progressColor;
+
+  _RingPainter({
+    required this.progress,
+    required this.trackColor,
+    required this.progressColor,
+  });
+
+  @override
+  void paint(Canvas canvas, Size size) {
+    final center = Offset(size.width / 2, size.height / 2);
+    final radius = size.width / 2 - 3;
+
+    final trackPaint = Paint()
+      ..color = trackColor
+      ..style = PaintingStyle.stroke
+      ..strokeWidth = 4;
+    canvas.drawCircle(center, radius, trackPaint);
+
+    final progressPaint = Paint()
+      ..color = progressColor
+      ..style = PaintingStyle.stroke
+      ..strokeWidth = 4
+      ..strokeCap = StrokeCap.round;
+
+    final sweep = 2 * 3.14159265 * progress.clamp(0.0, 1.0);
+    canvas.drawArc(
+      Rect.fromCircle(center: center, radius: radius),
+      -3.14159265 / 2,
+      sweep,
+      false,
+      progressPaint,
+    );
+  }
+
+  @override
+  bool shouldRepaint(covariant _RingPainter oldDelegate) =>
+      oldDelegate.progress != progress;
+}
+
+
 // Static (non-tappable) card showing a single rotating safety tip below
 // the two action cards. Purely additive — does not touch the hero,
 // background, or any existing widget.

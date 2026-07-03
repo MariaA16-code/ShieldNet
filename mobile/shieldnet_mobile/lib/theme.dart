@@ -2,22 +2,25 @@ import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
 
 class AppTheme {
-  // ── Core Palette ───────────────────────────────────────────
-  static const Color background  = Color(0xFF040D12);
-  static const Color cardColor   = Color(0xFF0A1628);
-  static const Color purple      = Color(0xFF00D4FF);
-  static const Color blue        = Color(0xFF0066FF);
-  static const Color success     = Color(0xFF00FF88);
+  // ── Core Palette (Slate Steel) ────────────────────────────
+  // Same variable names as before — only the hex values changed —
+  // so every screen that references AppTheme.* keeps working
+  // untouched. No functionality, only color, was changed here.
+  static const Color background  = Color(0xFF0B0F14);
+  static const Color cardColor   = Color(0xFF161C24);
+  static const Color purple      = Color(0xFF5B9DF9);
+  static const Color blue        = Color(0xFF2F5FD0);
+  static const Color success     = Color(0xFF34D399);
   static const Color warning     = Color(0xFFFFB347);
-  static const Color error       = Color(0xFFFF4444);
-  static const Color textPrimary = Color(0xFFFFFFFF);
-  static const Color textSecondary = Color(0xFF6B8A9A);
-  static const Color border      = Color(0xFF0F2335);
+  static const Color error       = Color(0xFFFF5C5C);
+  static const Color textPrimary = Color(0xFFEDF1F5);
+  static const Color textSecondary = Color(0xFF8291A3);
+  static const Color border      = Color(0xFF26313E);
 
   static const LinearGradient accentGradient = LinearGradient(
     begin: Alignment.topLeft,
     end: Alignment.bottomRight,
-    colors: [Color(0xFF00D4FF), Color(0xFF0066FF)],
+    colors: [Color(0xFF5B9DF9), Color(0xFF2F5FD0)],
   );
 
   // ── ThemeData ──────────────────────────────────────────────
@@ -113,7 +116,9 @@ class AppTheme {
       elevatedButtonTheme: ElevatedButtonThemeData(
         style: ElevatedButton.styleFrom(
           backgroundColor: purple,
-          foregroundColor: Colors.black,
+          // Dark navy instead of pure black — reads cleaner against
+          // the cooler slate accent than black did.
+          foregroundColor: const Color(0xFF08111D),
           padding: const EdgeInsets.symmetric(vertical: 16, horizontal: 24),
           shape: RoundedRectangleBorder(
             borderRadius: BorderRadius.circular(14),
