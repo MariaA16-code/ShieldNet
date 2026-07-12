@@ -1,13 +1,11 @@
 # ShieldNet
 
 ## Overview
-Final Year Project built as a team of three. A cyber harassment reporting 
-platform that uses AI to analyze evidence and simulate DMCA takedown requests. 
-My responsibility was the Flask backend and AI integration.
+Final Year Project built as a team of three. A cyber harassment reporting platform that uses AI to analyze evidence and simulate DMCA takedown requests.
 
 ## Tech Stack
 - Python, Flask
-- DeepFace, OpenCV
+- OpenCV
 - React.js, Flutter
 - MySQL
 
@@ -18,4 +16,7 @@ My responsibility was the Flask backend and AI integration.
 - Web and mobile interface
 
 ## Note
-This project runs locally not live yet, and is currently under academic evaluation.
+This project is deployed and functional, but is not intended for public use — it is an academic Final Year Project built for evaluation purposes only.
+
+## Demo
+🔗 [Live Demo](https://shieldnet-cyber.vercel.app/)
